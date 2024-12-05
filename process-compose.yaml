@@ -1,0 +1,111 @@
+version: "0.5"
+
+processes:
+  skladka:
+    command: >
+      air
+      --build.cmd="mage generate && mage build"
+      --build.bin="./bin/skladka"
+      --build.exclude_dir="bin,data,docs,observability,infra,magefiles,tmp"
+    # command: "go run ./cmd/serve.go"
+    availability:
+      restart: always
+    depends_on:
+      postgres: { condition: process_started }
+    environment:
+      - SKD_METRICS_ENABLED=true
+      - SKD_METRICS_HOST=localhost
+      - SKD_METRICS_PORT=9095
+      - SKD_TRACING_ENABLED=true
+      - SKD_TRACING_HOST=localhost
+      - SKD_TRACING_PORT=9096
+      - SKD_LOGGING_ENABLED=true
+      - SKD_LOGGING_HOST=localhost
+      - SKD_LOGGING_PORT=9097
+      - SKD_POSTGRES_DB_URL=postgresql://popelar:@localhost:2345/skladka?sslmode=disable
+
+  postgres:
+    command: >
+      bash -c "
+        if [ ! -d ./data/postgres ]; then
+          initdb -D ./data/postgres;
+        fi;
+        pg_ctl -D ./data/postgres -o '-p 2345' start;
+        while ! pg_isready -p 2345; do echo 'waiting for server to start...' && sleep 1; done;
+        echo 'server started';
+        createuser -p 2345 -s popelar || echo 'popelar user already exists';
+        createdb -p 2345 popelar || echo 'skladka database already exists';
+        createdb -p 2345 skladka || echo 'skladka database already exists';
+        atlas migrate apply --url=postgresql://popelar:@localhost:2345/skladka?sslmode=disable --dir=file://internal/storage/sql/migrations;
+        sleep 10;
+      "
+    shutdown:
+      command: "pg_ctl -D ./data/postgres stop"
+    environment:
+      - PGPORT=2345
+      - PGDATA=./data/postgres
+    is_daemon: true
+    readiness_probe:
+      exec:
+        command: "pg_isready -p 2345"
+      initial_delay_seconds: 5
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+
+  docs:
+    command: "hugo server --port 4500"
+    working_dir: "docs"
+    availability:
+      restart: always
+
+  alloy:
+    command: >
+      alloy run
+      --storage.path=./data/alloy/
+      --stability.level=experimental
+      --server.http.listen-addr=:12345
+      ./observability/alloy/config
+    availability:
+      restart: always
+
+  grafana:
+    command: >
+      grafana server
+      --config ./observability/grafana/grafana.ini
+      --homepath /opt/homebrew/share/grafana
+    availability:
+      restart: always
+    depends_on:
+      alloy: { condition: process_started }
+      mimir: { condition: process_started }
+      tempo: { condition: process_started }
+      loki: { condition: process_started }
+
+  mimir:
+    command: >
+      mimir
+      --config.file=./observability/mimir/config.yaml
+    availability:
+      restart: always
+    depends_on:
+      alloy: { condition: process_started }
+
+  tempo:
+    command: >
+      tempo
+      --config.file=./observability/tempo/config.yaml
+    availability:
+      restart: always
+    depends_on:
+      alloy: { condition: process_started }
+
+  loki:
+    command: >
+      loki
+      --config.file=./observability/loki/config.yaml
+    availability:
+      restart: always
+    depends_on:
+      alloy: { condition: process_started }

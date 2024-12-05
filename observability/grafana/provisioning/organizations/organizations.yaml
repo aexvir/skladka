@@ -1,0 +1,5 @@
+apiVersion: 1
+
+organizations:
+  - name: Main Org
+    id: 1

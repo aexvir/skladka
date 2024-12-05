@@ -1,0 +1,45 @@
+package components
+
+import (
+	"fmt"
+	"github.com/aexvir/skladka/internal/frontend/icons"
+	"github.com/aexvir/skladka/internal/paste"
+	"strconv"
+)
+
+templ PasteEntry(paste paste.Paste) {
+	<a href={ templ.SafeURL("/" + paste.Reference) } class="block p-4 border-main bg-muted rounded-lg border hover:bg-accent transition-colors">
+		<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+			<div class="flex flex-col">
+				<h3 class="text-lg font-medium text-main">
+					{{
+						title := "untitled"
+						if paste.Title != "" {
+							title = paste.Title
+						}
+					}}
+					{ title }
+				</h3>
+				<div class="text-sm text-muted flex flex-row gap-2 my-2 lg:my-0">
+					<span class="text-blue-400">&#64;aexvir</span>
+					·
+					<span class="flex flex-row items-center gap-2">
+						@icons.Calendar(14, 14, "text-muted")
+						{ paste.Creation.Format("Jan 2, 2006") }
+					</span>
+				</div>
+			</div>
+			<div class="flex flex-col items-center gap-2 lg:gap-0">
+				<span class="text-sm text-muted">
+					{{ size := fmt.Sprintf("%.1f", float64(len([]byte(paste.Content)))/1024.0) }}
+					{ strconv.Itoa(paste.Views) } views | { paste.Syntax } | { size }kb
+				</span>
+				<div class="flex flex-wrap gap-1">
+					for _, tag := range paste.Tags {
+						<span class="bg-main text-muted px-2 py-0.5 rounded text-sm">{ tag }</span>
+					}
+				</div>
+			</div>
+		</div>
+	</a>
+}

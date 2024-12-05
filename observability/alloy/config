@@ -1,0 +1,81 @@
+otelcol.receiver.otlp "metrics" {
+  grpc {
+    endpoint = "0.0.0.0:9095"
+  }
+
+  output {
+    metrics = [otelcol.processor.batch.default.input]
+  }
+}
+
+otelcol.receiver.otlp "traces" {
+  grpc {
+    endpoint = "0.0.0.0:9096"
+  }
+
+  output {
+    traces = [otelcol.processor.batch.default.input]
+  }
+}
+
+otelcol.receiver.otlp "logs" {
+  grpc {
+    endpoint = "0.0.0.0:9097"
+  }
+
+  output {
+    logs = [otelcol.processor.batch.default.input]
+  }
+}
+
+otelcol.processor.batch "default" {
+  output {
+    metrics = [otelcol.exporter.prometheus.default.input]
+    traces  = [otelcol.exporter.otlphttp.default.input]
+    logs    = [otelcol.exporter.loki.default.input]
+  }
+}
+
+otelcol.exporter.prometheus "default" {
+  forward_to = [prometheus.remote_write.mimir.receiver]
+}
+
+prometheus.remote_write "mimir" {
+  endpoint {
+    url = "http://localhost:4100/api/v1/push"
+  }
+}
+
+otelcol.exporter.otlphttp "default" {
+  client {
+    // tempo listens on different ports for its own api and otlp
+    endpoint = "http://localhost:4250"
+    tls {
+      insecure = true
+    }
+  }
+}
+
+otelcol.exporter.loki "default" {
+  forward_to = [loki.relabel.replace_dots.receiver]
+}
+
+loki.relabel "replace_dots" {
+  forward_to = [loki.write.default.receiver]
+
+  rule {
+    action = "labelmap"
+    regex = "([.])+"
+    replacement = "_"
+  }
+}
+
+loki.write "default" {
+  endpoint {
+    url = "http://localhost:4300/loki/api/v1/push"
+  }
+}
+
+livedebugging {
+  enabled = true
+}

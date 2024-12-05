@@ -1,0 +1,10 @@
+package views
+
+import "github.com/aexvir/skladka/internal/frontend/components"
+
+templ Creation(name string) {
+	<div class="h-full w-full flex flex-row">
+		@components.Editor("", "", false)
+		@components.Sidebar()
+	</div>
+}

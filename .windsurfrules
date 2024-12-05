@@ -1,0 +1,46 @@
+* this project is a pastebin like service written in go
+* users currently can
+    * create a new paste, add metadata and restrict its visibility
+    * view the content of a specific paste when visiting the url with the reference
+    * list public pastes
+
+* each package in this project has a doc.go file giving information about the package
+    * read these files before doing changes
+* routing is handled by chi https://github.com/go-chi/chi
+* the database is postgres and it's managed via sqlc https://github.com/sqlc-dev/sqlc
+* observability
+    * logging is built on top of opentelemetry https://github.com/open-telemetry/opentelemetry-go inside the internal/logging package
+        * it exposes a slog/log interface for interacting with the logger
+    * metrics are built on top of opentelemetry https://github.com/open-telemetry/opentelemetry-go inside the internal/metrics package
+    * traces are built on top of opentelemetry https://github.com/open-telemetry/opentelemetry-go inside the internal/tracing package
+    * all throughout the codebase only the internal logging, metrics and tracing packages are imported, the underlying implementations are not exposed
+* custom error handling is done via the internal/errors package
+    * the error interface is defined in the errors package
+    * the errors package provides functions for creating errors, wrapping errors, joining errors, converting errors to http errors, and handling errors, mainly adding stack traces as metadata
+* packages and filenames usually have a single word or if multiple words are needed, they are short and consecutive
+* go files should always have the following structure
+    * examples: buffer.go, meter.go, tracer.go
+    * exceptions for test files with _test.go or _internal_test.go as well as for generated files like _templ.go
+* go files should always have the following structure
+    * package name
+    * imports
+    * constants
+    * types
+    * exported functions
+    * internal functions
+* the frontend is built using plain html and javascript
+    * no javascript build tool is used
+    * libraries are imported either locally or from cdn
+    * the markup is written using templ https://github.com/a-h/templ
+    * styling is done using tailwindcss https://tailwindcss.com/
+    * templ files should always have the following structure
+        * package name
+        * imports
+        * exported templates
+        * scripts
+    * components encapsulate their markup and logic, they should be self contained
+* configuration is handled via env vars
+    * the config is loaded with https://github.com/ardanlabs/conf/v3
+* config is intialized in the main function and passed to all other functions that need it
+* the observability stack and the logging stack are initialized in the main function and passed via context
+* best practices, testability and readability are prioritized

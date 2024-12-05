@@ -1,0 +1,11 @@
+.fleet
+.github
+.idea
+.env*
+.windsurfrules
+dockerfile
+sqlc.yml
+bin
+data
+infra
+observability

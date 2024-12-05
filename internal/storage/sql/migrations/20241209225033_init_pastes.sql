@@ -1,0 +1,2 @@
+-- Create "pastes" table
+CREATE TABLE "public"."pastes" ("id" bigserial NOT NULL, "reference" character varying(8) NOT NULL, "title" character varying(255) NOT NULL, "content" text NOT NULL, "syntax" character varying(50) NULL, "tags" text[] NULL, "expiration" timestamp NULL, "public" boolean NOT NULL DEFAULT true, "created_at" timestamp NOT NULL DEFAULT now(), "updated_at" timestamp NULL, "deleted_at" timestamp NULL, PRIMARY KEY ("id"));

@@ -1,0 +1,170 @@
+package components
+
+import (
+	"fmt"
+	"github.com/aexvir/skladka/internal/frontend/icons"
+	"github.com/aexvir/skladka/internal/paste"
+	"strconv"
+)
+
+templ Sidebar() {
+	<div class="h-full lg:w-[300px] flex-none">
+		// Desktop view
+		<div class="hidden lg:block h-full">
+			@sidebarContent()
+		</div>
+		// Mobile view
+		<div class="lg:hidden">
+			<div id="mobile-overlay" class="fixed inset-0 bg-main opacity-0 pointer-events-none transition-opacity duration-300"></div>
+			<div id="mobile-sidebar" class="fixed inset-x-0 bottom-0 w-full bg-muted text-muted lowercase transform transition-transform duration-300 translate-y-full">
+				<div class="h-[90vh] overflow-y-auto bg-main shadow-2xl">
+					<div class="w-12 h-1 bg-[--text-main] rounded-full mx-auto my-2"></div>
+					@sidebarContent()
+				</div>
+			</div>
+			<div class="fixed inset-x-0 bottom-0 px-4 pb-4 pt-2">
+				<div class="w-full h-12 flex items-center justify-center bg-accent text-main rounded">
+					<button type="submit" form="paste-form" class="flex-1 text-center">paste</button>
+					<div class="w-12 flex items-center justify-center border-l border-main cursor-pointer" id="expand-form">
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+						</svg>
+					</div>
+				</div>
+			</div>
+		</div>
+		@initSidebar()
+	</div>
+}
+
+templ Metadata(paste paste.Paste) {
+	<div class="bg-muted h-full lg:w-[300px] flex-none p-4">
+		<h1 class="text-2xl text-main">{ paste.Title }</h1>
+		<div class="flex flex-row w-full text-sm gap-2">
+			<span class="text-blue-400">&#64;aexvir</span>
+			·
+			<span class="text-muted flex flex-row items-center gap-2">
+				@icons.Calendar(14, 14, "text-muted")
+				{ paste.Creation.Format("Jan 2, 2006") }
+			</span>
+		</div>
+		<div class="flex flex-row justify-center gap-2 py-4 text-sm">
+			{{ size := fmt.Sprintf("%.1f", float64(len([]byte(paste.Content)))/1024.0) }}
+			{ strconv.Itoa(paste.Views) } views | { paste.Syntax } | { size }kb
+		</div>
+		if len(paste.Tags) > 0 {
+			<div class="space-y-1">
+				<label class="text-sm flex flex-row gap-2 items-center">
+					@icons.Tag(14, 14, "text-muted")
+					tags
+				</label>
+				<div class="flex flex-wrap gap-1">
+					for _, tag := range paste.Tags {
+						<span class="bg-main text-muted px-2 py-0.5 rounded text-sm">{ tag }</span>
+					}
+				</div>
+			</div>
+		}
+		if paste.Expiration != nil {
+			<div class="w-full mt-4 border-t border-main"></div>
+			<div class="flex flex-row justify-center gap-2 py-4 text-red-400">
+				expires { paste.Expiration.Format("Jan 2, 2006") }
+			</div>
+		}
+	</div>
+}
+
+templ sidebarContent() {
+	<form method="POST" action="/" class="h-full bg-main text-gray-300 p-4 flex flex-col lowercase" id="paste-form">
+		<div class="flex-grow space-y-4">
+			@TextInput("title", "title", "", icons.Paperclip(14, 14, "text-muted"))
+			@TagsInput("tags", "tags", icons.Tag(14, 14, "text-muted"))
+			@SelectInput("syntax", "syntax highlight", icons.Code(14, 14, "text-muted"), "plaintext", "go", "python", "javascript")
+			@ToggleWithContent("toggle-password", "", "password protection", icons.Lock(14, 14, "text-gray-400")) {
+				@PasswordInput("password", "password", "")
+			}
+			@ToggleWithContent("toggle-expiration", "", "expiration", icons.Clock(14, 14, "text-gray-400")) {
+				@SelectInput("expiration", "", icons.Clock(14, 14, "text-muted"), "10m", "30m", "1h", "1d")
+			}
+			@Toggle("toggle-unlisted", "unlisted", "unlisted", icons.Eye(14, 14, "text-gray-400"))
+			<input type="hidden" name="content" id="editor-content"/>
+		</div>
+		<button type="submit" class="lg:block hidden w-full bg-accent text-white py-3 rounded hover:bg-[#4070dd] transition-colors mt-4">
+			paste
+		</button>
+	</form>
+}
+
+script initSidebar() {
+	document.addEventListener('DOMContentLoaded', () => {
+		// Syntax selector initialization
+		const syntaxSelector = document.querySelector('select[name="syntax"]')
+		syntaxSelector.addEventListener('change', (e) => {
+			window.Editor.setSyntax(e.target.value)
+		})
+
+		// Mobile sidebar initialization
+		const mobileSidebar = document.getElementById('mobile-sidebar')
+		const mobileOverlay = document.getElementById('mobile-overlay')
+		const expandButton = document.getElementById('expand-form')
+		let startY = 0
+		let currentY = 0
+		let isExpanded = false
+
+		const toggleSidebar = () => {
+			isExpanded = !isExpanded
+			mobileSidebar.style.transform = isExpanded ? 'translateY(0)' : 'translateY(100%)'
+			mobileOverlay.style.opacity = isExpanded ? '0.5' : '0'
+			mobileOverlay.style.pointerEvents = isExpanded ? 'auto' : 'none'
+		}
+
+		expandButton.addEventListener('click', (e) => {
+			e.stopPropagation()
+			toggleSidebar()
+		})
+
+		mobileOverlay.addEventListener('click', () => {
+			if (isExpanded) {
+				toggleSidebar()
+			}
+		})
+
+		mobileSidebar.addEventListener('touchstart', (e) => {
+			startY = e.touches[0].clientY
+			currentY = startY
+		})
+
+		mobileSidebar.addEventListener('touchmove', (e) => {
+			const deltaY = e.touches[0].clientY - currentY
+			currentY = e.touches[0].clientY
+
+			const newTranslateY = Math.max(0, parseInt(getComputedStyle(mobileSidebar).transform.split(',')[5]) + deltaY)
+			mobileSidebar.style.transform = `translateY(${newTranslateY}px)`
+
+			const progress = Math.min(1, newTranslateY / (mobileSidebar.offsetHeight * 0.3))
+			mobileOverlay.style.opacity = 0.5 * (1 - progress)
+		})
+
+		mobileSidebar.addEventListener('touchend', () => {
+			const translateY = parseInt(getComputedStyle(mobileSidebar).transform.split(',')[5])
+			if (translateY > mobileSidebar.offsetHeight * 0.3) {
+				isExpanded = false
+				mobileSidebar.style.transform = 'translateY(100%)'
+				mobileOverlay.style.opacity = '0'
+				mobileOverlay.style.pointerEvents = 'none'
+			} else {
+				isExpanded = true
+				mobileSidebar.style.transform = 'translateY(0)'
+				mobileOverlay.style.opacity = '0.5'
+				mobileOverlay.style.pointerEvents = 'auto'
+			}
+		})
+
+		// Handle form submission
+		document.querySelector('form').addEventListener('submit', (e) => {
+			// Get editor content and set it in the hidden input
+			const editorContent = window.Editor.getContent()
+			document.getElementById('editor-content').value = editorContent
+		})
+	})
+}

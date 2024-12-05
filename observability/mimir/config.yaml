@@ -1,0 +1,32 @@
+target: all
+server:
+  http_listen_port: 4100
+  grpc_listen_port: 9100
+
+multitenancy_enabled: false
+
+blocks_storage:
+  backend: filesystem
+  filesystem:
+    dir: ./data/mimir/blocks
+  bucket_store:
+    sync_dir: ./data/mimir/sync
+  tsdb:
+    dir: ./data/mimir/tsdb
+
+compactor:
+  data_dir: ./data/mimir/compactor
+
+distributor:
+  ring:
+    instance_addr: 127.0.0.1
+
+ingester:
+  ring:
+    instance_addr: 127.0.0.1
+    replication_factor: 1
+
+ruler_storage:
+  backend: filesystem
+  filesystem:
+    dir: ./data/mimir/rules

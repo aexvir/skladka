@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/sqlc-dev/sqlc/8bf28178dd494a0cde554995e21bba0ed10d523b/internal/config/v_two.json
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "internal/storage/sql/queries"
+    schema: "internal/storage/sql/migrations"
+    gen:
+      go:
+        package: "sql"
+        out: "internal/storage/sql"
+        sql_package: "pgx/v5"
+        emit_db_tags: true
+        emit_json_tags: true
+        emit_sql_as_comment: true

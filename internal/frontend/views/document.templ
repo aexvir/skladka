@@ -1,0 +1,13 @@
+package views
+
+import (
+	"github.com/aexvir/skladka/internal/frontend/components"
+	"github.com/aexvir/skladka/internal/paste"
+)
+
+templ Document(paste paste.Paste) {
+	<div class="h-full w-full flex flex-row">
+		@components.Editor(paste.Content, paste.Syntax, true)
+		@components.Metadata(paste)
+	</div>
+}

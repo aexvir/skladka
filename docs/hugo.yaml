@@ -1,0 +1,28 @@
+baseURL: https://paste.xvr.sh
+languageCode: en-us
+title: skladka
+module:
+  imports:
+    - path: github.com/imfing/hextra
+params:
+  navbar:
+    logo:
+      path: images/logo-light.png
+      dark: images/logo-dark.png
+  editURL:
+    enable: true
+    base: "https://github.com/aexvir/skladka/edit/main"
+menu:
+  main:
+    - name: documentation
+      pageRef: /docs
+      weight: 1
+    - name: search
+      weight: 2
+      params:
+        type: search
+    - name: GitHub
+      weight: 3
+      url: "https://github.com/aexvir/skladka"
+      params:
+        icon: github

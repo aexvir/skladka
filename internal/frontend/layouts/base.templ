@@ -1,0 +1,47 @@
+package layouts
+
+import (
+	"github.com/aexvir/skladka/internal/frontend/components"
+	"github.com/aexvir/skladka/internal/frontend/icons"
+)
+
+templ Base(content templ.Component) {
+	<html class="h-full">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>skladka</title>
+			<link rel="icon" type="image/png" href="/static/favicon-96x96.png" sizes="96x96"/>
+			<link rel="icon" type="image/svg+xml" href="/static/favicon.svg"/>
+			<link rel="shortcut icon" href="/static/favicon.ico"/>
+			<link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png"/>
+			<meta name="apple-mobile-web-app-title" content="skladka"/>
+			<link rel="manifest" href="/static/site.webmanifest"/>
+			<script src="https://cdn.tailwindcss.com"></script>
+			<script src="/static/htmx.js"></script>
+			<link rel="stylesheet" href="/static/style.css"/>
+			<style>
+				.toggle-checkbox:checked {
+					right: 0;
+					border-color: var(--bg-accent);
+				}
+				.toggle-checkbox:checked + .toggle-label {
+					background-color: var(--bg-accent);
+				}
+			</style>
+		</head>
+		<body class="h-full flex flex-col">
+			@components.CommandPalette()
+			<div class="flex flex-col h-full w-full">
+				@components.Nav(
+					"skladka",
+					components.Link{Icon: icons.Clock(16, 16, "text-muted"), Text: "recent", URL: templ.SafeURL("/archive")},
+					components.Link{Icon: icons.Cog(16, 16, "text-muted"), Text: "settings", URL: templ.SafeURL("/settings")},
+				)
+				<div class="relative h-full w-full">
+					@content
+				</div>
+			</div>
+		</body>
+	</html>
+}

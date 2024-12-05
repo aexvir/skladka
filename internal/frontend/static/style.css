@@ -1,0 +1,163 @@
+:root {
+    /* Light theme variables */
+    --light-bg-main: #edeff1;
+    --light-bg-muted: #f8f9fa;
+    --light-bg-accent: #ffaa33;
+
+    --light-text-main: #5c6166;
+    --light-text-muted: #8a9199;
+    --light-text-accent: #ffaa33;
+
+    --light-border-main: #8a919945;
+    --light-border-accent: #ffaa33b3;
+
+    --light-selection: #035bd626;
+    --light-error: #e65050;
+
+    /* Dark theme variables */
+    --dark-bg-main: #1f2430;
+    --dark-bg-muted: #242936;
+    --dark-bg-accent: #ffcc66;
+
+    --dark-text-main: #cccac2;
+    --dark-text-muted: #707a8c;
+    --dark-text-accent: #ffcc66;
+
+    --dark-border-main: #707a8c45;
+    --dark-border-accent: #ffcc66b3;
+
+    --dark-selection: #409fff40;
+    --dark-error: #f27983;
+
+    /* Default to light theme */
+    --bg-main: var(--light-bg-main);
+    --bg-muted: var(--light-bg-muted);
+    --bg-accent: var(--light-bg-accent);
+
+    --text-main: var(--light-text-main);
+    --text-muted: var(--light-text-muted);
+    --text-accent: var(--light-text-accent);
+
+    --border-main: var(--light-border-main);
+    --border-accent: var(--light-border-accent);
+
+    --selection: var(--light-selection);
+    --error: var(--light-error);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-main: var(--dark-bg-main);
+        --bg-muted: var(--dark-bg-muted);
+        --bg-accent: var(--dark-bg-accent);
+
+        --text-main: var(--dark-text-main);
+        --text-muted: var(--dark-text-muted);
+        --text-accent: var(--dark-text-accent);
+
+        --border-main: var(--dark-border-main);
+        --border-accent: var(--dark-border-accent);
+
+        --selection: var(--dark-selection);
+        --error: var(--dark-error);
+    }
+}
+
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&display=swap");
+
+/* Base styles */
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: "JetBrains Mono", monospace;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+}
+
+input,
+textarea,
+select {
+    background-color: var(--bg-muted);
+    color: var(--text-main);
+    border-color: var(--border-main);
+}
+
+::selection {
+    background-color: var(--selection);
+}
+
+/* Utility classes */
+.bg-main {
+    background-color: var(--bg-main);
+}
+
+.bg-muted {
+    background-color: var(--bg-muted);
+}
+
+.bg-accent {
+    background-color: var(--bg-accent);
+}
+
+.text-main {
+    color: var(--text-main);
+}
+
+.text-muted {
+    color: var(--text-muted);
+}
+
+.text-accent {
+    color: var(--text-accent);
+}
+
+.border-main {
+    border-color: var(--border-main);
+}
+
+.focus\:border-main:focus {
+    border-color: var(--border-main);
+}
+
+.border-accent {
+    border-color: var(--border-accent);
+}
+
+.focus\:border-accent:focus {
+    border-color: var(--border-accent);
+}
+
+/* Interactive states */
+.hover\:bg-accent:hover {
+    background-color: var(--bg-accent);
+}
+
+.hover\:text-main:hover {
+    color: var(--text-main);
+}
+
+.hover\:text-accent:hover {
+    color: var(--text-accent);
+}
+
+.hover\:border-accent:hover {
+    border-color: var(--border-accent);
+}
+
+/* Error states */
+.text-error {
+    color: var(--error);
+}
+
+#nav-logo {
+    filter: invert(57%) sepia(14%) saturate(204%) hue-rotate(172deg)
+        brightness(98%) contrast(86%);
+}
+
+@media (prefers-color-scheme: dark) {
+    #nav-logo {
+        filter: invert(49%) sepia(5%) saturate(1258%) hue-rotate(180deg)
+            brightness(96%) contrast(88%);
+    }
+}

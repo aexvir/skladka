@@ -1,0 +1,61 @@
+package components
+
+templ Toggle(id string, name string, label string, icon templ.Component) {
+	<div class="space-y-1">
+		<div class="flex items-center justify-between">
+		    @InputLabel(label, icon)
+			<div class="relative inline-block w-10 mr-2 align-middle select-none">
+				<input
+					type="checkbox"
+					id={ id }
+					name={ name }
+					class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
+				/>
+				<label
+					for={ id }
+					class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"
+				></label>
+			</div>
+		</div>
+	</div>
+}
+
+templ ToggleWithContent(id string, name string, label string, icon templ.Component) {
+	<div class="space-y-1">
+		<div class="flex items-center justify-between">
+		    @InputLabel(label, icon)
+			<div class="relative inline-block w-10 mr-2 align-middle select-none">
+				<input
+					type="checkbox"
+					id={ id }
+					name={ name }
+					class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
+				/>
+				<label
+					for={ id }
+					class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"
+				></label>
+			</div>
+		</div>
+		<div id={ id + "-content" } class="hidden">
+			{ children... }
+		</div>
+	</div>
+	@initToggleWithContent(id)
+}
+
+script initToggleWithContent(toggleId string) {
+    document.addEventListener(
+        'DOMContentLoaded', () => {
+            const toggle = document.getElementById(toggleId);
+            const content = document.getElementById(toggleId + "-content");
+            if (toggle && content) {
+                toggle.addEventListener(
+                    'change', () => {
+                        content.style.display = toggle.checked ? 'block' : 'none';
+                    }
+                );
+            }
+        }
+    );
+}

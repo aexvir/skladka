@@ -1,0 +1,6 @@
+bin
+data
+infra/.terraform*
+infra/*tfstate*
+docs/public
+tmp
