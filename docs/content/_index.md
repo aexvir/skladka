@@ -1,6 +1,6 @@
 # skladka
 
-{{< figure src="/images/logo-color.svg" width="300px" >}}
+{{< figure src="images/logo-color.svg" width="300px" >}}
 
 minimalistic pastebin service written in go, deployable as single binary
 

@@ -1,4 +1,3 @@
-baseURL: https://paste.xvr.sh
 languageCode: en-us
 title: skladka
 module:
@@ -11,7 +10,7 @@ params:
       dark: images/logo-dark.png
   editURL:
     enable: true
-    base: "https://github.com/aexvir/skladka/edit/main"
+    base: "https://github.com/aexvir/skladka/edit/master"
 menu:
   main:
     - name: documentation
