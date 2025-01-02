@@ -1792,6 +1792,37 @@ templ Editor(content, syntax string, readonly bool) {
                             },
                             setReadOnly: function() {
                                 return editor.updateOptions({ readOnly: true})
+                            },
+                            copyToClipboard: function() {
+                                return navigator.clipboard.writeText(editor.getValue())
+                            },
+                            downloadAsFile: function() {
+                                const blob = new Blob([editor.getValue()], { type: 'text/plain' })
+                                const url = URL.createObjectURL(blob)
+
+                                const title = document.
+                                    getElementById("paste-title").
+                                    innerText.
+                                    toLowerCase().
+                                    replace(/ /g, '-')
+
+                                const language = monaco.
+                                    languages.
+                                    getLanguages().
+                                    find((lang) => lang.id === editor.getModel().getLanguageId()
+                                )
+
+                                let extension = "txt"
+                                if (language !== undefined && language.extensions.length > 0) {
+                                    extension = language.extensions[0]
+                                }
+
+                                const link = document.createElement('a')
+                                link.href = url
+                                link.download = `${title}${extension}`
+                                link.click()
+
+                                URL.revokeObjectURL(url)
                             }
                         }
                     }

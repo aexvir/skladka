@@ -169,5 +169,35 @@ func DashboardRouter(storage Storage) chi.Router {
 		),
 	)
 
+	router.Get(
+		"/{ref}/raw",
+		http.HandlerFunc(
+			func(w http.ResponseWriter, r *http.Request) {
+				ref := chi.URLParam(r, "ref")
+
+				paste, err := storage.GetPaste(r.Context(), ref)
+				if err != nil {
+					w.WriteHeader(422)
+					w.Write([]byte(fmt.Sprintf("error fetching paste %s: %v", ref, err)))
+					return
+				}
+
+				logging.
+					FromContext(r.Context()).
+					Info(
+						"frontend.dashboard", "rendering raw document page",
+						"ref", ref,
+						"title", paste.Title,
+						"syntax", paste.Syntax,
+						"tags", paste.Tags,
+					)
+
+				w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+				w.Write([]byte(paste.Content))
+				return
+			},
+		),
+	)
+
 	return router
 }

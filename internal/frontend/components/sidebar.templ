@@ -38,39 +38,46 @@ templ Sidebar() {
 }
 
 templ Metadata(paste paste.Paste) {
-	<div class="bg-muted h-full lg:w-[300px] flex-none p-4">
-		<h1 class="text-2xl text-main">{ paste.Title }</h1>
-		<div class="flex flex-row w-full text-sm gap-2">
-			<span class="text-blue-400">&#64;aexvir</span>
-			·
-			<span class="text-muted flex flex-row items-center gap-2">
-				@icons.Calendar(14, 14, "text-muted")
-				{ paste.Creation.Format("Jan 2, 2006") }
-			</span>
-		</div>
-		<div class="flex flex-row justify-center gap-2 py-4 text-sm">
-			{{ size := fmt.Sprintf("%.1f", float64(len([]byte(paste.Content)))/1024.0) }}
-			{ strconv.Itoa(paste.Views) } views | { paste.Syntax } | { size }kb
-		</div>
-		if len(paste.Tags) > 0 {
-			<div class="space-y-1">
-				<label class="text-sm flex flex-row gap-2 items-center">
-					@icons.Tag(14, 14, "text-muted")
-					tags
-				</label>
-				<div class="flex flex-wrap gap-1">
-					for _, tag := range paste.Tags {
-						<span class="bg-main text-muted px-2 py-0.5 rounded text-sm">{ tag }</span>
-					}
+	<div class="bg-muted h-full lg:w-[300px] flex flex-col p-4">
+		<div class="flex-grow">
+			<h1 class="text-2xl text-main" id="paste-title">{ paste.Title }</h1>
+			<div class="flex flex-row w-full text-sm gap-2">
+				<span class="text-blue-400">&#64;aexvir</span>
+				·
+				<span class="text-muted flex flex-row items-center gap-2">
+					@icons.Calendar(14, 14, "text-muted")
+					{ paste.Creation.Format("Jan 2, 2006") }
+				</span>
+			</div>
+			<div class="flex flex-row justify-center gap-2 py-4 text-sm">
+				{{ size := fmt.Sprintf("%.1f", float64(len([]byte(paste.Content)))/1024.0) }}
+				{ strconv.Itoa(paste.Views) } views | { paste.Syntax } | { size }kb
+			</div>
+			if len(paste.Tags) > 0 {
+				<div class="space-y-1">
+					<label class="text-sm flex flex-row gap-2 items-center">
+						@icons.Tag(14, 14, "text-muted")
+						tags
+					</label>
+					<div class="flex flex-wrap gap-1">
+						for _, tag := range paste.Tags {
+							<span class="bg-main text-muted px-2 py-0.5 rounded text-sm">{ tag }</span>
+						}
+					</div>
 				</div>
-			</div>
-		}
-		if paste.Expiration != nil {
-			<div class="w-full mt-4 border-t border-main"></div>
-			<div class="flex flex-row justify-center gap-2 py-4 text-red-400">
-				expires { paste.Expiration.Format("Jan 2, 2006") }
-			</div>
-		}
+			}
+			if paste.Expiration != nil {
+				<div class="w-full mt-4 border-t border-main"></div>
+				<div class="flex flex-row justify-center gap-2 py-4 text-red-400">
+					expires { paste.Expiration.Format("Jan 2, 2006") }
+				</div>
+			}
+		</div>
+		<div class="flex flex-row w-full mt-4">
+			<button onclick="window.Editor.copyToClipboard()" type="button" class="rounded-l w-full flex items-center bg-main text-main hover:bg-accent px-4 py-2 whitespace-nowrap">copy</button>
+			<a href={ templ.URL(fmt.Sprintf("/%s/raw", paste.Reference)) } type="button" class="w-full flex items-center bg-main hover:bg-accent px-4 py-2 whitespace-nowrap">raw</a>
+			<button onclick="window.Editor.downloadAsFile()" type="button" class="rounded-r w-full flex items-center bg-main hover:bg-accent px-4 py-2 whitespace-nowrap">download</button>
+		</div>
 	</div>
 }
 
