@@ -56,6 +56,7 @@ Components are designed to work seamlessly with the [templ](<https://github.com/
 - [func Sidebar\(\) templ.Component](<#Sidebar>)
 - [func TagsInput\(id, label string, icon templ.Component\) templ.Component](<#TagsInput>)
 - [func TextInput\(id, label, placeholder string, icon templ.Component\) templ.Component](<#TextInput>)
+- [func Toast\(\) templ.Component](<#Toast>)
 - [func Toggle\(id string, name string, label string, icon templ.Component\) templ.Component](<#Toggle>)
 - [func ToggleWithContent\(id string, name string, label string, icon templ.Component\) templ.Component](<#ToggleWithContent>)
 - [type Link](<#Link>)
@@ -156,6 +157,15 @@ func TagsInput(id, label string, icon templ.Component) templ.Component
 
 ```go
 func TextInput(id, label, placeholder string, icon templ.Component) templ.Component
+```
+
+
+
+<a name="Toast"></a>
+## func [Toast](<https://github.com/aexvir/skladka/blob/master/internal/frontend/components/toast_templ.go#L10>)
+
+```go
+func Toast() templ.Component
 ```
 
 

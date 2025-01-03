@@ -1,0 +1,81 @@
+package components
+
+templ Toast() {
+	<div id="toast-container" class="fixed bottom-2 right-2 flex flex-col gap-2 z-50"></div>
+	<script>
+		window.Toaster = {
+			show: function(message, options = {}) {
+				const defaults = {
+					type: 'default', // default, success, error
+					duration: 3000,
+					action: null,
+				}
+
+				const settings = { ...defaults, ...options }
+
+				const container = document.getElementById('toast-container')
+				const toast = document.createElement('div')
+
+				// Base styles
+				toast.className = 'flex items-center gap-2 min-w-[300px] p-4 rounded-lg shadow-lg transform transition-all duration-300 ease-out translate-x-full'
+
+				// Type-specific styles
+				const typeStyles = {
+					default: 'bg-gray-800 text-white',
+					success: 'bg-green-800 text-white',
+					error: 'bg-red-800 text-white'
+				}
+
+				toast.className += ' ' + (typeStyles[settings.type] || typeStyles.default)
+
+				// Message
+				const messageSpan = document.createElement('span')
+				messageSpan.className = 'flex-grow'
+				messageSpan.textContent = message
+				toast.appendChild(messageSpan)
+
+				// Close button
+				const closeButton = document.createElement('button')
+				closeButton.className = 'text-white/80 hover:text-white transition-colors'
+				closeButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`
+				closeButton.onclick = () => removeToast(toast)
+				toast.appendChild(closeButton)
+
+				// Action button if provided
+				if (settings.action) {
+					const actionButton = document.createElement('button')
+					actionButton.className = 'text-white/80 hover:text-white transition-colors underline'
+					actionButton.textContent = settings.action.text
+					actionButton.onclick = () => {
+						settings.action.onClick()
+						removeToast(toast)
+					}
+					toast.insertBefore(actionButton, closeButton)
+				}
+
+				container.appendChild(toast)
+
+				// Trigger animation after a small delay to ensure the initial state is rendered
+				requestAnimationFrame(
+					() => {
+						toast.classList.remove('translate-x-full')
+						toast.classList.add('translate-x-0')
+					}
+				)
+
+				// Auto remove after duration
+				if (settings.duration > 0) {
+					setTimeout(() => removeToast(toast), settings.duration)
+				}
+
+				function removeToast(toast) {
+					toast.classList.remove('translate-x-0')
+					toast.classList.add('translate-x-full')
+					setTimeout(() => toast.remove(), 300) // Match the transition duration
+				}
+
+				return toast
+			}
+		}
+	</script>
+}
