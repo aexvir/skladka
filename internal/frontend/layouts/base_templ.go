@@ -33,7 +33,7 @@ func Base(content templ.Component) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<html class=\"h-full\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>skladka</title><link rel=\"icon\" type=\"image/png\" href=\"/static/favicon-96x96.png\" sizes=\"96x96\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/favicon.svg\"><link rel=\"shortcut icon\" href=\"/static/favicon.ico\"><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"><meta name=\"apple-mobile-web-app-title\" content=\"skladka\"><link rel=\"manifest\" href=\"/static/site.webmanifest\"><script src=\"https://cdn.tailwindcss.com\"></script><script src=\"/static/htmx.js\"></script><link rel=\"stylesheet\" href=\"/static/style.css\"><style>\n\t\t\t\t.toggle-checkbox:checked {\n\t\t\t\t\tright: 0;\n\t\t\t\t\tborder-color: var(--bg-accent);\n\t\t\t\t}\n\t\t\t\t.toggle-checkbox:checked + .toggle-label {\n\t\t\t\t\tbackground-color: var(--bg-accent);\n\t\t\t\t}\n\t\t\t</style></head><body class=\"h-full flex flex-col\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<html class=\"h-full\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>skladka</title><link rel=\"icon\" type=\"image/png\" href=\"/static/favicon-96x96.png\" sizes=\"96x96\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/favicon.svg\"><link rel=\"shortcut icon\" href=\"/static/favicon.ico\"><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"><meta name=\"apple-mobile-web-app-title\" content=\"skladka\"><link rel=\"manifest\" href=\"/static/site.webmanifest\"><script src=\"https://cdn.tailwindcss.com\"></script><script src=\"/static/htmx.js\"></script><link rel=\"stylesheet\" href=\"/static/style.css\"></head><body class=\"h-full flex flex-col\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -53,7 +53,7 @@ func Base(content templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"relative h-full w-full\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"relative h-full w-full relative\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

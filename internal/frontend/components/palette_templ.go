@@ -7,6 +7,8 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import "github.com/aexvir/skladka/internal/frontend/icons"
+
 func CommandPalette() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -28,11 +30,39 @@ func CommandPalette() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"command-palette\" class=\"hidden fixed inset-0 z-50 overflow-y-auto\" aria-labelledby=\"command-palette-title\" role=\"dialog\" aria-modal=\"true\"><div class=\"flex min-h-screen items-start justify-center px-4 pt-16 sm:px-6 sm:pt-32\"><div class=\"w-full max-w-2xl transform rounded-lg bg-main shadow-2xl transition-all\"><div class=\"p-4\"><input type=\"text\" id=\"command-palette-input\" class=\"w-full bg-muted text-main rounded px-4 py-2 focus:outline-none focus:ring-2 focus:border-accent\" placeholder=\"type to search...\"><div id=\"command-palette-links\" class=\"mt-4 space-y-2\"><a href=\"/documents\" class=\"block p-2 text-white hover:bg-gray-700 rounded transition-colors\">📄 Documents</a> <a href=\"/settings\" class=\"block p-2 text-white hover:bg-gray-700 rounded transition-colors\">⚙️ Settings</a> <a href=\"/help\" class=\"block p-2 text-white hover:bg-gray-700 rounded transition-colors\">❓ Help</a></div></div></div></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"command-palette-overlay\" class=\"hidden fixed inset-0 z-50 overflow-y-auto bg-black/30\" role=\"dialog\"><div class=\"flex min-h-screen items-start justify-center px-4 pt-16 sm:px-6 sm:pt-32\"><div class=\"w-full max-w-2xl transform rounded-lg bg-main border border-main shadow-2xl transition-all\" id=\"command-palette\"><div class=\"p-4\"><input type=\"text\" id=\"command-palette-input\" class=\"h-10 w-full bg-muted text-main border-main border rounded px-2 py-2 focus:outline-none focus:border-accent\" placeholder=\"type to search\"><div id=\"command-palette-links\" class=\"mt-4 space-y-2\"><a href=\"/\" class=\"block p-2 text-main border border-transparent hover:bg-muted hover:border-main rounded transition-colors flex flex-row items-center gap-2\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = icons.Clock(14, 14, "text-muted").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("home</a> <a href=\"/archive\" class=\"block p-2 text-main border border-transparent hover:bg-muted hover:border-main rounded transition-colors flex flex-row items-center gap-2\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = icons.Clock(14, 14, "text-muted").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("recent pastes</a> <a href=\"/settings\" class=\"block p-2 text-main border border-transparent hover:bg-muted hover:border-main rounded transition-colors flex flex-row items-center gap-2\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = icons.Cog(14, 14, "text-muted").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("settings</a></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = initCommandPalette().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -42,71 +72,109 @@ func CommandPalette() templ.Component {
 
 func initCommandPalette() templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_initCommandPalette_81fc`,
-		Function: `function __templ_initCommandPalette_81fc(){const palette = document.getElementById('command-palette')
-    const input = document.getElementById('command-palette-input')
-    const links = document.getElementById('command-palette-links')
-    let selectedIndex = 0
+		Name: `__templ_initCommandPalette_f66a`,
+		Function: `function __templ_initCommandPalette_f66a(){document.addEventListener(
+        'DOMContentLoaded', () => {
+            const overlay = document.getElementById('command-palette-overlay')
+            const palette = document.getElementById('command-palette')
+            const input = document.getElementById('command-palette-input')
+            const links = document.getElementById('command-palette-links').getElementsByTagName('a')
 
-    document.addEventListener('keydown', (e) => {
-        // Toggle palette visibility with cmd+k or ctrl+k
-        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-            e.preventDefault()
-            if (palette.classList.contains('hidden')) {
-                palette.classList.remove('hidden')
-                input.focus()
-            } else {
-                palette.classList.add('hidden')
+            let selectedIndex = -1
+            let commandPaletteVisible = false
+
+            const toggleCommandPalette = () => {
+                commandPaletteVisible = !commandPaletteVisible
+                overlay.classList.toggle('hidden', !commandPaletteVisible)
+                if (commandPaletteVisible) {
+                    input.focus()
+                }
             }
-        }
 
-        if (!palette.classList.contains('hidden')) {
-            const items = links.getElementsByTagName('a')
-
-            if (e.key === 'ArrowDown') {
-                e.preventDefault()
-                items[selectedIndex].classList.remove('bg-gray-700')
-                selectedIndex = (selectedIndex + 1) % items.length
-                items[selectedIndex].classList.add('bg-gray-700')
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault()
-                items[selectedIndex].classList.remove('bg-gray-700')
-                selectedIndex = (selectedIndex - 1 + items.length) % items.length
-                items[selectedIndex].classList.add('bg-gray-700')
-            } else if (e.key === 'Enter') {
-                e.preventDefault()
-                items[selectedIndex].click()
-            } else if (e.key === 'Escape') {
-                e.preventDefault()
-                palette.classList.add('hidden')
+            const visibleLinksOnly = () => {
+                return Array.from(links).filter(
+                    (link) => !link.classList.contains('hidden')
+                )
             }
-        }
-    })
 
-    input.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase()
-        const items = links.getElementsByTagName('a')
-
-        Array.from(items).forEach((item) => {
-            const text = item.textContent.toLowerCase()
-            if (text.includes(query)) {
-                item.classList.remove('hidden')
-            } else {
-                item.classList.add('hidden')
+            const updateSelectedItem = () => {
+                for (const [index, link] of visibleLinksOnly().entries()) {
+                    link.classList.toggle('bg-muted', index === selectedIndex)
+                    link.classList.toggle('text-accent', index === selectedIndex)
+                    link.classList.toggle('border-main', index === selectedIndex)
+                }
             }
-        })
 
-        // Reset selection
-        Array.from(items).forEach(item => item.classList.remove('bg-gray-700'))
-        selectedIndex = 0
-        const visibleItems = Array.from(items).filter(item => !item.classList.contains('hidden'))
-        if (visibleItems.length > 0) {
-            visibleItems[0].classList.add('bg-gray-700')
+            overlay.addEventListener(
+                'click', (e) => {
+                    if (!palette.contains(event.target)) {
+                        toggleCommandPalette()
+                    }
+                }
+            )
+
+            document.addEventListener(
+                'keydown', (e) => {
+                    // on cmd+k or ctrl+k toggle command palette visibility
+                    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                        e.preventDefault()
+                        toggleCommandPalette()
+                        return
+                    }
+
+                    // for every other key it only makes sense to handle when
+                    // the command palette is visible
+                    if (!commandPaletteVisible) {
+                        return
+                    }
+
+                    // hide palette on escape
+                    if (e.key === 'Escape') {
+                        e.preventDefault()
+                        toggleCommandPalette()
+                    }
+
+                    // navigate with arrow keys and select with enter
+                    switch (e.key) {
+                        case 'ArrowDown':
+                            e.preventDefault()
+                            selectedIndex = (selectedIndex + 1) % links.length
+                            updateSelectedItem()
+                            break
+
+                        case 'ArrowUp':
+                            e.preventDefault()
+                            selectedIndex = (selectedIndex - 1 + links.length) % links.length
+                            updateSelectedItem()
+                            break
+
+                        case 'Enter':
+                            e.preventDefault()
+                            visibleLinksOnly()[selectedIndex].click()
+                            break
+                    }
+                }
+            )
+
+            input.addEventListener(
+                'input', (e) => {
+                    const query = e.target.value.toLowerCase()
+
+                    for (const link of links) {
+                        const text = link.textContent.toLowerCase()
+                        link.classList.toggle('hidden', !text.includes(query))
+                    }
+
+                    // always keep first item selected
+                    selectedIndex = 0
+                    updateSelectedItem()
+                }
+            )
         }
-    })
+    )
 }`,
-		Call:       templ.SafeScript(`__templ_initCommandPalette_81fc`),
-		CallInline: templ.SafeScriptInline(`__templ_initCommandPalette_81fc`),
+		Call:       templ.SafeScript(`__templ_initCommandPalette_f66a`),
+		CallInline: templ.SafeScriptInline(`__templ_initCommandPalette_f66a`),
 	}
 }
 

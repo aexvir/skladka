@@ -3,7 +3,7 @@ package components
 templ Toggle(id string, name string, label string, icon templ.Component) {
 	<div class="space-y-1">
 		<div class="flex items-center justify-between">
-		    @InputLabel(label, icon)
+			@InputLabel(label, icon)
 			<div class="relative inline-block w-10 mr-2 align-middle select-none">
 				<input
 					type="checkbox"
@@ -23,7 +23,7 @@ templ Toggle(id string, name string, label string, icon templ.Component) {
 templ ToggleWithContent(id string, name string, label string, icon templ.Component) {
 	<div class="space-y-1">
 		<div class="flex items-center justify-between">
-		    @InputLabel(label, icon)
+			@InputLabel(label, icon)
 			<div class="relative inline-block w-10 mr-2 align-middle select-none">
 				<input
 					type="checkbox"
@@ -44,18 +44,19 @@ templ ToggleWithContent(id string, name string, label string, icon templ.Compone
 	@initToggleWithContent(id)
 }
 
-script initToggleWithContent(toggleId string) {
+script initToggleWithContent(toggleid string) {
     document.addEventListener(
         'DOMContentLoaded', () => {
-            const toggle = document.getElementById(toggleId);
-            const content = document.getElementById(toggleId + "-content");
+            const toggle = document.getElementById(toggleid)
+            const content = document.getElementById(toggleid + "-content")
+
             if (toggle && content) {
                 toggle.addEventListener(
                     'change', () => {
-                        content.style.display = toggle.checked ? 'block' : 'none';
+                        content.style.display = toggle.checked ? 'block' : 'none'
                     }
-                );
+                )
             }
         }
-    );
+    )
 }

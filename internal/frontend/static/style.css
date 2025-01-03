@@ -1,12 +1,16 @@
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&display=swap");
+
 :root {
-    /* Light theme variables */
+    /* light theme variables */
     --light-bg-main: #edeff1;
     --light-bg-muted: #f8f9fa;
     --light-bg-accent: #ffaa33;
+    --light-bg-accent-muted: #ffcc66;
 
     --light-text-main: #5c6166;
     --light-text-muted: #8a9199;
     --light-text-accent: #ffaa33;
+    --light-text-accent-muted: #804a00;
 
     --light-border-main: #8a919945;
     --light-border-accent: #ffaa33b3;
@@ -14,14 +18,16 @@
     --light-selection: #035bd626;
     --light-error: #e65050;
 
-    /* Dark theme variables */
-    --dark-bg-main: #1f2430;
-    --dark-bg-muted: #242936;
+    /* dark theme variables */
+    --dark-bg-main: #242936;
+    --dark-bg-muted: #1f2430;
     --dark-bg-accent: #ffcc66;
+    --dark-bg-accent-muted: #ffaa33;
 
     --dark-text-main: #cccac2;
     --dark-text-muted: #707a8c;
     --dark-text-accent: #ffcc66;
+    --dark-text-accent-muted: #805500;
 
     --dark-border-main: #707a8c45;
     --dark-border-accent: #ffcc66b3;
@@ -29,14 +35,16 @@
     --dark-selection: #409fff40;
     --dark-error: #f27983;
 
-    /* Default to light theme */
+    /* default to light theme */
     --bg-main: var(--light-bg-main);
     --bg-muted: var(--light-bg-muted);
     --bg-accent: var(--light-bg-accent);
+    --bg-accent-muted: var(--light-bg-accent-muted);
 
     --text-main: var(--light-text-main);
     --text-muted: var(--light-text-muted);
     --text-accent: var(--light-text-accent);
+    --text-accent-muted: var(--light-text-accent-muted);
 
     --border-main: var(--light-border-main);
     --border-accent: var(--light-border-accent);
@@ -50,10 +58,12 @@
         --bg-main: var(--dark-bg-main);
         --bg-muted: var(--dark-bg-muted);
         --bg-accent: var(--dark-bg-accent);
+        --bg-accent-muted: var(--dark-bg-accent-muted);
 
         --text-main: var(--dark-text-main);
         --text-muted: var(--dark-text-muted);
         --text-accent: var(--dark-text-accent);
+        --text-accent-muted: var(--dark-text-accent-muted);
 
         --border-main: var(--dark-border-main);
         --border-accent: var(--dark-border-accent);
@@ -63,9 +73,7 @@
     }
 }
 
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&display=swap");
-
-/* Base styles */
+/* base styles */
 body {
     background-color: var(--bg-main);
     color: var(--text-main);
@@ -83,11 +91,16 @@ select {
     border-color: var(--border-main);
 }
 
+::placeholder {
+    color: var(--text-muted) !important;
+    font-size: 0.75rem;
+}
+
 ::selection {
     background-color: var(--selection);
 }
 
-/* Utility classes */
+/* utility classes */
 .bg-main {
     background-color: var(--bg-main);
 }
@@ -98,6 +111,10 @@ select {
 
 .bg-accent {
     background-color: var(--bg-accent);
+}
+
+.bg-accent-muted {
+    background-color: var(--bg-accent-muted);
 }
 
 .text-main {
@@ -112,43 +129,68 @@ select {
     color: var(--text-accent);
 }
 
-.border-main {
-    border-color: var(--border-main);
+.text-accent-muted {
+    color: var(--text-accent-muted);
 }
 
-.focus\:border-main:focus {
-    border-color: var(--border-main);
+.border-main {
+    border-color: var(--border-main) !important;
 }
 
 .border-accent {
     border-color: var(--border-accent);
 }
 
-.focus\:border-accent:focus {
-    border-color: var(--border-accent);
+/* interactive states */
+.hover\:bg-main:hover {
+    background-color: var(--bg-main);
 }
 
-/* Interactive states */
+.hover\:bg-muted:hover {
+    background-color: var(--bg-muted);
+}
+
 .hover\:bg-accent:hover {
     background-color: var(--bg-accent);
+}
+
+.hover\:bg-accent-muted:hover {
+    background-color: var(--bg-accent-muted);
 }
 
 .hover\:text-main:hover {
     color: var(--text-main);
 }
 
+.hover\:text-muted:hover {
+    color: var(--text-muted);
+}
+
 .hover\:text-accent:hover {
     color: var(--text-accent);
+}
+
+.hover\:text-accent-muted:hover {
+    color: var(--text-accent-muted);
+}
+
+.hover\:border-main:hover {
+    border-color: var(--border-main);
 }
 
 .hover\:border-accent:hover {
     border-color: var(--border-accent);
 }
 
-/* Error states */
-.text-error {
-    color: var(--error);
+.focus\:border-main:focus {
+    border-color: var(--border-main);
 }
+
+.focus\:border-accent:focus {
+    border-color: var(--border-accent);
+}
+
+/* other misc stuff */
 
 #nav-logo {
     filter: invert(57%) sepia(14%) saturate(204%) hue-rotate(172deg)
@@ -160,4 +202,13 @@ select {
         filter: invert(49%) sepia(5%) saturate(1258%) hue-rotate(180deg)
             brightness(96%) contrast(88%);
     }
+}
+
+.toggle-checkbox:checked {
+    right: 0;
+    border-color: var(--bg-accent);
+}
+
+.toggle-checkbox:checked + .toggle-label {
+    background-color: var(--bg-accent);
 }

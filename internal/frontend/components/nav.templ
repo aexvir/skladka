@@ -7,7 +7,7 @@ type Link struct {
 }
 
 templ Nav(name string, links ...Link) {
-	<nav class="bg-muted text-main px-4 py-2 flex justify-between items-center lowercase block">
+	<nav class="bg-muted text-main px-4 py-2 flex justify-between items-center lowercase block border-b border-main ">
 		<a class="flex flex-row items-center gap-4 transition-all text-main hover:text-accent" href="/">
 			<img src="/static/landfill.svg" class="h-auto w-8" id="nav-logo"/>
 			<div class="text-2xl">{ name }</div>

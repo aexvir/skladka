@@ -44,7 +44,7 @@ func PasteEntry(paste paste.Paste) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"block p-4 border-main bg-muted rounded-lg border hover:bg-accent transition-colors\"><div class=\"flex flex-col lg:flex-row lg:items-center lg:justify-between\"><div class=\"flex flex-col\"><h3 class=\"text-lg font-medium text-main\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"block p-4 border-main bg-muted rounded-lg border hover:shadow-xl hover:text-accent transition-all duration-200\"><div class=\"flex flex-col lg:flex-row lg:items-center lg:justify-between\"><div class=\"flex flex-col\"><h3 class=\"text-lg font-medium\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -124,14 +124,14 @@ func PasteEntry(paste paste.Paste) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		for _, tag := range paste.Tags {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<span class=\"bg-main text-muted px-2 py-0.5 rounded text-sm\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<span class=\"bg-main text-muted px-2 py-0.5 rounded text-sm border border-main\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(tag)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/entry.templ`, Line: 39, Col: 72}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/entry.templ`, Line: 39, Col: 91}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {

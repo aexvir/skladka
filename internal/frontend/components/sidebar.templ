@@ -8,170 +8,120 @@ import (
 )
 
 templ Sidebar() {
-	<div class="h-full lg:w-[300px] flex-none">
-		// Desktop view
-		<div class="hidden lg:block h-full">
-			@sidebarContent()
-		</div>
-		// Mobile view
-		<div class="lg:hidden">
-			<div id="mobile-overlay" class="fixed inset-0 bg-main opacity-0 pointer-events-none transition-opacity duration-300"></div>
-			<div id="mobile-sidebar" class="fixed inset-x-0 bottom-0 w-full bg-muted text-muted lowercase transform transition-transform duration-300 translate-y-full">
-				<div class="h-[90vh] overflow-y-auto bg-main shadow-2xl">
-					<div class="w-12 h-1 bg-[--text-main] rounded-full mx-auto my-2"></div>
-					@sidebarContent()
+	<div class="h-[90vh] lg:h-full w-full lg:w-[300px] flex-none lg:border-l border-main fixed inset-x-0 -bottom-full lg:static transition-all duration-300" id="sidebar">
+		<div class="h-full">
+			<form method="POST" action="/" class="h-full bg-main p-4 flex flex-col lowercase rounded-t-2xl lg:rounded-none shadow-xl lg:shadow-none" id="paste-form">
+				<div class="flex-grow space-y-4">
+					@TextInput("title", "title", "", icons.Paperclip(14, 14, "text-muted"))
+					@TagsInput("tags", "tags", icons.Tag(14, 14, "text-muted"))
+					@SelectInput("syntax", "syntax highlight", icons.Code(14, 14, "text-muted"), "plaintext", "go", "python", "javascript")
+					@ToggleWithContent("toggle-password", "", "password protection", icons.Lock(14, 14, "text-muted")) {
+						@PasswordInput("password", "password", "")
+					}
+					@ToggleWithContent("toggle-expiration", "", "expiration", icons.Clock(14, 14, "text-muted")) {
+						@SelectInput("expiration", "", icons.Clock(14, 14, "text-muted"), "10m", "30m", "1h", "1d")
+					}
+					@Toggle("toggle-unlisted", "unlisted", "unlisted", icons.Eye(14, 14, "text-muted"))
+					<input type="hidden" name="content" id="editor-content"/>
 				</div>
-			</div>
-			<div class="fixed inset-x-0 bottom-0 px-4 pb-4 pt-2">
-				<div class="w-full h-12 flex items-center justify-center bg-accent text-main rounded">
-					<button type="submit" form="paste-form" class="flex-1 text-center">paste</button>
-					<div class="w-12 flex items-center justify-center border-l border-main cursor-pointer" id="expand-form">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
-						</svg>
+				<div class="flex flex-row w-full fixed inset-x-0 bottom-0 lg:static p-4 lg:p-0">
+					<button type="submit" class="w-full bg-accent text-accent-muted py-2 rounded-l lg:rounded transition-all duration-200 hover:bg-accent-muted hover:shadow-md">
+						<span class="flex-grow">paste</span>
+					</button>
+					<div class="w-12 flex items-center justify-center border-l border-main cursor-pointer lg:hidden rounded-r bg-accent" id="expand-sidebar">
+						@icons.ChevronUp(18, 18, "text-accent-muted transform transition-all duration-200")
 					</div>
 				</div>
-			</div>
+			</form>
 		</div>
 		@initSidebar()
 	</div>
 }
 
 templ Metadata(paste paste.Paste) {
-	<div class="bg-muted h-full lg:w-[300px] flex flex-col p-4">
-		<div class="flex-grow">
-			<h1 class="text-2xl text-main" id="paste-title">{ paste.Title }</h1>
-			<div class="flex flex-row w-full text-sm gap-2">
-				<span class="text-blue-400">&#64;aexvir</span>
-				·
-				<span class="text-muted flex flex-row items-center gap-2">
-					@icons.Calendar(14, 14, "text-muted")
-					{ paste.Creation.Format("Jan 2, 2006") }
-				</span>
-			</div>
-			<div class="flex flex-row justify-center gap-2 py-4 text-sm">
-				{{ size := fmt.Sprintf("%.1f", float64(len([]byte(paste.Content)))/1024.0) }}
-				{ strconv.Itoa(paste.Views) } views | { paste.Syntax } | { size }kb
-			</div>
-			if len(paste.Tags) > 0 {
-				<div class="space-y-1">
-					<label class="text-sm flex flex-row gap-2 items-center">
-						@icons.Tag(14, 14, "text-muted")
-						tags
-					</label>
-					<div class="flex flex-wrap gap-1">
-						for _, tag := range paste.Tags {
-							<span class="bg-main text-muted px-2 py-0.5 rounded text-sm">{ tag }</span>
-						}
+	<div class="h-full lg:w-[300px] flex-none border-l border-main">
+		<div class="h-full bg-main flex flex-col p-4">
+			<div class="flex-grow">
+				<h1 class="text-2xl text-main" id="paste-title">{ paste.Title }</h1>
+				<div class="flex flex-row w-full text-sm gap-2">
+					<span class="text-blue-400">&#64;aexvir</span>
+					·
+					<span class="text-muted flex flex-row items-center gap-2">
+						@icons.Calendar(14, 14, "text-muted")
+						{ paste.Creation.Format("Jan 2, 2006") }
+					</span>
+				</div>
+				<div class="flex flex-row justify-center gap-2 py-4 text-sm">
+					{{ size := fmt.Sprintf("%.1f", float64(len([]byte(paste.Content)))/1024.0) }}
+					{ strconv.Itoa(paste.Views) } views | { paste.Syntax } | { size }kb
+				</div>
+				if len(paste.Tags) > 0 {
+					<div class="space-y-1">
+						<label class="text-sm flex flex-row gap-2 items-center">
+							@icons.Tag(14, 14, "text-muted")
+							tags
+						</label>
+						<div class="flex flex-wrap gap-1">
+							for _, tag := range paste.Tags {
+								<span class="bg-muted text-muted border border-main px-2 py-0.5 rounded text-sm">{ tag }</span>
+							}
+						</div>
 					</div>
-				</div>
-			}
-			if paste.Expiration != nil {
-				<div class="w-full mt-4 border-t border-main"></div>
-				<div class="flex flex-row justify-center gap-2 py-4 text-red-400">
-					expires { paste.Expiration.Format("Jan 2, 2006") }
-				</div>
-			}
-		</div>
-		<div class="flex flex-row w-full mt-4">
-			<button onclick="window.Editor.copyToClipboard()" type="button" class="rounded-l w-full flex items-center bg-main text-main hover:bg-accent px-4 py-2 whitespace-nowrap">copy</button>
-			<a href={ templ.URL(fmt.Sprintf("/%s/raw", paste.Reference)) } type="button" class="w-full flex items-center bg-main hover:bg-accent px-4 py-2 whitespace-nowrap">raw</a>
-			<button onclick="window.Editor.downloadAsFile()" type="button" class="rounded-r w-full flex items-center bg-main hover:bg-accent px-4 py-2 whitespace-nowrap">download</button>
+				}
+				if paste.Expiration != nil {
+					<div class="w-full mt-4 border-t border-main"></div>
+					<div class="flex flex-row justify-center gap-2 py-4 text-red-400">
+						expires { paste.Expiration.Format("Jan 2, 2006") }
+					</div>
+				}
+			</div>
+			<div class="flex flex-row w-full">
+				<button onclick="window.Editor.copyToClipboard()" type="button" class="rounded-l w-full text-center bg-muted hover:bg-accent text-main hover:text-accent-muted px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap">copy</button>
+				<a href={ templ.URL(fmt.Sprintf("/%s/raw", paste.Reference)) } class="w-full text-center bg-muted hover:bg-accent text-main hover:text-accent-muted px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap">raw</a>
+				<button onclick="window.Editor.downloadAsFile()" type="button" class="rounded-r w-full text-center bg-muted hover:bg-accent text-main hover:text-accent-muted px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap">download</button>
+			</div>
 		</div>
 	</div>
 }
 
-templ sidebarContent() {
-	<form method="POST" action="/" class="h-full bg-main text-gray-300 p-4 flex flex-col lowercase" id="paste-form">
-		<div class="flex-grow space-y-4">
-			@TextInput("title", "title", "", icons.Paperclip(14, 14, "text-muted"))
-			@TagsInput("tags", "tags", icons.Tag(14, 14, "text-muted"))
-			@SelectInput("syntax", "syntax highlight", icons.Code(14, 14, "text-muted"), "plaintext", "go", "python", "javascript")
-			@ToggleWithContent("toggle-password", "", "password protection", icons.Lock(14, 14, "text-gray-400")) {
-				@PasswordInput("password", "password", "")
-			}
-			@ToggleWithContent("toggle-expiration", "", "expiration", icons.Clock(14, 14, "text-gray-400")) {
-				@SelectInput("expiration", "", icons.Clock(14, 14, "text-muted"), "10m", "30m", "1h", "1d")
-			}
-			@Toggle("toggle-unlisted", "unlisted", "unlisted", icons.Eye(14, 14, "text-gray-400"))
-			<input type="hidden" name="content" id="editor-content"/>
-		</div>
-		<button type="submit" class="lg:block hidden w-full bg-accent text-white py-3 rounded hover:bg-[#4070dd] transition-colors mt-4">
-			paste
-		</button>
-	</form>
-}
-
 script initSidebar() {
-	document.addEventListener('DOMContentLoaded', () => {
-		// Syntax selector initialization
-		const syntaxSelector = document.querySelector('select[name="syntax"]')
-		syntaxSelector.addEventListener('change', (e) => {
-			window.Editor.setSyntax(e.target.value)
-		})
+    document.addEventListener(
+        'DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar')
+            const expandbtn = document.getElementById('expand-sidebar')
+            const expandicon = expandbtn.querySelector('svg')
 
-		// Mobile sidebar initialization
-		const mobileSidebar = document.getElementById('mobile-sidebar')
-		const mobileOverlay = document.getElementById('mobile-overlay')
-		const expandButton = document.getElementById('expand-form')
-		let startY = 0
-		let currentY = 0
-		let isExpanded = false
+            let sidebarExpanded = false
 
-		const toggleSidebar = () => {
-			isExpanded = !isExpanded
-			mobileSidebar.style.transform = isExpanded ? 'translateY(0)' : 'translateY(100%)'
-			mobileOverlay.style.opacity = isExpanded ? '0.5' : '0'
-			mobileOverlay.style.pointerEvents = isExpanded ? 'auto' : 'none'
-		}
+            const toggleSidebar = () => {
+                sidebarExpanded = !sidebarExpanded
+                sidebar.style.bottom = sidebarExpanded ? '0' : '-100%'
+                expandicon.style.transform = sidebarExpanded ? 'rotate(180deg)': 'rotate(0deg)'
+            }
 
-		expandButton.addEventListener('click', (e) => {
-			e.stopPropagation()
-			toggleSidebar()
-		})
+            expandbtn.addEventListener(
+                'click', (e) => {
+                    e.stopPropagation()
+                    toggleSidebar()
+                }
+            )
 
-		mobileOverlay.addEventListener('click', () => {
-			if (isExpanded) {
-				toggleSidebar()
-			}
-		})
+            document.
+                querySelector('select[name="syntax"]').
+                addEventListener(
+                    'change', (e) => {
+                        window.Editor.setSyntax(e.target.value)
+                    }
+                )
 
-		mobileSidebar.addEventListener('touchstart', (e) => {
-			startY = e.touches[0].clientY
-			currentY = startY
-		})
-
-		mobileSidebar.addEventListener('touchmove', (e) => {
-			const deltaY = e.touches[0].clientY - currentY
-			currentY = e.touches[0].clientY
-
-			const newTranslateY = Math.max(0, parseInt(getComputedStyle(mobileSidebar).transform.split(',')[5]) + deltaY)
-			mobileSidebar.style.transform = `translateY(${newTranslateY}px)`
-
-			const progress = Math.min(1, newTranslateY / (mobileSidebar.offsetHeight * 0.3))
-			mobileOverlay.style.opacity = 0.5 * (1 - progress)
-		})
-
-		mobileSidebar.addEventListener('touchend', () => {
-			const translateY = parseInt(getComputedStyle(mobileSidebar).transform.split(',')[5])
-			if (translateY > mobileSidebar.offsetHeight * 0.3) {
-				isExpanded = false
-				mobileSidebar.style.transform = 'translateY(100%)'
-				mobileOverlay.style.opacity = '0'
-				mobileOverlay.style.pointerEvents = 'none'
-			} else {
-				isExpanded = true
-				mobileSidebar.style.transform = 'translateY(0)'
-				mobileOverlay.style.opacity = '0.5'
-				mobileOverlay.style.pointerEvents = 'auto'
-			}
-		})
-
-		// Handle form submission
-		document.querySelector('form').addEventListener('submit', (e) => {
-			// Get editor content and set it in the hidden input
-			const editorContent = window.Editor.getContent()
-			document.getElementById('editor-content').value = editorContent
-		})
-	})
+            document.
+                querySelector('form').
+                addEventListener(
+                    'submit', (e) => {
+                        const editorContent = window.Editor.getContent()
+                        document.getElementById('editor-content').value = editorContent
+                    }
+                )
+        }
+    )
 }

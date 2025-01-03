@@ -125,7 +125,7 @@ func TextInput(id, label, placeholder string, icon templ.Component) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"h-10 w-full bg-muted text-muted border-main border rounded px-3 py-2 focus:outline-none focus:border-accent\"></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"h-10 w-full bg-muted text-main border-main border rounded px-2 py-2 focus:outline-none focus:border-accent\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -180,7 +180,7 @@ func PasswordInput(id, label, placeholder string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" type=\"password\" class=\"h-10 w-full bg-muted text-muted border-main border rounded px-3 py-2 focus:outline-none focus:border-accent\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" type=\"password\" class=\"h-10 w-full bg-muted text-main border-main border rounded px-2 py-2 focus:outline-none focus:border-accent\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -243,7 +243,7 @@ func SelectInput(id, label string, icon templ.Component, options ...string) temp
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"h-10 w-full bg-muted text-muted border-main border rounded px-3 py-2 focus:outline-none focus:border-accent\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"h-10 w-full bg-muted text-main border-main border rounded px-2 py-2 focus:outline-none focus:border-accent\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -255,7 +255,7 @@ func SelectInput(id, label string, icon templ.Component, options ...string) temp
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(option)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/input.templ`, Line: 41, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/input.templ`, Line: 41, Col: 26}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
@@ -268,7 +268,7 @@ func SelectInput(id, label string, icon templ.Component, options ...string) temp
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(option)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/input.templ`, Line: 41, Col: 36}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/input.templ`, Line: 41, Col: 37}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
@@ -329,14 +329,14 @@ func TagsInput(id, label string, icon templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"min-h-10 w-full bg-muted text-muted border-main border rounded px-3 py-2 focus:outline-none focus:border-accent\"><div class=\"tags-container flex flex-wrap items-center gap-1\"><input type=\"text\" class=\"bg-transparent outline-none text-base min-w-[50px] flex-1\"></div><input type=\"hidden\" name=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"min-h-10 w-full bg-muted text-main border-main border rounded px-2 py-1.5 focus:outline-none focus:border-accent\"><div class=\"tags-container flex flex-wrap items-center gap-1\"><input type=\"text\" placeholder=\"type and press enter or comma\" class=\"bg-transparent outline-none text-base min-w-[50px] flex-1\"></div><input type=\"hidden\" name=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/input.templ`, Line: 60, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/input.templ`, Line: 61, Col: 33}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
@@ -360,95 +360,115 @@ func TagsInput(id, label string, icon templ.Component) templ.Component {
 
 func initTagsInput(inputId string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_initTagsInput_72a1`,
-		Function: `function __templ_initTagsInput_72a1(inputId){document.addEventListener('DOMContentLoaded', () => {
-        const wrapper = document.getElementById(inputId);
-        const tagsContainer = wrapper.querySelector('.tags-container');
-        const input = wrapper.querySelector('input[type="text"]');
-        let tags = [];
-        let hiddenInput = wrapper.querySelector('input[type="hidden"]');
+		Name: `__templ_initTagsInput_ccde`,
+		Function: `function __templ_initTagsInput_ccde(inputId){document.addEventListener('DOMContentLoaded', () => {
+        const wrapper = document.getElementById(inputId)
+        const tagsContainer = wrapper.querySelector('.tags-container')
+        const input = wrapper.querySelector('input[type="text"]')
+        const hiddenInput = wrapper.querySelector('input[type="hidden"]')
+        const placeholder = input.placeholder
+
+        let tags = []
 
         const updateHiddenInput = () => {
-            hiddenInput.value = tags.join(',');
-        };
+            hiddenInput.value = tags.join(',')
+        }
 
         const updatePlaceholder = () => {
-            input.placeholder = tags.length === 0 ? "type and press enter or comma" : "";
-        };
+            input.placeholder = tags.length === 0 ? placeholder : ""
+        }
 
-        const createTagElement = (tag) => {
-            const tagElement = document.createElement('span');
-            tagElement.className = 'inline-flex items-center border-main text-base px-2 py-0.25 rounded';
-            tagElement.innerHTML = ` + "`" + `
-                ${tag}
-                <button type="button" class="ml-1.5 text-gray-400 hover:text-gray-200">&times;</button>
-            ` + "`" + `;
-            tagElement.querySelector('button').addEventListener('click', (e) => {
-                e.preventDefault();
-                tags = tags.filter(t => t !== tag);
-                tagElement.remove();
-                updateHiddenInput();
-                updatePlaceholder();
-                input.focus();
-            });
-            return tagElement;
-        };
+        const createTagElement = (value) => {
+            const tag = document.createElement('span')
 
-        input.addEventListener('keydown', (e) => {
-            if ((e.key === 'Enter' || e.key === ',' || e.key === ' ') && !e.shiftKey) {
-                e.preventDefault();
-                const tag = input.value.trim().replace(',', '');
-                if (tag && !tags.includes(tag)) {
-                    tags.push(tag);
-                    tagsContainer.insertBefore(createTagElement(tag), input);
-                    input.value = '';
-                    updateHiddenInput();
-                    updatePlaceholder();
+            tag.className = 'inline-flex items-center border border-main text-base px-2 py-0.25 rounded'
+            tag.innerHTML = ` + "`" + `
+                ${value}
+                <button type="button" class="ml-1.5 text-muted hover:text-main">&times</button>
+            ` + "`" + `
+
+            tag.
+                querySelector('button').
+                addEventListener(
+                    'click',
+                    (e) => {
+                        e.preventDefault()
+                        tags = tags.filter(t => t !== value)
+                        tag.remove()
+                        updateHiddenInput()
+                        updatePlaceholder()
+                        input.focus()
+                    }
+                )
+
+            return tag
+        }
+
+        input.addEventListener(
+            'keydown',
+            (e) => {
+                if ((e.key === 'Enter' || e.key === ',' || e.key === ' ') && !e.shiftKey) {
+                    e.preventDefault()
+                    const tag = input.value.trim().replace(',', '')
+                    console.log(tags, tag, e.key)
+                    if (tag && !tags.includes(tag)) {
+                        tags.push(tag)
+                        tagsContainer.insertBefore(createTagElement(tag), input)
+                        input.value = ''
+                        updateHiddenInput()
+                        updatePlaceholder()
+                    }
+                    return
                 }
-            } else if (e.key === 'Backspace' && input.value === '' && tags.length > 0) {
-                const lastTag = tags[tags.length - 1];
-                tags.pop();
-                tagsContainer.removeChild(tagsContainer.lastChild.previousSibling);
-                updateHiddenInput();
-                updatePlaceholder();
+
+                if (e.key === 'Backspace' && input.value === '' && tags.length > 0) {
+                    console.log("delet")
+                    tags.pop()
+                    tagsContainer.removeChild(tagsContainer.lastChild.previousSibling)
+                    updateHiddenInput()
+                    updatePlaceholder()
+                }
             }
-        });
+        )
 
-        // Handle paste
-        input.addEventListener('paste', (e) => {
-            e.preventDefault();
-            const pastedText = e.clipboardData.getData('text');
-            const newTags = pastedText.split(/[,\n]/).map(t => t.trim()).filter(t => t && !tags.includes(t));
+        // allow pasting comma separated values and create tags for all values
+        input.addEventListener(
+            'paste',
+            (e) => {
+                e.preventDefault()
+                const pastedText = e.clipboardData.getData('text')
+                const newTags = pastedText.split(/[,\n]/).map(t => t.trim()).filter(t => t && !tags.includes(t))
 
-            newTags.forEach(tag => {
-                tags.push(tag);
-                tagsContainer.insertBefore(createTagElement(tag), input);
-            });
-            updateHiddenInput();
-            updatePlaceholder();
-        });
+                newTags.forEach(
+                    tag => {
+                        tags.push(tag)
+                          tagsContainer.insertBefore(createTagElement(tag), input)
+                    }
+                )
 
-        // Handle focus
-        input.addEventListener('focus', () => {
-            wrapper.classList.add('border-accent');
-        });
+                updateHiddenInput()
+                updatePlaceholder()
+            }
+        )
 
+        // handle focus events
+        input.addEventListener('focus', () => { wrapper.classList.add('border-accent') })
         input.addEventListener('blur', () => {
-            wrapper.classList.remove('border-accent');
-            // Add any remaining input as a tag
-            const tag = input.value.trim();
+            wrapper.classList.remove('border-accent')
+            // add any remaining input as a tag
+            const tag = input.value.trim()
             if (tag && !tags.includes(tag)) {
-                tags.push(tag);
-                tagsContainer.insertBefore(createTagElement(tag), input);
-                input.value = '';
-                updateHiddenInput();
-                updatePlaceholder();
+                tags.push(tag)
+                tagsContainer.insertBefore(createTagElement(tag), input)
+                input.value = ''
+                updateHiddenInput()
+                updatePlaceholder()
             }
-        });
-    });
+        })
+    })
 }`,
-		Call:       templ.SafeScript(`__templ_initTagsInput_72a1`, inputId),
-		CallInline: templ.SafeScriptInline(`__templ_initTagsInput_72a1`, inputId),
+		Call:       templ.SafeScript(`__templ_initTagsInput_ccde`, inputId),
+		CallInline: templ.SafeScriptInline(`__templ_initTagsInput_ccde`, inputId),
 	}
 }
 

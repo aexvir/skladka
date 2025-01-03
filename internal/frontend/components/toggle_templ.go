@@ -184,25 +184,26 @@ func ToggleWithContent(id string, name string, label string, icon templ.Componen
 	})
 }
 
-func initToggleWithContent(toggleId string) templ.ComponentScript {
+func initToggleWithContent(toggleid string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_initToggleWithContent_231b`,
-		Function: `function __templ_initToggleWithContent_231b(toggleId){document.addEventListener(
+		Name: `__templ_initToggleWithContent_c17a`,
+		Function: `function __templ_initToggleWithContent_c17a(toggleid){document.addEventListener(
         'DOMContentLoaded', () => {
-            const toggle = document.getElementById(toggleId);
-            const content = document.getElementById(toggleId + "-content");
+            const toggle = document.getElementById(toggleid)
+            const content = document.getElementById(toggleid + "-content")
+
             if (toggle && content) {
                 toggle.addEventListener(
                     'change', () => {
-                        content.style.display = toggle.checked ? 'block' : 'none';
+                        content.style.display = toggle.checked ? 'block' : 'none'
                     }
-                );
+                )
             }
         }
-    );
+    )
 }`,
-		Call:       templ.SafeScript(`__templ_initToggleWithContent_231b`, toggleId),
-		CallInline: templ.SafeScriptInline(`__templ_initToggleWithContent_231b`, toggleId),
+		Call:       templ.SafeScript(`__templ_initToggleWithContent_c17a`, toggleid),
+		CallInline: templ.SafeScriptInline(`__templ_initToggleWithContent_c17a`, toggleid),
 	}
 }
 

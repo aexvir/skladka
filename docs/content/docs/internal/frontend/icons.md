@@ -10,9 +10,14 @@ import "github.com/aexvir/skladka/internal/frontend/icons"
 
 - [func Bookmark\(width, height int, classes ...string\) templ.Component](<#Bookmark>)
 - [func Calendar\(width, height int, classes ...string\) templ.Component](<#Calendar>)
+- [func ChevronDown\(width, height int, classes ...string\) templ.Component](<#ChevronDown>)
+- [func ChevronLeft\(width, height int, classes ...string\) templ.Component](<#ChevronLeft>)
+- [func ChevronRight\(width, height int, classes ...string\) templ.Component](<#ChevronRight>)
+- [func ChevronUp\(width, height int, classes ...string\) templ.Component](<#ChevronUp>)
 - [func Clock\(width, height int, classes ...string\) templ.Component](<#Clock>)
 - [func Code\(width, height int, classes ...string\) templ.Component](<#Code>)
 - [func Cog\(width, height int, classes ...string\) templ.Component](<#Cog>)
+- [func Document\(width, height int, classes ...string\) templ.Component](<#Document>)
 - [func Eye\(width, height int, classes ...string\) templ.Component](<#Eye>)
 - [func List\(width, height int, classes ...string\) templ.Component](<#List>)
 - [func Lock\(width, height int, classes ...string\) templ.Component](<#Lock>)
@@ -34,6 +39,42 @@ func Bookmark(width, height int, classes ...string) templ.Component
 
 ```go
 func Calendar(width, height int, classes ...string) templ.Component
+```
+
+
+
+<a name="ChevronDown"></a>
+## func [ChevronDown](<https://github.com/aexvir/skladka/blob/master/internal/frontend/icons/chevron_templ.go#L88>)
+
+```go
+func ChevronDown(width, height int, classes ...string) templ.Component
+```
+
+
+
+<a name="ChevronLeft"></a>
+## func [ChevronLeft](<https://github.com/aexvir/skladka/blob/master/internal/frontend/icons/chevron_templ.go#L161>)
+
+```go
+func ChevronLeft(width, height int, classes ...string) templ.Component
+```
+
+
+
+<a name="ChevronRight"></a>
+## func [ChevronRight](<https://github.com/aexvir/skladka/blob/master/internal/frontend/icons/chevron_templ.go#L234>)
+
+```go
+func ChevronRight(width, height int, classes ...string) templ.Component
+```
+
+
+
+<a name="ChevronUp"></a>
+## func [ChevronUp](<https://github.com/aexvir/skladka/blob/master/internal/frontend/icons/chevron_templ.go#L15>)
+
+```go
+func ChevronUp(width, height int, classes ...string) templ.Component
 ```
 
 
@@ -61,6 +102,15 @@ func Code(width, height int, classes ...string) templ.Component
 
 ```go
 func Cog(width, height int, classes ...string) templ.Component
+```
+
+
+
+<a name="Document"></a>
+## func [Document](<https://github.com/aexvir/skladka/blob/master/internal/frontend/icons/document_templ.go#L15>)
+
+```go
+func Document(width, height int, classes ...string) templ.Component
 ```
 
 

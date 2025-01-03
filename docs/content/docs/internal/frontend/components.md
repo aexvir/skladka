@@ -62,7 +62,7 @@ Components are designed to work seamlessly with the [templ](<https://github.com/
 
 
 <a name="CommandPalette"></a>
-## func [CommandPalette](<https://github.com/aexvir/skladka/blob/master/internal/frontend/components/palette_templ.go#L10>)
+## func [CommandPalette](<https://github.com/aexvir/skladka/blob/master/internal/frontend/components/palette_templ.go#L12>)
 
 ```go
 func CommandPalette() templ.Component
@@ -89,7 +89,7 @@ func InputLabel(name string, icon templ.Component) templ.Component
 
 
 <a name="Metadata"></a>
-## func [Metadata](<https://github.com/aexvir/skladka/blob/master/internal/frontend/components/sidebar_templ.go#L70>)
+## func [Metadata](<https://github.com/aexvir/skladka/blob/master/internal/frontend/components/sidebar_templ.go#L126>)
 
 ```go
 func Metadata(paste paste.Paste) templ.Component
