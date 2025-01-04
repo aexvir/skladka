@@ -9,6 +9,7 @@ import (
 	"github.com/aexvir/harness"
 	"github.com/aexvir/harness/bintool"
 	"github.com/aexvir/harness/commons"
+
 	"github.com/aexvir/skladka/internal/errors"
 )
 

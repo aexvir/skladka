@@ -33,21 +33,25 @@ if err != nil {
 ## Index
 
 - [type Cipher](<#Cipher>)
-  - [func NewCipher\(key string\) \*Cipher](<#NewCipher>)
+  - [func NewCipher\(key, salt string\) \*Cipher](<#NewCipher>)
   - [func \(c \*Cipher\) Decrypt\(encrypted string\) \(string, error\)](<#Cipher.Decrypt>)
   - [func \(c \*Cipher\) Encrypt\(plaintext string\) \(string, error\)](<#Cipher.Encrypt>)
   - [func \(c \*Cipher\) Hash\(value string\) string](<#Cipher.Hash>)
+  - [func \(c \*Cipher\) Verify\(password, encoded string\) bool](<#Cipher.Verify>)
 - [type Metrics](<#Metrics>)
 - [type PostgresStorage](<#PostgresStorage>)
   - [func NewPostgresStorage\(ctx context.Context, cfg config.Config, opts ...PostgresStorageOption\) \(\*PostgresStorage, error\)](<#NewPostgresStorage>)
   - [func \(s \*PostgresStorage\) CreatePaste\(ctx context.Context, paste paste.Paste\) \(string, error\)](<#PostgresStorage.CreatePaste>)
+  - [func \(s \*PostgresStorage\) DecryptPaste\(paste \*paste.Paste\) error](<#PostgresStorage.DecryptPaste>)
+  - [func \(s \*PostgresStorage\) EncryptPaste\(paste \*paste.Paste\) error](<#PostgresStorage.EncryptPaste>)
   - [func \(s \*PostgresStorage\) GetPaste\(ctx context.Context, ref string\) \(paste.Paste, error\)](<#PostgresStorage.GetPaste>)
+  - [func \(s \*PostgresStorage\) GetPasteWithPassword\(ctx context.Context, ref, password string\) \(\*paste.Paste, error\)](<#PostgresStorage.GetPasteWithPassword>)
   - [func \(s \*PostgresStorage\) ListPastes\(ctx context.Context\) \(\[\]paste.Paste, error\)](<#PostgresStorage.ListPastes>)
 - [type PostgresStorageOption](<#PostgresStorageOption>)
 
 
 <a name="Cipher"></a>
-## type [Cipher](<https://github.com/aexvir/skladka/blob/master/internal/storage/cipher.go#L12-L14>)
+## type [Cipher](<https://github.com/aexvir/skladka/blob/master/internal/storage/cipher.go#L14-L16>)
 
 
 
@@ -58,16 +62,16 @@ type Cipher struct {
 ```
 
 <a name="NewCipher"></a>
-### func [NewCipher](<https://github.com/aexvir/skladka/blob/master/internal/storage/cipher.go#L16>)
+### func [NewCipher](<https://github.com/aexvir/skladka/blob/master/internal/storage/cipher.go#L18>)
 
 ```go
-func NewCipher(key string) *Cipher
+func NewCipher(key, salt string) *Cipher
 ```
 
 
 
 <a name="Cipher.Decrypt"></a>
-### func \(\*Cipher\) [Decrypt](<https://github.com/aexvir/skladka/blob/master/internal/storage/cipher.go#L46>)
+### func \(\*Cipher\) [Decrypt](<https://github.com/aexvir/skladka/blob/master/internal/storage/cipher.go#L70>)
 
 ```go
 func (c *Cipher) Decrypt(encrypted string) (string, error)
@@ -76,7 +80,7 @@ func (c *Cipher) Decrypt(encrypted string) (string, error)
 
 
 <a name="Cipher.Encrypt"></a>
-### func \(\*Cipher\) [Encrypt](<https://github.com/aexvir/skladka/blob/master/internal/storage/cipher.go#L26>)
+### func \(\*Cipher\) [Encrypt](<https://github.com/aexvir/skladka/blob/master/internal/storage/cipher.go#L50>)
 
 ```go
 func (c *Cipher) Encrypt(plaintext string) (string, error)
@@ -85,10 +89,19 @@ func (c *Cipher) Encrypt(plaintext string) (string, error)
 
 
 <a name="Cipher.Hash"></a>
-### func \(\*Cipher\) [Hash](<https://github.com/aexvir/skladka/blob/master/internal/storage/cipher.go#L20>)
+### func \(\*Cipher\) [Hash](<https://github.com/aexvir/skladka/blob/master/internal/storage/cipher.go#L24>)
 
 ```go
 func (c *Cipher) Hash(value string) string
+```
+
+
+
+<a name="Cipher.Verify"></a>
+### func \(\*Cipher\) [Verify](<https://github.com/aexvir/skladka/blob/master/internal/storage/cipher.go#L37>)
+
+```go
+func (c *Cipher) Verify(password, encoded string) bool
 ```
 
 
@@ -176,7 +189,7 @@ func main() error {
 </details>
 
 <a name="PostgresStorage.CreatePaste"></a>
-### func \(\*PostgresStorage\) [CreatePaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L72>)
+### func \(\*PostgresStorage\) [CreatePaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L73>)
 
 ```go
 func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (string, error)
@@ -184,8 +197,26 @@ func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (s
 
 
 
+<a name="PostgresStorage.DecryptPaste"></a>
+### func \(\*PostgresStorage\) [DecryptPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L202>)
+
+```go
+func (s *PostgresStorage) DecryptPaste(paste *paste.Paste) error
+```
+
+
+
+<a name="PostgresStorage.EncryptPaste"></a>
+### func \(\*PostgresStorage\) [EncryptPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L190>)
+
+```go
+func (s *PostgresStorage) EncryptPaste(paste *paste.Paste) error
+```
+
+
+
 <a name="PostgresStorage.GetPaste"></a>
-### func \(\*PostgresStorage\) [GetPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L118>)
+### func \(\*PostgresStorage\) [GetPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L119>)
 
 ```go
 func (s *PostgresStorage) GetPaste(ctx context.Context, ref string) (paste.Paste, error)
@@ -193,8 +224,17 @@ func (s *PostgresStorage) GetPaste(ctx context.Context, ref string) (paste.Paste
 
 
 
+<a name="PostgresStorage.GetPasteWithPassword"></a>
+### func \(\*PostgresStorage\) [GetPasteWithPassword](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L146>)
+
+```go
+func (s *PostgresStorage) GetPasteWithPassword(ctx context.Context, ref, password string) (*paste.Paste, error)
+```
+
+
+
 <a name="PostgresStorage.ListPastes"></a>
-### func \(\*PostgresStorage\) [ListPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L151>)
+### func \(\*PostgresStorage\) [ListPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L163>)
 
 ```go
 func (s *PostgresStorage) ListPastes(ctx context.Context) ([]paste.Paste, error)

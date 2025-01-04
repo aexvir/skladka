@@ -22,6 +22,9 @@ type Storage interface {
 	// GetPaste retrieves a paste by its reference.
 	GetPaste(context.Context, string) (paste.Paste, error)
 
+	// GetPasteWithPassword retrieves a paste by its reference.
+	GetPasteWithPassword(context.Context, string, string) (*paste.Paste, error)
+
 	// CreatePaste stores a new paste and returns its reference.
 	CreatePaste(context.Context, paste.Paste) (string, error)
 
@@ -96,6 +99,10 @@ func DashboardRouter(storage Storage) chi.Router {
 					p.Tags = strings.Split(tags, ",")
 				}
 
+				if password := r.FormValue("password"); password != "" {
+					p.Password = &password
+				}
+
 				if err := p.Validate(); err != nil {
 					w.WriteHeader(http.StatusBadRequest)
 					w.Write([]byte(fmt.Sprintf("error creating paste: %v", err)))
@@ -151,6 +158,13 @@ func DashboardRouter(storage Storage) chi.Router {
 					return
 				}
 
+				if paste.Password != nil {
+					layouts.Base(
+						views.PasswordPrompt(ref),
+					).Render(r.Context(), w)
+					return
+				}
+
 				logging.
 					FromContext(r.Context()).
 					Info(
@@ -168,6 +182,38 @@ func DashboardRouter(storage Storage) chi.Router {
 			},
 		),
 	)
+
+	router.Post("/{ref}/unlock", func(w http.ResponseWriter, r *http.Request) {
+		ref := chi.URLParam(r, "ref")
+		password := r.FormValue("password")
+
+		paste, err := storage.GetPasteWithPassword(r.Context(), ref, password)
+		if err != nil {
+			w.WriteHeader(422)
+			w.Write([]byte(fmt.Sprintf("error fetching paste %s: %v", ref, err)))
+			return
+		}
+
+		if paste == nil {
+			http.Error(w, "Invalid password", http.StatusForbidden)
+			return
+		}
+
+		logging.
+			FromContext(r.Context()).
+			Info(
+				"frontend.dashboard", "rendering document page",
+				"ref", ref,
+				"title", paste.Title,
+				"syntax", paste.Syntax,
+				"tags", paste.Tags,
+			)
+
+		layouts.Base(
+			views.Document(*paste),
+		).Render(r.Context(), w)
+		return
+	})
 
 	router.Get(
 		"/{ref}/raw",

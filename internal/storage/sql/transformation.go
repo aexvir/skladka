@@ -19,6 +19,11 @@ func (db Paste) ToDomain() paste.Paste {
 		expiration = &db.Expiration.Time
 	}
 
+	var password *string
+	if db.Password.Valid {
+		password = &db.Password.String
+	}
+
 	return paste.Paste{
 		Reference:  db.Reference,
 		Title:      db.Title,
@@ -29,6 +34,7 @@ func (db Paste) ToDomain() paste.Paste {
 		Expiration: expiration,
 		Public:     db.Public,
 		Views:      int(db.Views.Int32),
+		Password:   password,
 	}
 }
 
@@ -49,6 +55,14 @@ func (Paste) FromDomain(domain paste.Paste) *Paste {
 		}
 	}
 
+	var password pgtype.Text
+	if domain.Password != nil {
+		password = pgtype.Text{
+			String: *domain.Password,
+			Valid:  true,
+		}
+	}
+
 	return &Paste{
 		Reference:  domain.Reference,
 		Title:      domain.Title,
@@ -57,5 +71,6 @@ func (Paste) FromDomain(domain paste.Paste) *Paste {
 		Tags:       domain.Tags,
 		Expiration: expiration,
 		Public:     domain.Public,
+		Password:   password,
 	}
 }

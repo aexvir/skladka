@@ -8,10 +8,11 @@ import (
 	"github.com/aexvir/skladka/internal/storage"
 )
 
-func TestCipher(t *testing.T) {
+func TestCipherEncryption(t *testing.T) {
 	key := "supersecretkey=="
+	salt := "6370b25f61f2025a0d4fcbb4aaf8859f"
 
-	cipher := storage.NewCipher(key)
+	cipher := storage.NewCipher(key, salt)
 	encrypted, encerr := cipher.Encrypt("test")
 	require.NoError(t, encerr)
 
@@ -19,4 +20,16 @@ func TestCipher(t *testing.T) {
 	require.NoError(t, decerr)
 
 	require.Equal(t, "test", decrypted)
+}
+
+func TestCipherHashing(t *testing.T) {
+	key := "supersecretkey=="
+	salt := "6370b25f61f2025a0d4fcbb4aaf8859f"
+
+	cipher := storage.NewCipher(key, salt)
+
+	password := "muchosecreto"
+	encoded := cipher.Hash(password)
+
+	require.True(t, cipher.Verify("muchosecreto", encoded))
 }

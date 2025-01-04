@@ -13,8 +13,8 @@ import (
 
 const createPaste = `-- name: CreatePaste :one
 insert into pastes
-(reference, title, content, syntax, tags, expiration, public)
-values ($1, $2, $3, $4, $5, $6, $7)
+(reference, title, content, syntax, tags, expiration, public, password)
+values ($1, $2, $3, $4, $5, $6, $7, $8)
 returning id
 `
 
@@ -26,13 +26,14 @@ type CreatePasteParams struct {
 	Tags       []string         `db:"tags" json:"tags"`
 	Expiration pgtype.Timestamp `db:"expiration" json:"expiration"`
 	Public     bool             `db:"public" json:"public"`
+	Password   pgtype.Text      `db:"password" json:"password"`
 }
 
 // CreatePaste
 //
 //	insert into pastes
-//	(reference, title, content, syntax, tags, expiration, public)
-//	values ($1, $2, $3, $4, $5, $6, $7)
+//	(reference, title, content, syntax, tags, expiration, public, password)
+//	values ($1, $2, $3, $4, $5, $6, $7, $8)
 //	returning id
 func (q *Queries) CreatePaste(ctx context.Context, arg CreatePasteParams) (int64, error) {
 	row := q.db.QueryRow(ctx, createPaste,
@@ -43,6 +44,7 @@ func (q *Queries) CreatePaste(ctx context.Context, arg CreatePasteParams) (int64
 		arg.Tags,
 		arg.Expiration,
 		arg.Public,
+		arg.Password,
 	)
 	var id int64
 	err := row.Scan(&id)
@@ -50,7 +52,7 @@ func (q *Queries) CreatePaste(ctx context.Context, arg CreatePasteParams) (int64
 }
 
 const getPasteByID = `-- name: GetPasteByID :one
-select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views
+select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
 from pastes
 where id = $1
     and deleted_at is null
@@ -58,7 +60,7 @@ where id = $1
 
 // GetPasteByID
 //
-//	select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views
+//	select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
 //	from pastes
 //	where id = $1
 //	    and deleted_at is null
@@ -78,6 +80,7 @@ func (q *Queries) GetPasteByID(ctx context.Context, id int64) (Paste, error) {
 		&i.UpdatedAt,
 		&i.DeletedAt,
 		&i.Views,
+		&i.Password,
 	)
 	return i, err
 }
@@ -87,7 +90,7 @@ update pastes
 set views = views + 1
 where reference = $1
     and deleted_at is null
-returning id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views
+returning id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
 `
 
 // GetPasteByReference
@@ -96,7 +99,7 @@ returning id, reference, title, content, syntax, tags, expiration, public, creat
 //	set views = views + 1
 //	where reference = $1
 //	    and deleted_at is null
-//	returning id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views
+//	returning id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
 func (q *Queries) GetPasteByReference(ctx context.Context, reference string) (Paste, error) {
 	row := q.db.QueryRow(ctx, getPasteByReference, reference)
 	var i Paste
@@ -113,22 +116,25 @@ func (q *Queries) GetPasteByReference(ctx context.Context, reference string) (Pa
 		&i.UpdatedAt,
 		&i.DeletedAt,
 		&i.Views,
+		&i.Password,
 	)
 	return i, err
 }
 
 const listPublicPastes = `-- name: ListPublicPastes :many
-select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views
+select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
 from pastes
 where public = true
+    and deleted_at is null
 order by created_at desc
 `
 
 // ListPublicPastes
 //
-//	select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views
+//	select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
 //	from pastes
 //	where public = true
+//	    and deleted_at is null
 //	order by created_at desc
 func (q *Queries) ListPublicPastes(ctx context.Context) ([]Paste, error) {
 	rows, err := q.db.Query(ctx, listPublicPastes)
@@ -152,6 +158,7 @@ func (q *Queries) ListPublicPastes(ctx context.Context) ([]Paste, error) {
 			&i.UpdatedAt,
 			&i.DeletedAt,
 			&i.Views,
+			&i.Password,
 		); err != nil {
 			return nil, err
 		}

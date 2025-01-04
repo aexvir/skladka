@@ -72,7 +72,7 @@ type Config struct {
 ```
 
 <a name="Load"></a>
-### func [Load](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L67>)
+### func [Load](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L69>)
 
 ```go
 func Load() (Config, error)
@@ -81,7 +81,7 @@ func Load() (Config, error)
 
 
 <a name="Core"></a>
-## type [Core](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L28-L35>)
+## type [Core](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L28-L37>)
 
 
 
@@ -91,13 +91,15 @@ type Core struct {
     Hostname string `conf:"hostname,env:HOSTNAME"`
     // EncryptionKey used to encrypt all paste data.
     EncryptionKey string `conf:"encryption-key,env:ENCRYPTION_KEY"`
+    // EncryptionSalt used to encrypt all paste data.
+    EncryptionSalt string `conf:"encryption-salt,env:ENCRYPTION_SALT"`
     // Environment the application is running in.
     Environment string `conf:"env,env:ENVIRONMENT,default:dev"`
 }
 ```
 
 <a name="Observability"></a>
-## type [Observability](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L52-L56>)
+## type [Observability](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L54-L58>)
 
 
 
@@ -110,7 +112,7 @@ type Observability struct {
 ```
 
 <a name="Otlp"></a>
-## type [Otlp](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L58-L65>)
+## type [Otlp](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L60-L67>)
 
 
 
@@ -126,7 +128,7 @@ type Otlp struct {
 ```
 
 <a name="Postgres"></a>
-## type [Postgres](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L37-L50>)
+## type [Postgres](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L39-L52>)
 
 
 

@@ -4,23 +4,47 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"crypto/sha512"
+	"crypto/subtle"
 	"encoding/base64"
 	"io"
+
+	"golang.org/x/crypto/argon2"
 )
 
 type Cipher struct {
 	key []byte
 }
 
-func NewCipher(key string) *Cipher {
-	return &Cipher{key: []byte(key)}
+func NewCipher(key, salt string) *Cipher {
+	return &Cipher{
+		key: argon2.IDKey([]byte(key), []byte(salt), 3, 64*1024, 2, 32),
+	}
 }
 
 func (c *Cipher) Hash(value string) string {
+	salt := make([]byte, 16)
+	if _, err := rand.Read(salt); err != nil {
+		panic(err)
+	}
+
+	hash := argon2.IDKey([]byte(value), salt, 3, 64*1024, 2, 32)
+
 	return base64.URLEncoding.EncodeToString(
-		sha512.New().Sum([]byte(value)),
+		append(salt, hash...),
 	)
+}
+
+func (c *Cipher) Verify(password, encoded string) bool {
+	combined, err := base64.URLEncoding.DecodeString(encoded)
+	if err != nil {
+		panic(err)
+	}
+
+	salt, storedhash := combined[:16], combined[16:]
+
+	computedhash := argon2.IDKey([]byte(password), salt, 3, 64*1024, 2, 32)
+
+	return subtle.ConstantTimeCompare(storedhash, computedhash) == 1
 }
 
 func (c *Cipher) Encrypt(plaintext string) (string, error) {

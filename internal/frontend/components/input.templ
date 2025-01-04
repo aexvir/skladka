@@ -19,7 +19,7 @@ templ TextInput(id, label, placeholder string, icon templ.Component) {
 			name={ id }
 			type="text"
 			placeholder={ placeholder }
-			class="h-10 w-full bg-muted text-main border-main border rounded px-2 py-2 focus:outline-none focus:border-accent"
+			class="h-10 w-full bg-muted text-main border-main border rounded p-2 focus:outline-none focus:border-accent"
 		/>
 	</div>
 }
@@ -29,14 +29,14 @@ templ PasswordInput(id, label, placeholder string) {
 		id={ id }
 		name={ id }
 		type="password"
-		class="h-10 w-full bg-muted text-main border-main border rounded px-2 py-2 focus:outline-none focus:border-accent"
+		class="h-10 w-full bg-muted text-main border-main border rounded p-2 focus:outline-none focus:border-accent"
 	/>
 }
 
 templ SelectInput(id, label string, icon templ.Component, options ...string) {
 	<div class="space-y-1">
 		@InputLabel(label, icon)
-		<select id={ id } name={ id } class="h-10 w-full bg-muted text-main border-main border rounded px-2 py-2 focus:outline-none focus:border-accent">
+		<select id={ id } name={ id } class="h-10 w-full bg-muted text-main border-main border rounded p-2 focus:outline-none focus:border-accent">
 			for _, option := range options {
 				<option value={ option }>{ option }</option>
 			}
@@ -49,9 +49,9 @@ templ TagsInput(id, label string, icon templ.Component) {
 		@InputLabel(label, icon)
 		<div
 			id={ id }
-			class="min-h-10 w-full bg-muted text-main border-main border rounded px-2 py-1.5 focus:outline-none focus:border-accent"
+			class="min-h-10 w-full bg-muted text-main border-main border rounded px-2 py-1.5"
 		>
-			<div class="tags-container flex flex-wrap items-center gap-1">
+			<div class="tags-container flex flex-wrap items-center gap-1 placeholder-text-small">
 				<input
 					type="text"
 					placeholder="type and press enter or comma"
@@ -156,9 +156,16 @@ script initTagsInput(inputId string) {
         )
 
         // handle focus events
-        input.addEventListener('focus', () => { wrapper.classList.add('border-accent') })
+        input.addEventListener(
+            'focus', () => {
+                wrapper.classList.remove('border-main')
+                wrapper.classList.add('border-accent')
+            }
+        )
+
         input.addEventListener('blur', () => {
             wrapper.classList.remove('border-accent')
+            wrapper.classList.add('border-main')
             // add any remaining input as a tag
             const tag = input.value.trim()
             if (tag && !tags.includes(tag)) {

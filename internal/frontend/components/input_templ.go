@@ -125,7 +125,7 @@ func TextInput(id, label, placeholder string, icon templ.Component) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"h-10 w-full bg-muted text-main border-main border rounded px-2 py-2 focus:outline-none focus:border-accent\"></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"h-10 w-full bg-muted text-main border-main border rounded p-2 focus:outline-none focus:border-accent\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -180,7 +180,7 @@ func PasswordInput(id, label, placeholder string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" type=\"password\" class=\"h-10 w-full bg-muted text-main border-main border rounded px-2 py-2 focus:outline-none focus:border-accent\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" type=\"password\" class=\"h-10 w-full bg-muted text-main border-main border rounded p-2 focus:outline-none focus:border-accent\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -243,7 +243,7 @@ func SelectInput(id, label string, icon templ.Component, options ...string) temp
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"h-10 w-full bg-muted text-main border-main border rounded px-2 py-2 focus:outline-none focus:border-accent\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"h-10 w-full bg-muted text-main border-main border rounded p-2 focus:outline-none focus:border-accent\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -329,7 +329,7 @@ func TagsInput(id, label string, icon templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"min-h-10 w-full bg-muted text-main border-main border rounded px-2 py-1.5 focus:outline-none focus:border-accent\"><div class=\"tags-container flex flex-wrap items-center gap-1\"><input type=\"text\" placeholder=\"type and press enter or comma\" class=\"bg-transparent outline-none text-base min-w-[50px] flex-1\"></div><input type=\"hidden\" name=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"min-h-10 w-full bg-muted text-main border-main border rounded px-2 py-1.5\"><div class=\"tags-container flex flex-wrap items-center gap-1 placeholder-text-small\"><input type=\"text\" placeholder=\"type and press enter or comma\" class=\"bg-transparent outline-none text-base min-w-[50px] flex-1\"></div><input type=\"hidden\" name=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -360,8 +360,8 @@ func TagsInput(id, label string, icon templ.Component) templ.Component {
 
 func initTagsInput(inputId string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_initTagsInput_ccde`,
-		Function: `function __templ_initTagsInput_ccde(inputId){document.addEventListener('DOMContentLoaded', () => {
+		Name: `__templ_initTagsInput_e98c`,
+		Function: `function __templ_initTagsInput_e98c(inputId){document.addEventListener('DOMContentLoaded', () => {
         const wrapper = document.getElementById(inputId)
         const tagsContainer = wrapper.querySelector('.tags-container')
         const input = wrapper.querySelector('input[type="text"]')
@@ -381,7 +381,7 @@ func initTagsInput(inputId string) templ.ComponentScript {
         const createTagElement = (value) => {
             const tag = document.createElement('span')
 
-            tag.className = 'inline-flex items-center border border-main text-base px-2 py-0.25 rounded'
+            tag.className = 'inline-flex items-center border border-main text-base px-2 py-0.35 rounded'
             tag.innerHTML = ` + "`" + `
                 ${value}
                 <button type="button" class="ml-1.5 text-muted hover:text-main">&times</button>
@@ -452,9 +452,16 @@ func initTagsInput(inputId string) templ.ComponentScript {
         )
 
         // handle focus events
-        input.addEventListener('focus', () => { wrapper.classList.add('border-accent') })
+        input.addEventListener(
+            'focus', () => {
+                wrapper.classList.remove('border-main')
+                wrapper.classList.add('border-accent')
+            }
+        )
+
         input.addEventListener('blur', () => {
             wrapper.classList.remove('border-accent')
+            wrapper.classList.add('border-main')
             // add any remaining input as a tag
             const tag = input.value.trim()
             if (tag && !tags.includes(tag)) {
@@ -467,8 +474,8 @@ func initTagsInput(inputId string) templ.ComponentScript {
         })
     })
 }`,
-		Call:       templ.SafeScript(`__templ_initTagsInput_ccde`, inputId),
-		CallInline: templ.SafeScriptInline(`__templ_initTagsInput_ccde`, inputId),
+		Call:       templ.SafeScript(`__templ_initTagsInput_e98c`, inputId),
+		CallInline: templ.SafeScriptInline(`__templ_initTagsInput_e98c`, inputId),
 	}
 }
 

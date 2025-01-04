@@ -30,6 +30,8 @@ type Core struct {
 	Hostname string `conf:"hostname,env:HOSTNAME"`
 	// EncryptionKey used to encrypt all paste data.
 	EncryptionKey string `conf:"encryption-key,env:ENCRYPTION_KEY"`
+	// EncryptionSalt used to encrypt all paste data.
+	EncryptionSalt string `conf:"encryption-salt,env:ENCRYPTION_SALT"`
 	// Environment the application is running in.
 	Environment string `conf:"env,env:ENVIRONMENT,default:dev"`
 }

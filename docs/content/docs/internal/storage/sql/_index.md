@@ -23,7 +23,7 @@ import "github.com/aexvir/skladka/internal/storage/sql"
 
 
 <a name="CreatePasteParams"></a>
-## type [CreatePasteParams](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L21-L29>)
+## type [CreatePasteParams](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L21-L30>)
 
 
 
@@ -36,6 +36,7 @@ type CreatePasteParams struct {
     Tags       []string         `db:"tags" json:"tags"`
     Expiration pgtype.Timestamp `db:"expiration" json:"expiration"`
     Public     bool             `db:"public" json:"public"`
+    Password   pgtype.Text      `db:"password" json:"password"`
 }
 ```
 
@@ -53,7 +54,7 @@ type DBTX interface {
 ```
 
 <a name="Paste"></a>
-## type [Paste](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/models.go#L11-L24>)
+## type [Paste](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/models.go#L11-L25>)
 
 
 
@@ -71,11 +72,12 @@ type Paste struct {
     UpdatedAt  pgtype.Timestamp `db:"updated_at" json:"updated_at"`
     DeletedAt  pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
     Views      pgtype.Int4      `db:"views" json:"views"`
+    Password   pgtype.Text      `db:"password" json:"password"`
 }
 ```
 
 <a name="Paste.FromDomain"></a>
-### func \(Paste\) [FromDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L35>)
+### func \(Paste\) [FromDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L41>)
 
 ```go
 func (Paste) FromDomain(domain paste.Paste) *Paste
@@ -113,7 +115,7 @@ func New(db DBTX) *Queries
 
 
 <a name="Queries.CreatePaste"></a>
-### func \(\*Queries\) [CreatePaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L37>)
+### func \(\*Queries\) [CreatePaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L38>)
 
 ```go
 func (q *Queries) CreatePaste(ctx context.Context, arg CreatePasteParams) (int64, error)
@@ -123,13 +125,13 @@ CreatePaste
 
 ```
 insert into pastes
-(reference, title, content, syntax, tags, expiration, public)
-values ($1, $2, $3, $4, $5, $6, $7)
+(reference, title, content, syntax, tags, expiration, public, password)
+values ($1, $2, $3, $4, $5, $6, $7, $8)
 returning id
 ```
 
 <a name="Queries.GetPasteByID"></a>
-### func \(\*Queries\) [GetPasteByID](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L65>)
+### func \(\*Queries\) [GetPasteByID](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L67>)
 
 ```go
 func (q *Queries) GetPasteByID(ctx context.Context, id int64) (Paste, error)
@@ -138,14 +140,14 @@ func (q *Queries) GetPasteByID(ctx context.Context, id int64) (Paste, error)
 GetPasteByID
 
 ```
-select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views
+select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
 from pastes
 where id = $1
     and deleted_at is null
 ```
 
 <a name="Queries.GetPasteByReference"></a>
-### func \(\*Queries\) [GetPasteByReference](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L100>)
+### func \(\*Queries\) [GetPasteByReference](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L103>)
 
 ```go
 func (q *Queries) GetPasteByReference(ctx context.Context, reference string) (Paste, error)
@@ -158,11 +160,11 @@ update pastes
 set views = views + 1
 where reference = $1
     and deleted_at is null
-returning id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views
+returning id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
 ```
 
 <a name="Queries.ListPublicPastes"></a>
-### func \(\*Queries\) [ListPublicPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L133>)
+### func \(\*Queries\) [ListPublicPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L139>)
 
 ```go
 func (q *Queries) ListPublicPastes(ctx context.Context) ([]Paste, error)
@@ -171,9 +173,10 @@ func (q *Queries) ListPublicPastes(ctx context.Context) ([]Paste, error)
 ListPublicPastes
 
 ```
-select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views
+select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
 from pastes
 where public = true
+    and deleted_at is null
 order by created_at desc
 ```
 

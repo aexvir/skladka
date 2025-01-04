@@ -11,6 +11,7 @@ create table pastes (
     expiration timestamp null,
     public boolean not null default true,
     views integer default 0,
+    password text null,
 
     created_at timestamp not null default now(),
     updated_at timestamp null,

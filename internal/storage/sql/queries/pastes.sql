@@ -13,12 +13,13 @@ returning *;
 
 -- name: CreatePaste :one
 insert into pastes
-(reference, title, content, syntax, tags, expiration, public)
-values ($1, $2, $3, $4, $5, $6, $7)
+(reference, title, content, syntax, tags, expiration, public, password)
+values ($1, $2, $3, $4, $5, $6, $7, $8)
 returning id;
 
 -- name: ListPublicPastes :many
 select *
 from pastes
 where public = true
+    and deleted_at is null
 order by created_at desc;

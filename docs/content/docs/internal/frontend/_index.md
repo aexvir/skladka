@@ -45,7 +45,7 @@ The frontend package automatically handles static asset serving, page routing, a
 
 
 <a name="DashboardRouter"></a>
-## func [DashboardRouter](<https://github.com/aexvir/skladka/blob/master/internal/frontend/frontend.go#L41>)
+## func [DashboardRouter](<https://github.com/aexvir/skladka/blob/master/internal/frontend/frontend.go#L44>)
 
 ```go
 func DashboardRouter(storage Storage) chi.Router
@@ -56,7 +56,7 @@ DashboardRouter returns a chi.Router that handles all frontend routes. It sets u
 The router uses the provided Storage implementation for paste operations and automatically handles template rendering and static asset serving.
 
 <a name="Storage"></a>
-## type [Storage](<https://github.com/aexvir/skladka/blob/master/internal/frontend/frontend.go#L21-L30>)
+## type [Storage](<https://github.com/aexvir/skladka/blob/master/internal/frontend/frontend.go#L21-L33>)
 
 Storage defines the interface for paste storage operations required by the frontend. This interface allows the frontend to be decoupled from the actual storage implementation, making it easier to test and maintain.
 
@@ -64,6 +64,9 @@ Storage defines the interface for paste storage operations required by the front
 type Storage interface {
     // GetPaste retrieves a paste by its reference.
     GetPaste(context.Context, string) (paste.Paste, error)
+
+    // GetPasteWithPassword retrieves a paste by its reference.
+    GetPasteWithPassword(context.Context, string, string) (*paste.Paste, error)
 
     // CreatePaste stores a new paste and returns its reference.
     CreatePaste(context.Context, paste.Paste) (string, error)
