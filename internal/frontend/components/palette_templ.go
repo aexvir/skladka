@@ -30,7 +30,7 @@ func CommandPalette() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"command-palette-overlay\" class=\"hidden fixed inset-0 z-50 overflow-y-auto bg-black/30\" role=\"dialog\"><div class=\"flex min-h-screen items-start justify-center px-4 pt-16 sm:px-6 sm:pt-32\"><div class=\"w-full max-w-2xl transform rounded-lg bg-main border border-main shadow-2xl transition-all\" id=\"command-palette\"><div class=\"p-4\"><input type=\"text\" id=\"command-palette-input\" class=\"h-10 w-full bg-muted text-main border-main border rounded px-2 py-2 focus:outline-none focus:border-accent\" placeholder=\"type to search\"><div id=\"command-palette-links\" class=\"mt-4 space-y-2\"><a href=\"/\" class=\"block p-2 text-main border border-transparent hover:bg-muted hover:border-main rounded transition-colors flex flex-row items-center gap-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"command-palette-overlay\" class=\"hidden fixed inset-0 z-50 overflow-y-auto bg-black/30\" role=\"dialog\"><div class=\"flex min-h-screen items-start justify-center px-4 pt-16 sm:px-6 sm:pt-32\"><div class=\"w-full max-w-2xl transform rounded-lg bg-main border border-main shadow-2xl transition-all\" id=\"command-palette\"><div class=\"p-4\"><input type=\"text\" id=\"command-palette-input\" class=\"h-10 w-full bg-muted text-main border-main border rounded px-2 py-2 focus:outline-none focus:border-accent\" placeholder=\"type to search\"><div id=\"command-palette-links\" class=\"mt-4 space-y-2\"><a href=\"/\" class=\"block p-2 text-main border border-transparent hover:bg-muted hover:border-main rounded transition-colors flex flex-row items-center gap-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -38,7 +38,7 @@ func CommandPalette() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("home</a> <a href=\"/archive\" class=\"block p-2 text-main border border-transparent hover:bg-muted hover:border-main rounded transition-colors flex flex-row items-center gap-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "home</a> <a href=\"/archive\" class=\"block p-2 text-main border border-transparent hover:bg-muted hover:border-main rounded transition-colors flex flex-row items-center gap-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -46,7 +46,7 @@ func CommandPalette() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("recent pastes</a> <a href=\"/settings\" class=\"block p-2 text-main border border-transparent hover:bg-muted hover:border-main rounded transition-colors flex flex-row items-center gap-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "recent pastes</a> <a href=\"/settings\" class=\"block p-2 text-main border border-transparent hover:bg-muted hover:border-main rounded transition-colors flex flex-row items-center gap-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -54,7 +54,7 @@ func CommandPalette() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("settings</a></div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "settings</a></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -62,11 +62,11 @@ func CommandPalette() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		return templ_7745c5c3_Err
+		return nil
 	})
 }
 

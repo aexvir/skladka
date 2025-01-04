@@ -30,7 +30,7 @@ func PasswordPrompt(reference string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"h-full w-full flex flex-row items-center justify-center bg-main\"><div class=\"p-8 space-y-4 bg-muted border border-main rounded-lg shadow-xl\"><h2 class=\"text-2xl font-bold inline-flex items-center gap-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"h-full w-full flex flex-row items-center justify-center bg-main\"><div class=\"p-8 space-y-4 bg-muted border border-main rounded-lg shadow-xl\"><h2 class=\"text-2xl font-bold inline-flex items-center gap-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -38,7 +38,7 @@ func PasswordPrompt(reference string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("password protected paste</h2><form hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "password protected paste</h2><form hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -51,11 +51,11 @@ func PasswordPrompt(reference string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"body\" hx-swap=\"outerHTML\" class=\"flex flex-col lg:flex-row w-full gap-2 lg:gap-0\"><input type=\"password\" id=\"password\" name=\"password\" placeholder=\"password\" required class=\"h-10 p-2 flex-grow bg-muted text-main border border-main rounded lg:rounded-r-none focus:outline-none focus:border-accent\"> <button type=\"submit\" class=\"h-10 px-4 py-2 rounded lg:rounded-l-none bg-accent text-accent-muted hover:bg-accent-muted transition-all duration-200\">unlock</button></form></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" hx-target=\"body\" hx-swap=\"outerHTML\" class=\"flex flex-col lg:flex-row w-full gap-2 lg:gap-0\"><input type=\"password\" id=\"password\" name=\"password\" placeholder=\"password\" required class=\"h-10 p-2 flex-grow bg-muted text-main border border-main rounded lg:rounded-r-none focus:outline-none focus:border-accent\"> <button type=\"submit\" class=\"h-10 px-4 py-2 rounded lg:rounded-l-none bg-accent text-accent-muted hover:bg-accent-muted transition-all duration-200\">unlock</button></form></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		return templ_7745c5c3_Err
+		return nil
 	})
 }
 

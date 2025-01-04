@@ -3,7 +3,7 @@ module github.com/aexvir/skladka
 go 1.23.3
 
 require (
-	github.com/a-h/templ v0.2.793
+	github.com/a-h/templ v0.3.819
 	github.com/aexvir/harness v0.0.0-20240712192635-e8a382892f07
 	github.com/ardanlabs/conf/v3 v3.2.0
 	github.com/fatih/color v1.18.0

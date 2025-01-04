@@ -9,8 +9,8 @@ github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA
 github.com/VividCortex/ewma v1.1.1/go.mod h1:2Tkkvm3sRDVXaiyucHiACn4cqf7DpdyLvmxzcbUokwA=
 github.com/VividCortex/ewma v1.2.0 h1:f58SaIzcDXrSy3kWaHNvuJgJ3Nmz59Zji6XoJR/q1ow=
 github.com/VividCortex/ewma v1.2.0/go.mod h1:nz4BbCtbLyFDeC9SUHbtcT5644juEuWfUAUnGx7j5l4=
-github.com/a-h/templ v0.2.793 h1:Io+/ocnfGWYO4VHdR0zBbf39PQlnzVCVVD+wEEs6/qY=
-github.com/a-h/templ v0.2.793/go.mod h1:lq48JXoUvuQrU0VThrK31yFwdRjTCnIE5bcPCM9IP1w=
+github.com/a-h/templ v0.3.819 h1:KDJ5jTFN15FyJnmSmo2gNirIqt7hfvBD2VXVDTySckM=
+github.com/a-h/templ v0.3.819/go.mod h1:iDJKJktpttVKdWoTkRNNLcllRI+BlpopJc+8au3gOUo=
 github.com/aexvir/harness v0.0.0-20240712192635-e8a382892f07 h1:DJOMvQFJ0Rf3nosYbfU81PAvTg0qNJ7Ffgq5EXJwVnY=
 github.com/aexvir/harness v0.0.0-20240712192635-e8a382892f07/go.mod h1:xDpC42yoFeOb4ZYShzZwAcCHbWLeqtWNCpMyRWVGsEM=
 github.com/ardanlabs/conf/v3 v3.2.0 h1:Xi7OwSBupZLUYIFBGBRl6pHUXiw/hp+xP90h+UZby0c=
