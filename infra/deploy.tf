@@ -33,8 +33,8 @@ resource "kubernetes_deployment" "skladka" {
           }
 
           env_from {
-            config_map_ref {
-              name = kubernetes_config_map.skladka.metadata[0].name
+            secret_ref {
+              name = kubernetes_secret.skladka.metadata[0].name
             }
           }
 
@@ -87,7 +87,7 @@ resource "kubernetes_service" "skladka" {
   }
 }
 
-resource "kubernetes_config_map" "skladka" {
+resource "kubernetes_secret" "skladka" {
   metadata {
     name      = "skladka"
     namespace = kubernetes_namespace.skladka.id
@@ -98,6 +98,9 @@ resource "kubernetes_config_map" "skladka" {
     SKD_POSTGRES_USER = local.db_username
     SKD_POSTGRES_PASS = local.db_password
     SKD_POSTGRES_DB   = local.db_name
+
+    SKD_ENCRYPTION_KEY  = local.encryption_key
+    SKD_ENCRYPTION_SALT = local.encryption_salt
   }
 
   depends_on = [

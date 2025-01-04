@@ -6,14 +6,14 @@ variable "onepassword_token" {
 
 variable "onepassword_vault" {
   description = "id of the vault where the secrets are stored"
-  type    = string
-  default = "vault"
+  type        = string
+  default     = "vault"
 }
 
 variable "onepassword_item" {
   description = "if of the item inside the vault where the secrets are stored"
-  type    = string
-  default = "item"
+  type        = string
+  default     = "item"
 }
 
 variable "namespace" {
