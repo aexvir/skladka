@@ -220,12 +220,34 @@ func DashboardRouter(storage Storage) chi.Router {
 		http.HandlerFunc(
 			func(w http.ResponseWriter, r *http.Request) {
 				ref := chi.URLParam(r, "ref")
+				password := r.Header.Get("x-skd-password")
 
 				paste, err := storage.GetPaste(r.Context(), ref)
 				if err != nil {
 					w.WriteHeader(422)
 					w.Write([]byte(fmt.Sprintf("error fetching paste %s: %v", ref, err)))
 					return
+				}
+
+				if paste.Password != nil {
+					if password == "" {
+						layouts.Base(
+							views.RawPasswordPrompt(ref),
+						).Render(r.Context(), w)
+						return
+					}
+
+					paste, err := storage.GetPasteWithPassword(r.Context(), ref, password)
+					if err != nil {
+						w.WriteHeader(422)
+						w.Write([]byte(fmt.Sprintf("error fetching paste %s: %v", ref, err)))
+						return
+					}
+
+					if paste == nil {
+						http.Error(w, "Invalid password", http.StatusForbidden)
+						return
+					}
 				}
 
 				logging.

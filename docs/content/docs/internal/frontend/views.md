@@ -39,6 +39,7 @@ Views are designed to work with the \[layouts\] package for consistent page stru
 - [func Creation\(name string\) templ.Component](<#Creation>)
 - [func Document\(paste paste.Paste\) templ.Component](<#Document>)
 - [func PasswordPrompt\(reference string\) templ.Component](<#PasswordPrompt>)
+- [func RawPasswordPrompt\(reference string\) templ.Component](<#RawPasswordPrompt>)
 
 
 <a name="Archive"></a>
@@ -73,6 +74,15 @@ func Document(paste paste.Paste) templ.Component
 
 ```go
 func PasswordPrompt(reference string) templ.Component
+```
+
+
+
+<a name="RawPasswordPrompt"></a>
+## func [RawPasswordPrompt](<https://github.com/aexvir/skladka/blob/master/internal/frontend/views/password_templ.go#L62>)
+
+```go
+func RawPasswordPrompt(reference string) templ.Component
 ```
 
 

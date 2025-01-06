@@ -360,8 +360,8 @@ func TagsInput(id, label string, icon templ.Component) templ.Component {
 
 func initTagsInput(inputId string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_initTagsInput_90f0`,
-		Function: `function __templ_initTagsInput_90f0(inputId){document.addEventListener('DOMContentLoaded', () => {
+		Name: `__templ_initTagsInput_43dd`,
+		Function: `function __templ_initTagsInput_43dd(inputId){document.addEventListener('DOMContentLoaded', () => {
         const wrapper = document.getElementById(inputId)
         const tagsContainer = wrapper.querySelector('.tags-container')
         const input = wrapper.querySelector('input[type="text"]')
@@ -422,7 +422,6 @@ func initTagsInput(inputId string) templ.ComponentScript {
                 }
 
                 if (e.key === 'Backspace' && input.value === '' && tags.length > 0) {
-                    console.log("delet")
                     tags.pop()
                     tagsContainer.removeChild(tagsContainer.lastChild.previousSibling)
                     updateHiddenInput()
@@ -459,23 +458,25 @@ func initTagsInput(inputId string) templ.ComponentScript {
             }
         )
 
-        input.addEventListener('blur', () => {
-            wrapper.classList.remove('border-accent')
-            wrapper.classList.add('border-main')
-            // add any remaining input as a tag
-            const tag = input.value.trim()
-            if (tag && !tags.includes(tag)) {
-                tags.push(tag)
-                tagsContainer.insertBefore(createTagElement(tag), input)
-                input.value = ''
-                updateHiddenInput()
-                updatePlaceholder()
+        input.addEventListener(
+            'blur', () => {
+                wrapper.classList.remove('border-accent')
+                wrapper.classList.add('border-main')
+                // add any remaining input as a tag
+                const tag = input.value.trim()
+                if (tag && !tags.includes(tag)) {
+                    tags.push(tag)
+                    tagsContainer.insertBefore(createTagElement(tag), input)
+                    input.value = ''
+                    updateHiddenInput()
+                    updatePlaceholder()
+                }
             }
-        })
+        )
     })
 }`,
-		Call:       templ.SafeScript(`__templ_initTagsInput_90f0`, inputId),
-		CallInline: templ.SafeScriptInline(`__templ_initTagsInput_90f0`, inputId),
+		Call:       templ.SafeScript(`__templ_initTagsInput_43dd`, inputId),
+		CallInline: templ.SafeScriptInline(`__templ_initTagsInput_43dd`, inputId),
 	}
 }
 

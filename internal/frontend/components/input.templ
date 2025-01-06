@@ -126,7 +126,6 @@ script initTagsInput(inputId string) {
                 }
 
                 if (e.key === 'Backspace' && input.value === '' && tags.length > 0) {
-                    console.log("delet")
                     tags.pop()
                     tagsContainer.removeChild(tagsContainer.lastChild.previousSibling)
                     updateHiddenInput()
@@ -163,18 +162,20 @@ script initTagsInput(inputId string) {
             }
         )
 
-        input.addEventListener('blur', () => {
-            wrapper.classList.remove('border-accent')
-            wrapper.classList.add('border-main')
-            // add any remaining input as a tag
-            const tag = input.value.trim()
-            if (tag && !tags.includes(tag)) {
-                tags.push(tag)
-                tagsContainer.insertBefore(createTagElement(tag), input)
-                input.value = ''
-                updateHiddenInput()
-                updatePlaceholder()
+        input.addEventListener(
+            'blur', () => {
+                wrapper.classList.remove('border-accent')
+                wrapper.classList.add('border-main')
+                // add any remaining input as a tag
+                const tag = input.value.trim()
+                if (tag && !tags.includes(tag)) {
+                    tags.push(tag)
+                    tagsContainer.insertBefore(createTagElement(tag), input)
+                    input.value = ''
+                    updateHiddenInput()
+                    updatePlaceholder()
+                }
             }
-        })
+        )
     })
 }

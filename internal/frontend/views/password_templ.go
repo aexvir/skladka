@@ -59,4 +59,41 @@ func PasswordPrompt(reference string) templ.Component {
 	})
 }
 
+func RawPasswordPrompt(reference string) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var3 == nil {
+			templ_7745c5c3_Var3 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"h-full w-full flex flex-row items-center justify-center bg-main\"><div class=\"p-8 space-y-4 bg-muted border border-main rounded-lg shadow-xl\"><h2 class=\"text-2xl font-bold inline-flex items-center gap-2\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = icons.Lock(24, 24, "text-muted").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "password protected paste</h2><div class=\"flex flex-col lg:flex-row w-full gap-2 lg:gap-0\"><input type=\"password\" id=\"password\" name=\"password\" placeholder=\"password\" required class=\"h-10 p-2 flex-grow bg-muted text-main border border-main rounded lg:rounded-r-none focus:outline-none focus:border-accent\"> <button onclick=\"unlockPasswordProtectedPaste()\" class=\"h-10 px-4 py-2 rounded lg:rounded-l-none bg-accent text-accent-muted hover:bg-accent-muted transition-all duration-200\">unlock</button></div></div></div><script>\n\t\tdocument\n\t\t\t.getElementById('password')\n\t\t\t.addEventListener(\n\t\t\t\t'keyup', event => {\n\t\t\t\t\tif (event.key === 'Enter') {\n\t\t\t\t\t\tunlockPasswordProtectedPaste()\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t)\n\n\t\tconst unlockPasswordProtectedPaste = () => {\n\t\t\tconst password = document.getElementById('password').value\n\t\t\tfetch(\n\t\t\t\twindow.location.href,\n\t\t\t\t{ headers: { 'x-skd-password': password } }\n\t\t\t)\n\t\t\t.then(response => response.text())\n\t\t\t.then(\n\t\t\t\ttext => {\n\t\t\t\t\tdocument.open('text/plain')\n\t\t\t\t\tdocument.write(text)\n\t\t\t\t\tdocument.close()\n\t\t\t\t}\n\t\t\t)\n\t\t}\n\t</script>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
 var _ = templruntime.GeneratedTemplate
