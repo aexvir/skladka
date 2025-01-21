@@ -39,46 +39,71 @@ templ Sidebar() {
 }
 
 templ Metadata(paste paste.Paste) {
-	<div class="h-full lg:w-[300px] flex-none border-l border-main">
-		<div class="h-full bg-main flex flex-col p-4">
-			<div class="flex-grow">
-				<h1 class="text-2xl text-main" id="paste-title">{ paste.Title }</h1>
-				<div class="flex flex-row w-full text-sm gap-2">
-					<span class="text-blue-400">&#64;aexvir</span>
-					·
-					<span class="text-muted flex flex-row items-center gap-2">
-						@icons.Calendar(14, 14, "text-muted")
-						{ paste.Creation.Format("Jan 2, 2006") }
-					</span>
-				</div>
-				<div class="flex flex-row justify-center gap-2 py-4 text-sm">
-					{{ size := fmt.Sprintf("%.1f", float64(len([]byte(paste.Content)))/1024.0) }}
-					{ strconv.Itoa(paste.Views) } views | { paste.Syntax } | { size }kb
-				</div>
-				if len(paste.Tags) > 0 {
-					<div class="space-y-1">
-						<label class="text-sm flex flex-row gap-2 items-center">
-							@icons.Tag(14, 14, "text-muted")
-							tags
-						</label>
-						<div class="flex flex-wrap gap-1">
-							for _, tag := range paste.Tags {
-								<span class="bg-muted text-muted border border-main px-2 py-0.5 rounded text-sm">{ tag }</span>
-							}
+	<div class="h-[90vh] lg:h-full lg:w-[300px] flex-none lg:border-l border-main fixed inset-x-0 -bottom-full lg:static transition-all duration-300" id="metadata-sidebar">
+		<div class="h-full">
+			<div class="h-full bg-main flex flex-col p-4 rounded-t-2xl lg:rounded-none shadow-xl lg:shadow-none">
+				<div class="flex-grow">
+					<h1 class="text-2xl text-main" id="paste-title">{ paste.Title }</h1>
+					<div class="flex flex-row w-full text-sm gap-2">
+						<span class="text-blue-400">&#64;aexvir</span>
+						·
+						<span class="text-muted flex flex-row items-center gap-2">
+							@icons.Calendar(14, 14, "text-muted")
+							{ paste.Creation.Format("Jan 2, 2006") }
+						</span>
+					</div>
+					<div class="flex flex-row justify-center gap-2 py-4 text-sm">
+						{{ size := fmt.Sprintf("%.1f", float64(len([]byte(paste.Content)))/1024.0) }}
+						{ strconv.Itoa(paste.Views) } views | { paste.Syntax } | { size }kb
+					</div>
+					if len(paste.Tags) > 0 {
+						<div class="space-y-1">
+							<label class="text-sm flex flex-row gap-2 items-center">
+								@icons.Tag(14, 14, "text-muted")
+								tags
+							</label>
+							<div class="flex flex-wrap gap-1">
+								for _, tag := range paste.Tags {
+									<span class="bg-muted text-muted border border-main px-2 py-0.5 rounded text-sm">{ tag }</span>
+								}
+							</div>
 						</div>
+					}
+					if paste.Expiration != nil {
+						<div class="w-full mt-4 border-t border-main"></div>
+						<div class="flex flex-row justify-center gap-2 py-4 text-red-400">
+							expires { paste.Expiration.Format("Jan 2, 2006") }
+						</div>
+					}
+				</div>
+				<div class="flex flex-row w-full fixed inset-x-0 bottom-0 lg:static p-4 lg:p-0">
+					<div class="w-full flex flex-row border border-main rounded lg:border-none shadow-md lg:shadow-none rounded-r-none">
+						<button onclick="window.Editor.copyToClipboard()" type="button" class="rounded-l w-full text-center bg-muted hover:bg-accent text-main hover:text-accent-muted px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap">copy</button>
+						<a href={ templ.URL(fmt.Sprintf("/%s/raw", paste.Reference)) } class="w-full text-center bg-muted hover:bg-accent text-main hover:text-accent-muted px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap">raw</a>
+						<button onclick="window.Editor.downloadAsFile()" type="button" class="rounded-r w-full text-center bg-muted hover:bg-accent text-main hover:text-accent-muted px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap">download</button>
 					</div>
-				}
-				if paste.Expiration != nil {
-					<div class="w-full mt-4 border-t border-main"></div>
-					<div class="flex flex-row justify-center gap-2 py-4 text-red-400">
-						expires { paste.Expiration.Format("Jan 2, 2006") }
-					</div>
-				}
-			</div>
-			<div class="flex flex-row w-full">
-				<button onclick="window.Editor.copyToClipboard()" type="button" class="rounded-l w-full text-center bg-muted hover:bg-accent text-main hover:text-accent-muted px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap">copy</button>
-				<a href={ templ.URL(fmt.Sprintf("/%s/raw", paste.Reference)) } class="w-full text-center bg-muted hover:bg-accent text-main hover:text-accent-muted px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap">raw</a>
-				<button onclick="window.Editor.downloadAsFile()" type="button" class="rounded-r w-full text-center bg-muted hover:bg-accent text-main hover:text-accent-muted px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap">download</button>
+					<button onclick="toggleMetadata()" type="button" class="w-12 flex items-center justify-center border border-l-0 border-main cursor-pointer lg:hidden rounded-r bg-muted" id="expand-metadata">
+						@icons.ChevronUp(18, 18, "text-main transform transition-all duration-200")
+					</button>
+					<script>
+						const toggleMetadata = () => {
+							const sidebar = document.getElementById('metadata-sidebar')
+							const expandbtn = document.getElementById('expand-metadata')
+							const expandicon = expandbtn.querySelector('svg')
+
+							sidebar.classList.toggle('expanded')
+
+							if (sidebar.classList.contains('expanded')) {
+								sidebar.style.bottom = '0'
+								expandicon.style.transform = 'rotate(180deg)'
+								return
+							}
+
+							sidebar.style.bottom = '-100%'
+							expandicon.style.transform = 'rotate(0deg)'
+						}
+					</script>
+				</div>
 			</div>
 		</div>
 	</div>
