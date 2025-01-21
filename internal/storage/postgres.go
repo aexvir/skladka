@@ -3,8 +3,10 @@ package storage
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/aexvir/skladka/internal/config"
@@ -57,6 +59,8 @@ func NewPostgresStorage(ctx context.Context, cfg config.Config, opts ...Postgres
 	for _, opt := range opts {
 		opt(&store)
 	}
+
+	go store.expiration(ctx, 5*time.Second)
 
 	return &store, nil
 }
@@ -188,6 +192,39 @@ func (s *PostgresStorage) DecryptPaste(paste *paste.Paste) error {
 	}
 
 	return nil
+}
+
+// expiration coroutine that runs every [interval].
+// deletes expired pastes on every tick and reacts to context cancellation.
+func (s *PostgresStorage) expiration(ctx context.Context, interval time.Duration) {
+	ticker := time.NewTicker(interval)
+
+	logger := logging.FromContext(ctx)
+
+	for {
+		select {
+		case <-ctx.Done():
+			logger.Info("storage.postgres.expiration", "expiration coroutine stopped: context closed", "err", ctx.Err())
+			return
+
+		case <-ticker.C:
+			start := time.Now()
+
+			deleted, err := s.db.DeleteExpiredPastes(ctx)
+			if err != nil {
+				logger.Error(err, "storage.postgres.expiration", "failed to run expiration coroutine")
+				continue
+			}
+
+			logger.Info(
+				"storage.postgres.expiration",
+				"expiration coroutine",
+				attribute.Int("expired.count", len(deleted)),
+				attribute.StringSlice("expired.refs", deleted),
+				attribute.Int64("duration", time.Since(start).Milliseconds()),
+			)
+		}
+	}
 }
 
 func (s *PostgresStorage) ref(attempts int) (string, error) {

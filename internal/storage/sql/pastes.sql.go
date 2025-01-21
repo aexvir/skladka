@@ -51,6 +51,39 @@ func (q *Queries) CreatePaste(ctx context.Context, arg CreatePasteParams) (int64
 	return id, err
 }
 
+const deleteExpiredPastes = `-- name: DeleteExpiredPastes :many
+update pastes
+set deleted_at = now()
+where expiration < now() and deleted_at is null
+returning reference
+`
+
+// DeleteExpiredPastes
+//
+//	update pastes
+//	set deleted_at = now()
+//	where expiration < now() and deleted_at is null
+//	returning reference
+func (q *Queries) DeleteExpiredPastes(ctx context.Context) ([]string, error) {
+	rows, err := q.db.Query(ctx, deleteExpiredPastes)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var reference string
+		if err := rows.Scan(&reference); err != nil {
+			return nil, err
+		}
+		items = append(items, reference)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getPasteByID = `-- name: GetPasteByID :one
 select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
 from pastes

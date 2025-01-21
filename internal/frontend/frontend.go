@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 
@@ -105,6 +106,15 @@ func DashboardRouter(ctx context.Context, storage Storage) chi.Router {
 
 				if password := r.FormValue("password"); password != "" {
 					p.Password = &password
+				}
+
+				if expiration := r.FormValue("expiration"); expiration != "" {
+					delta, err := time.ParseDuration(expiration)
+					if err != nil {
+						return errors.NewHTTPError(http.StatusBadRequest, "invalid expiration value", err)
+					}
+					deadline := time.Now().Add(delta)
+					p.Expiration = &deadline
 				}
 
 				if err := p.Validate(); err != nil {

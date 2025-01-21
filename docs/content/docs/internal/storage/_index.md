@@ -106,7 +106,7 @@ func (c *Cipher) Verify(password, encoded string) bool
 
 
 <a name="PostgresStorage"></a>
-## type [PostgresStorage](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L18-L22>)
+## type [PostgresStorage](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L20-L24>)
 
 
 
@@ -117,7 +117,7 @@ type PostgresStorage struct {
 ```
 
 <a name="NewPostgresStorage"></a>
-### func [NewPostgresStorage](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L26>)
+### func [NewPostgresStorage](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L28>)
 
 ```go
 func NewPostgresStorage(ctx context.Context, cfg config.Config, opts ...PostgresStorageOption) (*PostgresStorage, error)
@@ -164,7 +164,7 @@ func main() error {
 </details>
 
 <a name="PostgresStorage.CreatePaste"></a>
-### func \(\*PostgresStorage\) [CreatePaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L64>)
+### func \(\*PostgresStorage\) [CreatePaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L68>)
 
 ```go
 func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (string, error)
@@ -173,7 +173,7 @@ func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (s
 
 
 <a name="PostgresStorage.DecryptPaste"></a>
-### func \(\*PostgresStorage\) [DecryptPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L181>)
+### func \(\*PostgresStorage\) [DecryptPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L185>)
 
 ```go
 func (s *PostgresStorage) DecryptPaste(paste *paste.Paste) error
@@ -182,7 +182,7 @@ func (s *PostgresStorage) DecryptPaste(paste *paste.Paste) error
 
 
 <a name="PostgresStorage.EncryptPaste"></a>
-### func \(\*PostgresStorage\) [EncryptPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L169>)
+### func \(\*PostgresStorage\) [EncryptPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L173>)
 
 ```go
 func (s *PostgresStorage) EncryptPaste(paste *paste.Paste) error
@@ -191,7 +191,7 @@ func (s *PostgresStorage) EncryptPaste(paste *paste.Paste) error
 
 
 <a name="PostgresStorage.GetPaste"></a>
-### func \(\*PostgresStorage\) [GetPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L105>)
+### func \(\*PostgresStorage\) [GetPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L109>)
 
 ```go
 func (s *PostgresStorage) GetPaste(ctx context.Context, ref string) (paste.Paste, error)
@@ -200,7 +200,7 @@ func (s *PostgresStorage) GetPaste(ctx context.Context, ref string) (paste.Paste
 
 
 <a name="PostgresStorage.GetPasteWithPassword"></a>
-### func \(\*PostgresStorage\) [GetPasteWithPassword](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L125>)
+### func \(\*PostgresStorage\) [GetPasteWithPassword](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L129>)
 
 ```go
 func (s *PostgresStorage) GetPasteWithPassword(ctx context.Context, ref, password string) (*paste.Paste, error)
@@ -209,7 +209,7 @@ func (s *PostgresStorage) GetPasteWithPassword(ctx context.Context, ref, passwor
 
 
 <a name="PostgresStorage.ListPastes"></a>
-### func \(\*PostgresStorage\) [ListPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L142>)
+### func \(\*PostgresStorage\) [ListPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L146>)
 
 ```go
 func (s *PostgresStorage) ListPastes(ctx context.Context) ([]paste.Paste, error)
@@ -218,7 +218,7 @@ func (s *PostgresStorage) ListPastes(ctx context.Context) ([]paste.Paste, error)
 
 
 <a name="PostgresStorageOption"></a>
-## type [PostgresStorageOption](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L24>)
+## type [PostgresStorageOption](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L26>)
 
 
 

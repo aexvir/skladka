@@ -23,3 +23,9 @@ from pastes
 where public = true
     and deleted_at is null
 order by created_at desc;
+
+-- name: DeleteExpiredPastes :many
+update pastes
+set deleted_at = now()
+where expiration < now() and deleted_at is null
+returning reference;

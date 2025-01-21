@@ -16,6 +16,7 @@ import "github.com/aexvir/skladka/internal/storage/sql"
 - [type Queries](<#Queries>)
   - [func New\(db DBTX\) \*Queries](<#New>)
   - [func \(q \*Queries\) CreatePaste\(ctx context.Context, arg CreatePasteParams\) \(int64, error\)](<#Queries.CreatePaste>)
+  - [func \(q \*Queries\) DeleteExpiredPastes\(ctx context.Context\) \(\[\]string, error\)](<#Queries.DeleteExpiredPastes>)
   - [func \(q \*Queries\) GetPasteByID\(ctx context.Context, id int64\) \(Paste, error\)](<#Queries.GetPasteByID>)
   - [func \(q \*Queries\) GetPasteByReference\(ctx context.Context, reference string\) \(Paste, error\)](<#Queries.GetPasteByReference>)
   - [func \(q \*Queries\) ListPublicPastes\(ctx context.Context\) \(\[\]Paste, error\)](<#Queries.ListPublicPastes>)
@@ -130,8 +131,24 @@ values ($1, $2, $3, $4, $5, $6, $7, $8)
 returning id
 ```
 
+<a name="Queries.DeleteExpiredPastes"></a>
+### func \(\*Queries\) [DeleteExpiredPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L67>)
+
+```go
+func (q *Queries) DeleteExpiredPastes(ctx context.Context) ([]string, error)
+```
+
+DeleteExpiredPastes
+
+```
+update pastes
+set deleted_at = now()
+where expiration < now() and deleted_at is null
+returning reference
+```
+
 <a name="Queries.GetPasteByID"></a>
-### func \(\*Queries\) [GetPasteByID](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L67>)
+### func \(\*Queries\) [GetPasteByID](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L100>)
 
 ```go
 func (q *Queries) GetPasteByID(ctx context.Context, id int64) (Paste, error)
@@ -147,7 +164,7 @@ where id = $1
 ```
 
 <a name="Queries.GetPasteByReference"></a>
-### func \(\*Queries\) [GetPasteByReference](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L103>)
+### func \(\*Queries\) [GetPasteByReference](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L136>)
 
 ```go
 func (q *Queries) GetPasteByReference(ctx context.Context, reference string) (Paste, error)
@@ -164,7 +181,7 @@ returning id, reference, title, content, syntax, tags, expiration, public, creat
 ```
 
 <a name="Queries.ListPublicPastes"></a>
-### func \(\*Queries\) [ListPublicPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L139>)
+### func \(\*Queries\) [ListPublicPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L172>)
 
 ```go
 func (q *Queries) ListPublicPastes(ctx context.Context) ([]Paste, error)

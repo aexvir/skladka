@@ -85,7 +85,7 @@ func Sidebar() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = SelectInput("expiration", "", icons.Clock(14, 14, "text-muted"), "10m", "30m", "1h", "1d").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = SelectInput("expiration", "", icons.Clock(14, 14, "text-muted"), "1m", "5m", "10m", "30m", "1h", "1d", "5d", "30d", "1y").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
