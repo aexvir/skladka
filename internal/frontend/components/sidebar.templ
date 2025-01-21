@@ -14,7 +14,7 @@ templ Sidebar() {
 				<div class="flex-grow space-y-4">
 					@TextInput("title", "title", "", icons.Paperclip(14, 14, "text-muted"))
 					@TagsInput("tags", "tags", icons.Tag(14, 14, "text-muted"))
-					@SelectInput("syntax", "syntax highlight", icons.Code(14, 14, "text-muted"), "plaintext", "go", "python", "javascript")
+					@SelectInput("syntax", "syntax highlight", icons.Code(14, 14, "text-muted"), "plaintext", "go", "python", "yaml", "hcl", "ocaml", "json", "yaml", "xml", "rust", "zig")
 					@ToggleWithContent("toggle-password", "", "password protection", icons.Lock(14, 14, "text-muted")) {
 						@PasswordInput("password", "password", "")
 					}
