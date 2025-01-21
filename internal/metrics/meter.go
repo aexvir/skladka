@@ -10,7 +10,7 @@ import (
 	"go.opentelemetry.io/otel/metric/noop"
 	sdk "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.25.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.27.0"
 
 	"github.com/aexvir/skladka/internal/errors"
 )
@@ -40,7 +40,7 @@ func NewMeter(service, env, version string, opts ...MeterOption) (*Meter, func(c
 	res := resource.NewWithAttributes(
 		semconv.SchemaURL,
 		semconv.ServiceName(service),
-		semconv.DeploymentEnvironment(env),
+		semconv.DeploymentEnvironmentName(env),
 		semconv.ServiceVersion(version),
 	)
 
@@ -90,8 +90,8 @@ func NewNoopMeter() *Meter {
 // Example struct with metric tags:
 //
 //	type Metrics struct {
-//		Requests    metric.Int64Counter    `metric:"requests_total,Total number of requests"`
-//		Duration    metric.Float64Histogram`metric:"request_duration_seconds,Request duration,s"`
+//		Requests    metrics.IntCounter     `metric:"requests_total,Total number of requests"`
+//		Duration    metrics.FloatHistogram `metric:"request_duration_seconds,Request duration,s"`
 //	}
 //
 // If called on a no-op metrics instance, it will initialize all metrics as no-op metrics.
@@ -110,7 +110,7 @@ func (m *Meter) Register(spec any) error {
 	defer m.mu.Unlock()
 
 	typ := elem.Type()
-	for i := 0; i < elem.NumField(); i++ {
+	for i := range elem.NumField() {
 		field := elem.Field(i)
 		if !field.CanSet() {
 			continue
@@ -123,7 +123,7 @@ func (m *Meter) Register(spec any) error {
 		}
 
 		if err := m.registerMetric(field, tag); err != nil {
-			return errors.Errorf("registering metric %q", structField.Name)
+			return errors.Wrapf(err, "registering metric %q", structField.Name)
 		}
 	}
 
@@ -142,40 +142,48 @@ func (m *Meter) registerMetric(field reflect.Value, tag string) error {
 		unit = parts[2]
 	}
 
-	opts := metric.WithDescription(desc)
-	if unit != "" {
-		opts = metric.WithUnit(unit)
-	}
-
-	var err error
 	switch field.Type().String() {
-	case "metric.Int64Counter":
-		counter, err := m.meter.Int64Counter(name, opts)
+	case "metrics.IntCounter":
+		counter, err := m.meter.Int64Counter(name, metric.WithDescription(desc), metric.WithUnit(unit))
 		if err != nil {
 			return err
 		}
-		field.Set(reflect.ValueOf(counter))
-	case "metric.Float64Counter":
-		counter, err := m.meter.Float64Counter(name, opts)
+		field.Set(reflect.ValueOf(IntCounter{counter}))
+	case "metrics.IntHistogram":
+		histogram, err := m.meter.Int64Histogram(name, metric.WithDescription(desc), metric.WithUnit(unit))
 		if err != nil {
 			return err
 		}
-		field.Set(reflect.ValueOf(counter))
-	case "metric.Int64Histogram":
-		histogram, err := m.meter.Int64Histogram(name, opts)
+		field.Set(reflect.ValueOf(IntHistogram{histogram}))
+	case "metrics.IntGauge":
+		gauge, err := m.meter.Int64Gauge(name, metric.WithDescription(desc), metric.WithUnit(unit))
 		if err != nil {
 			return err
 		}
-		field.Set(reflect.ValueOf(histogram))
-	case "metric.Float64Histogram":
-		histogram, err := m.meter.Float64Histogram(name, opts)
+		field.Set(reflect.ValueOf(IntGauge{gauge}))
+
+	case "metrics.FloatCounter":
+		counter, err := m.meter.Float64Counter(name, metric.WithDescription(desc), metric.WithUnit(unit))
 		if err != nil {
 			return err
 		}
-		field.Set(reflect.ValueOf(histogram))
+		field.Set(reflect.ValueOf(FloatCounter{counter}))
+	case "metrics.FloatHistogram":
+		histogram, err := m.meter.Float64Histogram(name, metric.WithDescription(desc), metric.WithUnit(unit))
+		if err != nil {
+			return err
+		}
+		field.Set(reflect.ValueOf(FloatHistogram{histogram}))
+	case "metrics.FloatGauge":
+		gauge, err := m.meter.Float64Gauge(name, metric.WithDescription(desc), metric.WithUnit(unit))
+		if err != nil {
+			return err
+		}
+		field.Set(reflect.ValueOf(FloatGauge{gauge}))
+
 	default:
 		return errors.Errorf("unsupported metric type: %s", field.Type())
 	}
 
-	return err
+	return nil
 }

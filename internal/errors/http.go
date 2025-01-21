@@ -5,6 +5,9 @@ import (
 	"io"
 	"net/http"
 
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
+
 	stderr "errors"
 )
 
@@ -38,6 +41,13 @@ func (e *HTTPError) Unwrap() error {
 	return e.error
 }
 
+// Format implements the fmt.Formatter interface to customize how the error is formatted.
+// It supports the following format verbs:
+//
+//	%s    prints just the error message
+//	%q    wraps the error message in quotes
+//	%v    same as %s
+//	%+v   prints error message, wrapped error if any, and stack trace
 func (e *HTTPError) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 'v':
@@ -89,10 +99,12 @@ func NewHTTPError(code int, message string, err error) error {
 //	httpErr := errors.AsHTTPError(err)
 //	fmt.Printf("Status code: %d\n", httpErr.Code)
 func AsHTTPError(err error) *HTTPError {
-	var httpErr *HTTPError
-	if stderr.As(err, &httpErr) {
-		return httpErr
+	var httperr *HTTPError
+
+	if stderr.As(err, &httperr) {
+		return httperr
 	}
+
 	return &HTTPError{
 		Code:    http.StatusInternalServerError,
 		Message: "Internal Server Error",
@@ -101,42 +113,42 @@ func AsHTTPError(err error) *HTTPError {
 	}
 }
 
-var (
-	// Common application errors
-	ErrNotFound           = NewHTTPError(http.StatusNotFound, "Resource not found", nil)
-	ErrBadRequest         = NewHTTPError(http.StatusBadRequest, "Bad request", nil)
-	ErrUnauthorized       = NewHTTPError(http.StatusUnauthorized, "Unauthorized", nil)
-	ErrForbidden          = NewHTTPError(http.StatusForbidden, "Forbidden", nil)
-	ErrInternalServer     = NewHTTPError(http.StatusInternalServerError, "Internal server error", nil)
-	ErrServiceUnavailable = NewHTTPError(http.StatusServiceUnavailable, "Service unavailable", nil)
-)
+type ErrorHandlerFunc func(http.ResponseWriter, *http.Request) error
 
-// IsNotFound returns true if the error is a not found error
-func IsNotFound(err error) bool {
-	var httpErr *HTTPError
-	return stderr.As(err, &httpErr) && httpErr.Code == http.StatusNotFound
-}
+// WithErrorHandler wraps an ErrorHandlerFunc and returns an http.HandlerFunc.
+// It handles errors returned by the ErrorHandlerFunc by:
+//   - For HTTPError: responding with the error's code and message
+//   - For other errors: setting the OpenTelemetry span status to Error and
+//     responding with 500 Internal Server Error
+//
+// Example usage:
+//
+//	http.HandleFunc(
+//	    "/users", errors.WithErrorHandler(
+//	        func(w http.ResponseWriter, r *http.Request) error {
+//	            user, err := getUser(r.Context())
+//	            if err != nil {
+//	                return errors.NewHTTPError(http.StatusNotFound, "user not found", err)
+//	            }
+//	            return json.NewEncoder(w).Encode(user)
+//	        }
+//	    )
+//	)
+func WithErrorHandler(handler ErrorHandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := handler(w, r)
+		if err != nil {
+			var httperr *HTTPError
 
-// IsBadRequest returns true if the error is a bad request error
-func IsBadRequest(err error) bool {
-	var httpErr *HTTPError
-	return stderr.As(err, &httpErr) && httpErr.Code == http.StatusBadRequest
-}
+			if stderr.As(err, &httperr) {
+				http.Error(w, httperr.Message, httperr.Code)
+				return
+			}
 
-// IsUnauthorized returns true if the error is an unauthorized error
-func IsUnauthorized(err error) bool {
-	var httpErr *HTTPError
-	return stderr.As(err, &httpErr) && httpErr.Code == http.StatusUnauthorized
-}
+			span := trace.SpanFromContext(r.Context())
+			span.SetStatus(codes.Error, err.Error())
 
-// IsForbidden returns true if the error is a forbidden error
-func IsForbidden(err error) bool {
-	var httpErr *HTTPError
-	return stderr.As(err, &httpErr) && httpErr.Code == http.StatusForbidden
-}
-
-// IsInternalServer returns true if the error is an internal server error
-func IsInternalServer(err error) bool {
-	var httpErr *HTTPError
-	return stderr.As(err, &httpErr) && httpErr.Code == http.StatusInternalServerError
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
 }

@@ -10,9 +10,10 @@ import (
 	"strings"
 
 	"go.opentelemetry.io/contrib/bridges/otelslog"
+	"go.opentelemetry.io/otel/attribute"
 	sdk "go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.25.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.27.0"
 )
 
 const (
@@ -44,7 +45,7 @@ func NewLogger(service, env, version string, opts ...LoggerOption) (*Logger, fun
 	res := resource.NewWithAttributes(
 		semconv.SchemaURL,
 		semconv.ServiceName(service),
-		semconv.DeploymentEnvironment(env),
+		semconv.DeploymentEnvironmentName(env),
 		semconv.ServiceVersion(version),
 	)
 
@@ -115,21 +116,21 @@ func (l *Logger) WithGroup(name string) *Logger {
 // The event type is added as a structured field named "event" to help categorize
 // and filter log entries.
 func (l *Logger) Info(event, message string, fields ...any) {
-	l.logger.Info(message, append(fields, slog.String("event", event))...)
+	l.logger.Info(message, append(otel2slog(fields...), slog.String("event", event))...)
 }
 
 // Debug logs a message at DEBUG level with the given event type and optional fields.
 // Debug logs are only emitted if the logger level is set to DEBUG or lower.
 // The event type is added as a structured field named "event".
 func (l *Logger) Debug(event, message string, fields ...any) {
-	l.logger.Debug(message, append(fields, slog.String("event", event))...)
+	l.logger.Debug(message, append(otel2slog(fields...), slog.String("event", event))...)
 }
 
 // Warn logs a message at WARN level with the given event type and optional fields.
 // The event type is added as a structured field named "event" to help categorize
 // and filter log entries.
 func (l *Logger) Warn(event, message string, fields ...any) {
-	l.logger.Warn(message, append(fields, slog.String("event", event))...)
+	l.logger.Warn(message, append(otel2slog(fields...), slog.String("event", event))...)
 }
 
 // Error logs a message at ERROR level with the given error, event type and optional fields.
@@ -143,7 +144,7 @@ func (l *Logger) Error(err error, event, message string, fields ...any) {
 	l.logger.Error(
 		message,
 		append(
-			fields,
+			otel2slog(fields...),
 			slog.String("event", event),
 			slog.String(TagErrMessage, err.Error()),
 			slog.String(TagErrKind, fmt.Sprintf("%T", err)),
@@ -186,4 +187,37 @@ func funcname(name string) string {
 	name = name[i+1:]
 	i = strings.Index(name, ".")
 	return name[i+1:]
+}
+
+// otel2slog receives log fields of any type and converts the
+// otel attribute.KeyValue to slog.Attr, leaving fields of any other
+// type untouched.
+func otel2slog(fields ...any) []any {
+	converged := make([]any, 0, len(fields))
+	for _, field := range fields {
+		// if the field is otel attribute, convert to slog
+		if attr, ok := field.(attribute.KeyValue); ok {
+			var slogattr slog.Attr
+
+			switch attr.Value.Type() {
+			case attribute.BOOL:
+				slogattr = slog.Bool(string(attr.Key), attr.Value.AsBool())
+			case attribute.INT64:
+				slogattr = slog.Int64(string(attr.Key), attr.Value.AsInt64())
+			case attribute.FLOAT64:
+				slogattr = slog.Float64(string(attr.Key), attr.Value.AsFloat64())
+			case attribute.STRING:
+				slogattr = slog.String(string(attr.Key), attr.Value.AsString())
+			default:
+				slogattr = slog.Any(string(attr.Key), attr.Value.AsInterface())
+			}
+
+			converged = append(converged, slogattr)
+			continue
+		}
+
+		// otherwise don't touchy
+		converged = append(converged, field)
+	}
+	return converged
 }

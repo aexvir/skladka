@@ -148,24 +148,20 @@ func main() {
 
 ## Index
 
-- [Variables](<#variables>)
 - [func As\(err error, target any\) bool](<#As>)
 - [func Cause\(err error\) error](<#Cause>)
 - [func Errorf\(format string, args ...interface\{\}\) error](<#Errorf>)
 - [func Is\(err, target error\) bool](<#Is>)
-- [func IsBadRequest\(err error\) bool](<#IsBadRequest>)
-- [func IsForbidden\(err error\) bool](<#IsForbidden>)
-- [func IsInternalServer\(err error\) bool](<#IsInternalServer>)
-- [func IsNotFound\(err error\) bool](<#IsNotFound>)
-- [func IsUnauthorized\(err error\) bool](<#IsUnauthorized>)
 - [func Join\(errs ...error\) error](<#Join>)
 - [func New\(message string\) error](<#New>)
 - [func NewHTTPError\(code int, message string, err error\) error](<#NewHTTPError>)
+- [func WithErrorHandler\(handler ErrorHandlerFunc\) http.HandlerFunc](<#WithErrorHandler>)
 - [func WithMessage\(err error, message string\) error](<#WithMessage>)
 - [func WithMessagef\(err error, format string, args ...interface\{\}\) error](<#WithMessagef>)
 - [func WithStack\(err error\) error](<#WithStack>)
 - [func Wrap\(err error, message string\) error](<#Wrap>)
 - [func Wrapf\(err error, format string, args ...interface\{\}\) error](<#Wrapf>)
+- [type ErrorHandlerFunc](<#ErrorHandlerFunc>)
 - [type Frame](<#Frame>)
   - [func \(f Frame\) Format\(state fmt.State, verb rune\)](<#Frame.Format>)
   - [func \(f Frame\) MarshalText\(\) \(\[\]byte, error\)](<#Frame.MarshalText>)
@@ -178,22 +174,6 @@ func main() {
 - [type StackTrace](<#StackTrace>)
   - [func \(st StackTrace\) Format\(state fmt.State, verb rune\)](<#StackTrace.Format>)
 
-
-## Variables
-
-<a name="ErrNotFound"></a>
-
-```go
-var (
-    // Common application errors
-    ErrNotFound           = NewHTTPError(http.StatusNotFound, "Resource not found", nil)
-    ErrBadRequest         = NewHTTPError(http.StatusBadRequest, "Bad request", nil)
-    ErrUnauthorized       = NewHTTPError(http.StatusUnauthorized, "Unauthorized", nil)
-    ErrForbidden          = NewHTTPError(http.StatusForbidden, "Forbidden", nil)
-    ErrInternalServer     = NewHTTPError(http.StatusInternalServerError, "Internal server error", nil)
-    ErrServiceUnavailable = NewHTTPError(http.StatusServiceUnavailable, "Service unavailable", nil)
-)
-```
 
 <a name="As"></a>
 ## func [As](<https://github.com/aexvir/skladka/blob/master/internal/errors/errors.go#L192>)
@@ -358,51 +338,6 @@ func Is(err, target error) bool
 
 Is reports whether any error in errs matches target. An error matches target if the error values are identical, as determined by ==.
 
-<a name="IsBadRequest"></a>
-## func [IsBadRequest](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L121>)
-
-```go
-func IsBadRequest(err error) bool
-```
-
-IsBadRequest returns true if the error is a bad request error
-
-<a name="IsForbidden"></a>
-## func [IsForbidden](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L133>)
-
-```go
-func IsForbidden(err error) bool
-```
-
-IsForbidden returns true if the error is a forbidden error
-
-<a name="IsInternalServer"></a>
-## func [IsInternalServer](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L139>)
-
-```go
-func IsInternalServer(err error) bool
-```
-
-IsInternalServer returns true if the error is an internal server error
-
-<a name="IsNotFound"></a>
-## func [IsNotFound](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L115>)
-
-```go
-func IsNotFound(err error) bool
-```
-
-IsNotFound returns true if the error is a not found error
-
-<a name="IsUnauthorized"></a>
-## func [IsUnauthorized](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L127>)
-
-```go
-func IsUnauthorized(err error) bool
-```
-
-IsUnauthorized returns true if the error is an unauthorized error
-
 <a name="Join"></a>
 ## func [Join](<https://github.com/aexvir/skladka/blob/master/internal/errors/errors.go#L167>)
 
@@ -540,7 +475,7 @@ func main() {
 </details>
 
 <a name="NewHTTPError"></a>
-## func [NewHTTPError](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L75>)
+## func [NewHTTPError](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L85>)
 
 ```go
 func NewHTTPError(code int, message string, err error) error
@@ -551,6 +486,34 @@ NewHTTPError creates a new HTTPError with the given code and message. If err is 
 ```
 err := errors.NewHTTPError(http.StatusNotFound, "user not found", nil)
 err = errors.NewHTTPError(http.StatusInternalServerError, "database error", dbErr)
+```
+
+<a name="WithErrorHandler"></a>
+## func [WithErrorHandler](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L137>)
+
+```go
+func WithErrorHandler(handler ErrorHandlerFunc) http.HandlerFunc
+```
+
+WithErrorHandler wraps an ErrorHandlerFunc and returns an http.HandlerFunc. It handles errors returned by the ErrorHandlerFunc by:
+
+- For HTTPError: responding with the error's code and message
+- For other errors: setting the OpenTelemetry span status to Error and responding with 500 Internal Server Error
+
+Example usage:
+
+```
+http.HandleFunc(
+    "/users", errors.WithErrorHandler(
+        func(w http.ResponseWriter, r *http.Request) error {
+            user, err := getUser(r.Context())
+            if err != nil {
+                return errors.NewHTTPError(http.StatusNotFound, "user not found", err)
+            }
+            return json.NewEncoder(w).Encode(user)
+        }
+    )
+)
 ```
 
 <a name="WithMessage"></a>
@@ -866,6 +829,15 @@ oh noes #2: whoops
 </p>
 </details>
 
+<a name="ErrorHandlerFunc"></a>
+## type [ErrorHandlerFunc](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L116>)
+
+
+
+```go
+type ErrorHandlerFunc func(http.ResponseWriter, *http.Request) error
+```
+
 <a name="Frame"></a>
 ## type [Frame](<https://github.com/aexvir/skladka/blob/master/internal/errors/stack.go#L58>)
 
@@ -909,7 +881,7 @@ func (f Frame) MarshalText() ([]byte, error)
 MarshalText formats a stacktrace Frame as a text string. The output is the same as that of fmt.Sprintf\("%\+v", f\), but without newlines or tabs.
 
 <a name="HTTPError"></a>
-## type [HTTPError](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L21-L26>)
+## type [HTTPError](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L24-L29>)
 
 HTTPError represents an error that includes an HTTP status code. It implements error, fmt.Formatter, and errors.Unwrap interfaces. The error can be formatted with %s, %q, %v, and %\+v verbs.
 
@@ -931,7 +903,7 @@ type HTTPError struct {
 ```
 
 <a name="AsHTTPError"></a>
-### func [AsHTTPError](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L91>)
+### func [AsHTTPError](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L101>)
 
 ```go
 func AsHTTPError(err error) *HTTPError
@@ -946,7 +918,7 @@ fmt.Printf("Status code: %d\n", httpErr.Code)
 ```
 
 <a name="HTTPError.Error"></a>
-### func \(\*HTTPError\) [Error](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L28>)
+### func \(\*HTTPError\) [Error](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L31>)
 
 ```go
 func (e *HTTPError) Error() string
@@ -955,16 +927,23 @@ func (e *HTTPError) Error() string
 
 
 <a name="HTTPError.Format"></a>
-### func \(\*HTTPError\) [Format](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L41>)
+### func \(\*HTTPError\) [Format](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L51>)
 
 ```go
 func (e *HTTPError) Format(s fmt.State, verb rune)
 ```
 
+Format implements the fmt.Formatter interface to customize how the error is formatted. It supports the following format verbs:
 
+```
+%s    prints just the error message
+%q    wraps the error message in quotes
+%v    same as %s
+%+v   prints error message, wrapped error if any, and stack trace
+```
 
 <a name="HTTPError.Is"></a>
-### func \(\*HTTPError\) [Is](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L62>)
+### func \(\*HTTPError\) [Is](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L72>)
 
 ```go
 func (e *HTTPError) Is(target error) bool
@@ -973,7 +952,7 @@ func (e *HTTPError) Is(target error) bool
 Is reports whether this error matches target. An error matches if both the Code and Message are equal.
 
 <a name="HTTPError.Unwrap"></a>
-### func \(\*HTTPError\) [Unwrap](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L37>)
+### func \(\*HTTPError\) [Unwrap](<https://github.com/aexvir/skladka/blob/master/internal/errors/http.go#L40>)
 
 ```go
 func (e *HTTPError) Unwrap() error

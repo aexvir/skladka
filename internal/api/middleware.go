@@ -8,30 +8,79 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-chi/chi/v5/middleware"
-	semconv "go.opentelemetry.io/otel/semconv/v1.25.0"
+	"github.com/go-chi/chi/v5"
+	chimw "github.com/go-chi/chi/v5/middleware"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
+	"github.com/aexvir/skladka/internal/attributes"
 	"github.com/aexvir/skladka/internal/logging"
+	"github.com/aexvir/skladka/internal/metrics"
 	"github.com/aexvir/skladka/internal/tracing"
 )
 
-// WithTracing returns a middleware that adds tracing to all requests.
+// WithMetrics returns a middleware that increments http core metrics on every request.
+func WithMetrics(meter *metrics.Meter) func(http.Handler) http.Handler {
+	met := new(
+		struct {
+			RequestCount    metrics.IntCounter     `metric:"http.requests.total,number of requests processed"`
+			RequestDuration metrics.FloatHistogram `metric:"http.requests.duration,processing duration of requests,ms"`
+		},
+	)
+
+	meter.Register(met)
+
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(
+			func(w http.ResponseWriter, r *http.Request) {
+				wrapper := chimw.NewWrapResponseWriter(w, r.ProtoMajor)
+
+				start := time.Now()
+				defer func() {
+					ctx := r.Context()
+
+					attrs := []attribute.KeyValue{
+						attributes.HttpReqMethod(r.Method),
+						attributes.HttpRespStatusCode(wrapper.Status()),
+						attributes.HttpRoute(
+							chi.RouteContext(ctx).RoutePattern(),
+						),
+					}
+
+					met.RequestCount.Add(ctx, 1, attrs...)
+					met.RequestDuration.Record(ctx, float64(time.Since(start).Milliseconds()), attrs...)
+				}()
+
+				next.ServeHTTP(w, r)
+			},
+		)
+	}
+}
+
+// WithTracing returns a middleware that creates a span for every request
+// and propagates the tracing context down the line.
 func WithTracing(tracer *tracing.Tracer) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(
 			func(w http.ResponseWriter, r *http.Request) {
-				ctx := tracing.NewContext(r.Context(), tracer)
+				wrapper := chimw.NewWrapResponseWriter(w, r.ProtoMajor)
 
 				operation := fmt.Sprintf("HTTP %s %s", r.Method, r.URL.Path)
-				ctx, finish := tracing.FromContext(ctx,
-					trace.SpanKindServer,
-					operation,
-					semconv.HTTPMethod(r.Method),
-					semconv.HTTPURL(r.URL.String()),
+				ctx, finish := tracer.StartSpan(r.Context(),
+					trace.SpanKindServer, operation,
+					attributes.HttpReqMethod(r.Method),
 				)
-				var err error
-				defer finish(&err)
+
+				defer func() {
+					finish(
+						nil,
+						attributes.HttpReqMethod(r.Method),
+						attributes.HttpRespStatusCode(wrapper.Status()),
+						attributes.HttpRoute(
+							chi.RouteContext(r.Context()).RoutePattern(),
+						),
+					)
+				}()
 
 				next.ServeHTTP(w, r.WithContext(ctx))
 			},
@@ -39,20 +88,14 @@ func WithTracing(tracer *tracing.Tracer) func(http.Handler) http.Handler {
 	}
 }
 
-// WithLogging enables logging service wide.
-// To do that, it first injects the logger to the request context, so any
-// downstream function can extract it as needed to log stuff.
-// Additionally, it uses the logger to log every request received.
+// WithLogging returns a middleware that logs every request using the specified logger.
 func WithLogging(logger *logging.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(
 			func(w http.ResponseWriter, r *http.Request) {
-				// inject logger to context
-				ctx := logging.NewContext(r.Context(), logger)
-
+				wrapper := chimw.NewWrapResponseWriter(w, r.ProtoMajor)
 				// measure and log request
 				start := time.Now()
-				wrapper := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
 				defer func() {
 					// request uri and url path should be the same
 					// but in cases like where the middleware modifies the path
@@ -62,23 +105,23 @@ func WithLogging(logger *logging.Logger) func(http.Handler) http.Handler {
 					// only in these cases
 					var resolved slog.Attr
 					if r.RequestURI != r.URL.Path {
-						resolved = slog.String("resolved", r.URL.Path)
+						resolved = slog.String("http.route.resolved", r.URL.Path)
 					}
 
 					logger.Info(
 						"api.serve",
 						"request",
-						slog.String("proto", r.Proto),
-						slog.String("method", r.Method),
-						slog.String("url", r.RequestURI),
+						attributes.HttpReqProtocol(r.Proto),
+						attributes.HttpReqMethod(r.Method),
+						attributes.HttpRoute(chi.RouteContext(r.Context()).RoutePattern()),
 						resolved,
-						slog.Int("status", wrapper.Status()),
-						slog.Int("bytes", wrapper.BytesWritten()),
-						slog.Int64("elapsed", time.Since(start).Milliseconds()),
+						attributes.HttpRespStatusCode(wrapper.Status()),
+						attributes.HttpRespSizeBytes(wrapper.BytesWritten()),
+						attributes.HttpRespDurationMilliseconds(int(time.Since(start).Milliseconds())),
 					)
 				}()
 
-				next.ServeHTTP(wrapper, r.WithContext(ctx))
+				next.ServeHTTP(wrapper, r)
 			},
 		)
 	}

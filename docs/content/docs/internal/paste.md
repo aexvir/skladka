@@ -42,6 +42,7 @@ Field validation rules:
 ## Index
 
 - [type Paste](<#Paste>)
+  - [func \(p Paste\) SizeBytes\(\) float64](<#Paste.SizeBytes>)
   - [func \(p \*Paste\) Validate\(\) error](<#Paste.Validate>)
 
 
@@ -65,8 +66,17 @@ type Paste struct {
 }
 ```
 
+<a name="Paste.SizeBytes"></a>
+### func \(Paste\) [SizeBytes](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L23>)
+
+```go
+func (p Paste) SizeBytes() float64
+```
+
+
+
 <a name="Paste.Validate"></a>
-### func \(\*Paste\) [Validate](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L25>)
+### func \(\*Paste\) [Validate](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L29>)
 
 ```go
 func (p *Paste) Validate() error

@@ -31,7 +31,7 @@ templ PasteEntry(paste paste.Paste) {
 			</div>
 			<div class="flex flex-col items-center gap-2 lg:gap-0">
 				<span class="text-sm text-muted">
-					{{ size := fmt.Sprintf("%.1f", float64(len([]byte(paste.Content)))/1024.0) }}
+					{{ size := fmt.Sprintf("%.1f", paste.SizeBytes()/1024.0) }}
 					{ strconv.Itoa(paste.Views) } views | { paste.Syntax } | { size }kb
 				</span>
 				<div class="flex flex-wrap gap-1">

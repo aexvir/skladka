@@ -83,7 +83,7 @@ func PasteEntry(paste paste.Paste) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		size := fmt.Sprintf("%.1f", float64(len([]byte(paste.Content)))/1024.0)
+		size := fmt.Sprintf("%.1f", paste.SizeBytes()/1024.0)
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(paste.Views))
 		if templ_7745c5c3_Err != nil {

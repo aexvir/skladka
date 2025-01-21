@@ -40,23 +40,42 @@ The frontend package automatically handles static asset serving, page routing, a
 
 ## Index
 
-- [func DashboardRouter\(storage Storage\) chi.Router](<#DashboardRouter>)
+- [func DashboardRouter\(ctx context.Context, storage Storage\) chi.Router](<#DashboardRouter>)
+- [type Metrics](<#Metrics>)
 - [type Storage](<#Storage>)
 
 
 <a name="DashboardRouter"></a>
-## func [DashboardRouter](<https://github.com/aexvir/skladka/blob/master/internal/frontend/frontend.go#L44>)
+## func [DashboardRouter](<https://github.com/aexvir/skladka/blob/master/internal/frontend/frontend.go#L47>)
 
 ```go
-func DashboardRouter(storage Storage) chi.Router
+func DashboardRouter(ctx context.Context, storage Storage) chi.Router
 ```
 
 DashboardRouter returns a chi.Router that handles all frontend routes. It sets up routes for static assets and implements the main application endpoints.
 
 The router uses the provided Storage implementation for paste operations and automatically handles template rendering and static asset serving.
 
+<a name="Metrics"></a>
+## type [Metrics](<https://github.com/aexvir/skladka/blob/master/internal/frontend/metrics.go#L7-L16>)
+
+
+
+```go
+type Metrics struct {
+    // PasteCreations counts the number of pastes created
+    PasteCreations metrics.IntCounter `metric:"paste.creations,number of pastes created"`
+
+    // PasteSize tracks the size of created pastes in bytes
+    PasteSize metrics.IntHistogram `metric:"paste.size,paste content size,bytes"`
+
+    // PasteRetrievals counts the number of paste retrievals
+    PasteRetrievals metrics.IntCounter `metric:"paste.retrievals,number of pastes retrieved"`
+}
+```
+
 <a name="Storage"></a>
-## type [Storage](<https://github.com/aexvir/skladka/blob/master/internal/frontend/frontend.go#L21-L33>)
+## type [Storage](<https://github.com/aexvir/skladka/blob/master/internal/frontend/frontend.go#L24-L36>)
 
 Storage defines the interface for paste storage operations required by the frontend. This interface allows the frontend to be decoupled from the actual storage implementation, making it easier to test and maintain.
 

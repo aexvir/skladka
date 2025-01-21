@@ -20,6 +20,10 @@ type Paste struct {
 	Views      int        `json:"views"`
 }
 
+func (p Paste) SizeBytes() float64 {
+	return float64(len([]byte(p.Content)))
+}
+
 // Validate checks if the paste meets all validation rules.
 // It returns an error if any rule is violated.
 func (p *Paste) Validate() error {

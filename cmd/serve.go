@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -53,16 +54,20 @@ func main() {
 
 	router := NewRouter()
 	router.Use(middleware.RequestID)
-	router.Use(api.WithLogging(logger))
-	router.Use(api.WithTracing(tracer))
 	router.Use(middleware.Heartbeat("/health"))
+	router.Use(api.WithTracing(tracer))
+	router.Use(api.WithMetrics(meter))
+	router.Use(api.WithLogging(logger))
 
-	router.Mount("/", frontend.DashboardRouter(db))
+	router.Mount("/", frontend.DashboardRouter(rootctx, db))
 	router.Handle("/metrics", metrics.Handler())
 
 	server := &http.Server{
 		Addr:    ":3000",
 		Handler: router,
+		BaseContext: func(net.Listener) context.Context {
+			return rootctx
+		},
 	}
 
 	exit := make(chan os.Signal, 1)

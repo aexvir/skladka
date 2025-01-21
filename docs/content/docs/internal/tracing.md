@@ -32,11 +32,11 @@ defer finish(&err)
 
 ## Index
 
-- [func FromContext\(ctx context.Context, kind trace.SpanKind, operation string, attributes ...attribute.KeyValue\) \(context.Context, func\(err \*error\)\)](<#FromContext>)
+- [func FromContext\(ctx context.Context, kind trace.SpanKind, operation string, attributes ...attribute.KeyValue\) \(context.Context, func\(\*error, ...attribute.KeyValue\)\)](<#FromContext>)
 - [func NewContext\(parent context.Context, tracer \*Tracer\) context.Context](<#NewContext>)
-- [type CloseSpanFn](<#CloseSpanFn>)
 - [type Tracer](<#Tracer>)
   - [func NewTracer\(service, env, version string, opts ...TracerOption\) \(\*Tracer, func\(context.Context\) error, error\)](<#NewTracer>)
+  - [func \(t \*Tracer\) StartSpan\(ctx context.Context, kind trace.SpanKind, operation string, attributes ...attribute.KeyValue\) \(context.Context, func\(\*error, ...attribute.KeyValue\)\)](<#Tracer.StartSpan>)
 - [type TracerOption](<#TracerOption>)
   - [func WithOtlpExporter\(ctx context.Context, hostname string, port int\) TracerOption](<#WithOtlpExporter>)
   - [func WithSampleRate\(value float64\) TracerOption](<#WithSampleRate>)
@@ -44,16 +44,16 @@ defer finish(&err)
 
 
 <a name="FromContext"></a>
-## func [FromContext](<https://github.com/aexvir/skladka/blob/master/internal/tracing/context.go#L26-L30>)
+## func [FromContext](<https://github.com/aexvir/skladka/blob/master/internal/tracing/context.go#L22-L26>)
 
 ```go
-func FromContext(ctx context.Context, kind trace.SpanKind, operation string, attributes ...attribute.KeyValue) (context.Context, func(err *error))
+func FromContext(ctx context.Context, kind trace.SpanKind, operation string, attributes ...attribute.KeyValue) (context.Context, func(*error, ...attribute.KeyValue))
 ```
 
 FromContext starts a new span and returns a new context instrumented with said span, as well as the function to close the span. The caller \*must\* call the close function. If no tracer instance is present in the context, this function is no\-op.
 
 <a name="NewContext"></a>
-## func [NewContext](<https://github.com/aexvir/skladka/blob/master/internal/tracing/context.go#L18>)
+## func [NewContext](<https://github.com/aexvir/skladka/blob/master/internal/tracing/context.go#L14>)
 
 ```go
 func NewContext(parent context.Context, tracer *Tracer) context.Context
@@ -61,17 +61,8 @@ func NewContext(parent context.Context, tracer *Tracer) context.Context
 
 NewContext returns a new context where the specified tracer has been injected to as value.
 
-<a name="CloseSpanFn"></a>
-## type [CloseSpanFn](<https://github.com/aexvir/skladka/blob/master/internal/tracing/context.go#L14>)
-
-
-
-```go
-type CloseSpanFn func(err *error)
-```
-
 <a name="Tracer"></a>
-## type [Tracer](<https://github.com/aexvir/skladka/blob/master/internal/tracing/tracer.go#L13-L19>)
+## type [Tracer](<https://github.com/aexvir/skladka/blob/master/internal/tracing/tracer.go#L16-L22>)
 
 Tracer is a wrapper around the OpenTelemetry TracerProvider.
 
@@ -82,7 +73,7 @@ type Tracer struct {
 ```
 
 <a name="NewTracer"></a>
-### func [NewTracer](<https://github.com/aexvir/skladka/blob/master/internal/tracing/tracer.go#L26>)
+### func [NewTracer](<https://github.com/aexvir/skladka/blob/master/internal/tracing/tracer.go#L29>)
 
 ```go
 func NewTracer(service, env, version string, opts ...TracerOption) (*Tracer, func(context.Context) error, error)
@@ -91,6 +82,24 @@ func NewTracer(service, env, version string, opts ...TracerOption) (*Tracer, fun
 NewTracer creates a new tracer with the given service name, environment and version. Additional options can be provided to customize the tracer behavior.
 
 Returns the tracer instance, a shutdown function, and any error that occurred during initialization. The shutdown function should be called when the application is shutting down to ensure all spans are flushed.
+
+<a name="Tracer.StartSpan"></a>
+### func \(\*Tracer\) [StartSpan](<https://github.com/aexvir/skladka/blob/master/internal/tracing/tracer.go#L81-L85>)
+
+```go
+func (t *Tracer) StartSpan(ctx context.Context, kind trace.SpanKind, operation string, attributes ...attribute.KeyValue) (context.Context, func(*error, ...attribute.KeyValue))
+```
+
+StartSpan starts a new span with the given operation name and attributes.
+
+The returned context contains the new span and should be passed to downstream functions. The returned function must be called when the operation is complete, typically using defer. The returned function accepts a pointer to an error which will be recorded if non\-nil, along with any additional attributes to add to the span before it ends.
+
+Example usage:
+
+```
+ctx, finish := tracer.StartSpan(ctx, trace.SpanKindServer, "my-operation")
+defer finish(&err)
+```
 
 <a name="TracerOption"></a>
 ## type [TracerOption](<https://github.com/aexvir/skladka/blob/master/internal/tracing/options.go#L19>)
