@@ -50,7 +50,7 @@ func Download(ctx context.Context) error {
 	}
 
 	err = download(
-		"https://unpkg.com/htmx.org@1.9.12",
+		"https://unpkg.com/htmx.org@2.0.4",
 		"./internal/frontend/static/htmx.js",
 	)
 	if err != nil {

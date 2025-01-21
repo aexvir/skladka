@@ -6,7 +6,7 @@ templ Editor(content, syntax string, readonly bool) {
 	</div>
 	<script src="/static/monaco/loader.js"></script>
 	<script type="module">
-        import { getHighlighter } from 'https://esm.sh/shiki'
+        import { createHighlighter } from 'https://esm.sh/shiki'
         import { shikiToMonaco } from 'https://esm.sh/@shikijs/monaco'
 
         const ayuLightTheme = {
@@ -1708,7 +1708,7 @@ templ Editor(content, syntax string, readonly bool) {
         }
 
        	const langs = ["go", "python", "yaml", "hcl", "ocaml", "json", "yaml", "xml", "rust", "zig"]
-        const highlighter = await getHighlighter(
+        const highlighter = await createHighlighter(
             {
                 themes: [ayuDarkTheme, ayuLightTheme],
                 langs: langs,
