@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/aexvir/skladka/internal/attributes"
+	"github.com/aexvir/skladka/internal/config"
 	"github.com/aexvir/skladka/internal/errors"
 	"github.com/aexvir/skladka/internal/frontend/layouts"
 	"github.com/aexvir/skladka/internal/frontend/views"
@@ -54,13 +55,18 @@ func DashboardRouter(ctx context.Context, storage Storage) chi.Router {
 	}
 
 	staticsrv := http.FileServerFS(static)
+	etag := fmt.Sprintf(`"%s"`, config.BuildRevision)
 	router.Get(
 		"/static/*",
 		http.HandlerFunc(
 			func(w http.ResponseWriter, r *http.Request) {
-				// w.Header().Set("Cache-Control", "public, max-age=31536000") // Cache for 1 year
-				// w.Header().Set("Expires", time.Now().Add(time.Hour*24*365).UTC().Format(http.TimeFormat))
-				// w.Header().Set("Pragma", "public")
+				if r.Header.Get("If-None-Match") == etag {
+					w.WriteHeader(http.StatusNotModified)
+					return
+				}
+
+				w.Header().Set("ETag", etag)
+				w.Header().Set("Cache-Control", "public, max-age=31536000")
 
 				staticsrv.ServeHTTP(w, r)
 			},
