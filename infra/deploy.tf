@@ -33,6 +33,12 @@ resource "kubernetes_deployment" "skladka" {
           }
 
           env_from {
+            config_map_ref {
+              name = kubernetes_config_map.skladka.metadata[0].name
+            }
+          }
+
+          env_from {
             secret_ref {
               name = kubernetes_secret.skladka.metadata[0].name
             }
@@ -85,6 +91,33 @@ resource "kubernetes_service" "skladka" {
 
     type = var.service_type
   }
+}
+
+resource "kubernetes_config_map" "skladka" {
+  metadata {
+    name      = "skladka"
+    namespace = kubernetes_namespace.skladka.id
+  }
+
+  data = {
+    SKD_ENVIRONMENT = "production"
+
+    SKD_METRICS_ENABLED = "true"
+    SKD_METRICS_HOST    = "grafana-k8s-monitoring-alloy-receiver.observability.svc.cluster.local"
+    SKD_METRICS_PORT    = "4317"
+
+    SKD_TRACING_ENABLED = "true"
+    SKD_TRACING_HOST    = "grafana-k8s-monitoring-alloy-receiver.observability.svc.cluster.local"
+    SKD_TRACING_PORT    = "4317"
+
+    SKD_LOGGING_ENABLED = "true"
+    SKD_LOGGING_HOST    = "grafana-k8s-monitoring-alloy-receiver.observability.svc.cluster.local"
+    SKD_LOGGING_PORT    = "4317"
+  }
+
+  depends_on = [
+    kubernetes_manifest.db
+  ]
 }
 
 resource "kubernetes_secret" "skladka" {
