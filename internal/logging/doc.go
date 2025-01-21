@@ -27,7 +27,7 @@
 //	// anywhere else in the code
 //	logger := logging.FromContext(ctx)
 //	logger.Info("event_name", "Processing request", slog.String("request_id", "abc123"))
-//	
+//
 //	// logging errors with automatic stack traces
 //	if err := someOperation(); err != nil {
 //		logger.Error(err, "operation_failed", "Operation failed", slog.String("op", "process"))

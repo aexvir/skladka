@@ -140,7 +140,7 @@ type FancyLoggerOptions struct {
 ```
 
 <a name="Logger"></a>
-## type [Logger](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L24-L35>)
+## type [Logger](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L25-L36>)
 
 
 
@@ -160,7 +160,7 @@ func FromContext(ctx context.Context) *Logger
 FromContext extracts the logger from the provided context. This is the recommended way to obtain a logger instance for logging. If no logger is found in the context, it returns a new no\-op logger that safely discards all log messages.
 
 <a name="NewLogger"></a>
-### func [NewLogger](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L43>)
+### func [NewLogger](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L44>)
 
 ```go
 func NewLogger(service, env, version string, opts ...LoggerOption) (*Logger, func(context.Context) error, error)
@@ -171,7 +171,7 @@ NewLogger creates a new structured logger with the given service name, environme
 Returns the logger instance, a shutdown function, and any error that occurred during initialization. The shutdown function should be called when the application is shutting down to ensure all logs are flushed.
 
 <a name="NewNopLogger"></a>
-### func [NewNopLogger](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L89>)
+### func [NewNopLogger](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L90>)
 
 ```go
 func NewNopLogger() *Logger
@@ -180,7 +180,7 @@ func NewNopLogger() *Logger
 NewNopLogger returns a logger that discards all log messages. This is useful for testing or when logging is not needed. The returned logger implements all Logger methods but performs no operations.
 
 <a name="Logger.Debug"></a>
-### func \(\*Logger\) [Debug](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L124>)
+### func \(\*Logger\) [Debug](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L125>)
 
 ```go
 func (l *Logger) Debug(event, message string, fields ...any)
@@ -189,7 +189,7 @@ func (l *Logger) Debug(event, message string, fields ...any)
 Debug logs a message at DEBUG level with the given event type and optional fields. Debug logs are only emitted if the logger level is set to DEBUG or lower. The event type is added as a structured field named "event".
 
 <a name="Logger.Error"></a>
-### func \(\*Logger\) [Error](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L140>)
+### func \(\*Logger\) [Error](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L141>)
 
 ```go
 func (l *Logger) Error(err error, event, message string, fields ...any)
@@ -202,7 +202,7 @@ Error logs a message at ERROR level with the given error, event type and optiona
 - error.stack: A formatted stack trace from the point of the error
 
 <a name="Logger.Info"></a>
-### func \(\*Logger\) [Info](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L117>)
+### func \(\*Logger\) [Info](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L118>)
 
 ```go
 func (l *Logger) Info(event, message string, fields ...any)
@@ -211,7 +211,7 @@ func (l *Logger) Info(event, message string, fields ...any)
 Info logs a message at INFO level with the given event type and optional fields. The event type is added as a structured field named "event" to help categorize and filter log entries.
 
 <a name="Logger.Warn"></a>
-### func \(\*Logger\) [Warn](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L131>)
+### func \(\*Logger\) [Warn](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L132>)
 
 ```go
 func (l *Logger) Warn(event, message string, fields ...any)
@@ -220,7 +220,7 @@ func (l *Logger) Warn(event, message string, fields ...any)
 Warn logs a message at WARN level with the given event type and optional fields. The event type is added as a structured field named "event" to help categorize and filter log entries.
 
 <a name="Logger.With"></a>
-### func \(\*Logger\) [With](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L100>)
+### func \(\*Logger\) [With](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L101>)
 
 ```go
 func (l *Logger) With(fields ...any) *Logger
@@ -229,7 +229,7 @@ func (l *Logger) With(fields ...any) *Logger
 With returns a new Logger with the given fields added to every log message. The fields are added as structured logging fields and will be present in all subsequent log entries made through the returned logger.
 
 <a name="Logger.WithGroup"></a>
-### func \(\*Logger\) [WithGroup](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L108>)
+### func \(\*Logger\) [WithGroup](<https://github.com/aexvir/skladka/blob/master/internal/logging/logger.go#L109>)
 
 ```go
 func (l *Logger) WithGroup(name string) *Logger

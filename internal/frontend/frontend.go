@@ -9,9 +9,12 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
+	"github.com/aexvir/skladka/internal/attributes"
+	"github.com/aexvir/skladka/internal/errors"
 	"github.com/aexvir/skladka/internal/frontend/layouts"
 	"github.com/aexvir/skladka/internal/frontend/views"
 	"github.com/aexvir/skladka/internal/logging"
+	"github.com/aexvir/skladka/internal/metrics"
 	"github.com/aexvir/skladka/internal/paste"
 )
 
@@ -41,8 +44,13 @@ var static embed.FS
 //
 // The router uses the provided Storage implementation for paste operations
 // and automatically handles template rendering and static asset serving.
-func DashboardRouter(storage Storage) chi.Router {
+func DashboardRouter(ctx context.Context, storage Storage) chi.Router {
 	router := chi.NewRouter()
+
+	met := new(Metrics)
+	if err := metrics.FromContext(ctx).Register(met); err != nil {
+		panic(errors.Wrap(err, "error initializing frontend metrics"))
+	}
 
 	staticsrv := http.FileServerFS(static)
 	router.Get(
@@ -60,31 +68,27 @@ func DashboardRouter(storage Storage) chi.Router {
 
 	router.Get(
 		"/",
-		http.HandlerFunc(
-			func(w http.ResponseWriter, r *http.Request) {
+		errors.WithErrorHandler(
+			func(w http.ResponseWriter, r *http.Request) error {
 				logger := logging.FromContext(r.Context())
 				logger.Info("frontend.dashboard", "rendering creation page")
 
-				layouts.Base(
+				return layouts.Base(
 					views.Creation("Skládka"),
 				).Render(r.Context(), w)
-
-				return
 			},
 		),
 	)
 
 	router.Post(
 		"/",
-		http.HandlerFunc(
-			func(w http.ResponseWriter, r *http.Request) {
+		errors.WithErrorHandler(
+			func(w http.ResponseWriter, r *http.Request) error {
 				logger := logging.FromContext(r.Context())
 				logger.Info("frontend.dashboard", "creating paste")
 
 				if err := r.ParseForm(); err != nil {
-					w.WriteHeader(http.StatusBadRequest)
-					w.Write([]byte(fmt.Sprintf("error parsing form: %v", err)))
-					return
+					return errors.NewHTTPError(http.StatusBadRequest, "error parsing form", err)
 				}
 
 				// Create paste object
@@ -104,41 +108,41 @@ func DashboardRouter(storage Storage) chi.Router {
 				}
 
 				if err := p.Validate(); err != nil {
-					w.WriteHeader(http.StatusBadRequest)
-					w.Write([]byte(fmt.Sprintf("error creating paste: %v", err)))
-					return
+					return errors.NewHTTPError(http.StatusBadRequest, "invalid paste", err)
 				}
 
 				// Save to storage
 				ref, err := storage.CreatePaste(r.Context(), p)
 				if err != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					w.Write([]byte(fmt.Sprintf("error creating paste: %v", err)))
-					return
+					return errors.NewHTTPError(http.StatusInternalServerError, "error creating paste", err)
 				}
+
+				met.PasteCreations.Add(r.Context(), 1, attributes.Status("ok"))
+				met.PasteSize.Record(r.Context(), int(p.SizeBytes()))
 
 				// Redirect to the paste view
 				http.Redirect(w, r, fmt.Sprintf("/%s", ref), http.StatusSeeOther)
-				return
+				return nil
 			},
 		),
 	)
 
 	router.Get(
 		"/archive",
-		http.HandlerFunc(
-			func(w http.ResponseWriter, r *http.Request) {
+		errors.WithErrorHandler(
+			func(w http.ResponseWriter, r *http.Request) error {
 				logger := logging.FromContext(r.Context())
 				logger.Info("frontend.archive", "rendering archive page")
 
 				pastes, err := storage.ListPastes(r.Context())
 				if err != nil {
 					logger.Error(err, "frontend.archive", "error listing pastes")
-					http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-					return
+					return errors.AsHTTPError(err)
 				}
 
-				layouts.Base(
+				met.PasteRetrievals.Add(r.Context(), len(pastes), attributes.Status(attributes.ValueStatusOk))
+
+				return layouts.Base(
 					views.Archive("Recent Pastes", pastes),
 				).Render(r.Context(), w)
 			},
@@ -147,22 +151,23 @@ func DashboardRouter(storage Storage) chi.Router {
 
 	router.Get(
 		"/{ref}",
-		http.HandlerFunc(
-			func(w http.ResponseWriter, r *http.Request) {
+		errors.WithErrorHandler(
+			func(w http.ResponseWriter, r *http.Request) error {
 				ref := chi.URLParam(r, "ref")
 
 				paste, err := storage.GetPaste(r.Context(), ref)
 				if err != nil {
-					w.WriteHeader(422)
-					w.Write([]byte(fmt.Sprintf("error fetching paste %s: %v", ref, err)))
-					return
+					return errors.NewHTTPError(
+						http.StatusUnprocessableEntity,
+						fmt.Sprintf("error fetching paste %s", ref),
+						err,
+					)
 				}
 
 				if paste.Password != nil {
-					layouts.Base(
+					return layouts.Base(
 						views.PasswordPrompt(ref),
 					).Render(r.Context(), w)
-					return
 				}
 
 				logging.
@@ -175,78 +180,83 @@ func DashboardRouter(storage Storage) chi.Router {
 						"tags", paste.Tags,
 					)
 
-				layouts.Base(
+				return layouts.Base(
 					views.Document(paste),
 				).Render(r.Context(), w)
-				return
 			},
 		),
 	)
 
-	router.Post("/{ref}/unlock", func(w http.ResponseWriter, r *http.Request) {
-		ref := chi.URLParam(r, "ref")
-		password := r.FormValue("password")
+	router.Post("/{ref}/unlock",
+		errors.WithErrorHandler(
+			func(w http.ResponseWriter, r *http.Request) error {
+				ref := chi.URLParam(r, "ref")
+				password := r.FormValue("password")
 
-		paste, err := storage.GetPasteWithPassword(r.Context(), ref, password)
-		if err != nil {
-			w.WriteHeader(422)
-			w.Write([]byte(fmt.Sprintf("error fetching paste %s: %v", ref, err)))
-			return
-		}
+				paste, err := storage.GetPasteWithPassword(r.Context(), ref, password)
+				if err != nil {
+					return errors.NewHTTPError(
+						http.StatusUnprocessableEntity,
+						fmt.Sprintf("error fetching paste %s", ref),
+						err,
+					)
+				}
 
-		if paste == nil {
-			http.Error(w, "Invalid password", http.StatusForbidden)
-			return
-		}
+				if paste == nil {
+					return errors.NewHTTPError(http.StatusForbidden, "invalid password", err)
+				}
 
-		logging.
-			FromContext(r.Context()).
-			Info(
-				"frontend.dashboard", "rendering document page",
-				"ref", ref,
-				"title", paste.Title,
-				"syntax", paste.Syntax,
-				"tags", paste.Tags,
-			)
+				logging.
+					FromContext(r.Context()).
+					Info(
+						"frontend.dashboard", "rendering document page",
+						"ref", ref,
+						"title", paste.Title,
+						"syntax", paste.Syntax,
+						"tags", paste.Tags,
+					)
 
-		layouts.Base(
-			views.Document(*paste),
-		).Render(r.Context(), w)
-		return
-	})
+				return layouts.Base(
+					views.Document(*paste),
+				).Render(r.Context(), w)
+			},
+		),
+	)
 
 	router.Get(
 		"/{ref}/raw",
-		http.HandlerFunc(
-			func(w http.ResponseWriter, r *http.Request) {
+		errors.WithErrorHandler(
+			func(w http.ResponseWriter, r *http.Request) error {
 				ref := chi.URLParam(r, "ref")
 				password := r.Header.Get("x-skd-password")
 
 				paste, err := storage.GetPaste(r.Context(), ref)
 				if err != nil {
-					w.WriteHeader(422)
-					w.Write([]byte(fmt.Sprintf("error fetching paste %s: %v", ref, err)))
-					return
+					return errors.NewHTTPError(
+						http.StatusUnprocessableEntity,
+						fmt.Sprintf("error fetching paste %s", ref),
+						err,
+					)
 				}
 
 				if paste.Password != nil {
 					if password == "" {
-						layouts.Base(
+						return layouts.Base(
 							views.RawPasswordPrompt(ref),
 						).Render(r.Context(), w)
-						return
 					}
 
 					paste, err := storage.GetPasteWithPassword(r.Context(), ref, password)
 					if err != nil {
-						w.WriteHeader(422)
-						w.Write([]byte(fmt.Sprintf("error fetching paste %s: %v", ref, err)))
-						return
+						return errors.NewHTTPError(
+							http.StatusUnprocessableEntity,
+							fmt.Sprintf("error fetching paste %s", ref),
+							err,
+						)
 					}
 
 					if paste == nil {
-						http.Error(w, "Invalid password", http.StatusForbidden)
-						return
+						return errors.NewHTTPError(http.StatusForbidden, "invalid password", err)
 					}
 				}
 
@@ -261,8 +271,8 @@ func DashboardRouter(storage Storage) chi.Router {
 					)
 
 				w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-				w.Write([]byte(paste.Content))
-				return
+				_, err = w.Write([]byte(paste.Content))
+				return err
 			},
 		),
 	)

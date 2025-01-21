@@ -35,8 +35,8 @@ afterwards it can be used
 ```
 // define metrics struct, usually at package level
 type Metrics struct {
-	CreatePaste   metric.Int64Counter    `metric:"storage_paste_create_total,Number of pastes created"`
-	PasteSize     metric.Int64Histogram  `metric:"storage_paste_size_bytes,Size of pastes in bytes"`
+	CreatePaste   metrics.IntCounter    `metric:"storage_paste_create_total,Number of pastes created"`
+	PasteSize     metrics.IntHistogram  `metric:"storage_paste_size_bytes,Size of pastes in bytes"`
 }
 
 // and reference them in the main package struct
@@ -65,6 +65,18 @@ The metrics package automatically handles registration and management of OpenTel
 
 - [func Handler\(\) http.Handler](<#Handler>)
 - [func NewContext\(parent context.Context, metrics \*Meter\) context.Context](<#NewContext>)
+- [type FloatCounter](<#FloatCounter>)
+  - [func \(c FloatCounter\) Add\(ctx context.Context, incr float64, attributes ...attribute.KeyValue\)](<#FloatCounter.Add>)
+- [type FloatGauge](<#FloatGauge>)
+  - [func \(g FloatGauge\) Record\(ctx context.Context, incr float64, attributes ...attribute.KeyValue\)](<#FloatGauge.Record>)
+- [type FloatHistogram](<#FloatHistogram>)
+  - [func \(g FloatHistogram\) Record\(ctx context.Context, incr float64, attributes ...attribute.KeyValue\)](<#FloatHistogram.Record>)
+- [type IntCounter](<#IntCounter>)
+  - [func \(c IntCounter\) Add\(ctx context.Context, incr int, attributes ...attribute.KeyValue\)](<#IntCounter.Add>)
+- [type IntGauge](<#IntGauge>)
+  - [func \(g IntGauge\) Record\(ctx context.Context, incr int, attributes ...attribute.KeyValue\)](<#IntGauge.Record>)
+- [type IntHistogram](<#IntHistogram>)
+  - [func \(h IntHistogram\) Record\(ctx context.Context, incr int, attributes ...attribute.KeyValue\)](<#IntHistogram.Record>)
 - [type Meter](<#Meter>)
   - [func FromContext\(ctx context.Context\) \*Meter](<#FromContext>)
   - [func NewMeter\(service, env, version string, opts ...MeterOption\) \(\*Meter, func\(context.Context\) error, error\)](<#NewMeter>)
@@ -92,6 +104,138 @@ func NewContext(parent context.Context, metrics *Meter) context.Context
 ```
 
 NewContext returns a new context.Context that carries the provided meter instance. This context should be used as the parent context for all operations that need to record metrics. The meter can be retrieved using FromContext.
+
+<a name="FloatCounter"></a>
+## type [FloatCounter](<https://github.com/aexvir/skladka/blob/master/internal/metrics/types.go#L47-L49>)
+
+FloatCounter is an instrument that records increasing float64 values.
+
+```go
+type FloatCounter struct {
+    metric.Float64Counter
+}
+```
+
+<a name="FloatCounter.Add"></a>
+### func \(FloatCounter\) [Add](<https://github.com/aexvir/skladka/blob/master/internal/metrics/types.go#L54>)
+
+```go
+func (c FloatCounter) Add(ctx context.Context, incr float64, attributes ...attribute.KeyValue)
+```
+
+Add records a change to the counter.
+
+Use the WithAttributes option to include measurement attributes.
+
+<a name="FloatGauge"></a>
+## type [FloatGauge](<https://github.com/aexvir/skladka/blob/master/internal/metrics/types.go#L72-L74>)
+
+FloatGauge is an instrument that records instantaneous float64 values.
+
+```go
+type FloatGauge struct {
+    metric.Float64Gauge
+}
+```
+
+<a name="FloatGauge.Record"></a>
+### func \(FloatGauge\) [Record](<https://github.com/aexvir/skladka/blob/master/internal/metrics/types.go#L79>)
+
+```go
+func (g FloatGauge) Record(ctx context.Context, incr float64, attributes ...attribute.KeyValue)
+```
+
+Record records the instantaneous value.
+
+Use the WithAttributes option to include measurement attributes.
+
+<a name="FloatHistogram"></a>
+## type [FloatHistogram](<https://github.com/aexvir/skladka/blob/master/internal/metrics/types.go#L60-L62>)
+
+FloatHistogram is an instrument that records a distribution of float64 values.
+
+```go
+type FloatHistogram struct {
+    metric.Float64Histogram
+}
+```
+
+<a name="FloatHistogram.Record"></a>
+### func \(FloatHistogram\) [Record](<https://github.com/aexvir/skladka/blob/master/internal/metrics/types.go#L67>)
+
+```go
+func (g FloatHistogram) Record(ctx context.Context, incr float64, attributes ...attribute.KeyValue)
+```
+
+Record adds an additional value to the distribution.
+
+Use the WithAttributes option to include measurement attributes.
+
+<a name="IntCounter"></a>
+## type [IntCounter](<https://github.com/aexvir/skladka/blob/master/internal/metrics/types.go#L11-L13>)
+
+IntCounter is an instrument that records increasing int values.
+
+```go
+type IntCounter struct {
+    metric.Int64Counter
+}
+```
+
+<a name="IntCounter.Add"></a>
+### func \(IntCounter\) [Add](<https://github.com/aexvir/skladka/blob/master/internal/metrics/types.go#L18>)
+
+```go
+func (c IntCounter) Add(ctx context.Context, incr int, attributes ...attribute.KeyValue)
+```
+
+Add records a change to the counter.
+
+Use the WithAttributes option to include measurement attributes.
+
+<a name="IntGauge"></a>
+## type [IntGauge](<https://github.com/aexvir/skladka/blob/master/internal/metrics/types.go#L35-L37>)
+
+IntGauge is an instrument that records instantaneous int values.
+
+```go
+type IntGauge struct {
+    metric.Int64Gauge
+}
+```
+
+<a name="IntGauge.Record"></a>
+### func \(IntGauge\) [Record](<https://github.com/aexvir/skladka/blob/master/internal/metrics/types.go#L42>)
+
+```go
+func (g IntGauge) Record(ctx context.Context, incr int, attributes ...attribute.KeyValue)
+```
+
+Record adds an additional value to the distribution.
+
+Use the WithAttributes option to include measurement attributes.
+
+<a name="IntHistogram"></a>
+## type [IntHistogram](<https://github.com/aexvir/skladka/blob/master/internal/metrics/types.go#L23-L25>)
+
+IntHistogram is an instrument that records a distribution of int values.
+
+```go
+type IntHistogram struct {
+    metric.Int64Histogram
+}
+```
+
+<a name="IntHistogram.Record"></a>
+### func \(IntHistogram\) [Record](<https://github.com/aexvir/skladka/blob/master/internal/metrics/types.go#L30>)
+
+```go
+func (h IntHistogram) Record(ctx context.Context, incr int, attributes ...attribute.KeyValue)
+```
+
+Record adds an additional value to the distribution.
+
+Use the WithAttributes option to include measurement attributes.
 
 <a name="Meter"></a>
 ## type [Meter](<https://github.com/aexvir/skladka/blob/master/internal/metrics/meter.go#L21-L28>)
@@ -150,8 +294,8 @@ Example struct with metric tags:
 
 ```
 type Metrics struct {
-	Requests    metric.Int64Counter    `metric:"requests_total,Total number of requests"`
-	Duration    metric.Float64Histogram`metric:"request_duration_seconds,Request duration,s"`
+	Requests    metrics.IntCounter     `metric:"requests_total,Total number of requests"`
+	Duration    metrics.FloatHistogram `metric:"request_duration_seconds,Request duration,s"`
 }
 ```
 

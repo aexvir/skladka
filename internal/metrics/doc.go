@@ -27,8 +27,8 @@
 //
 //	// define metrics struct, usually at package level
 //	type Metrics struct {
-//		CreatePaste   metric.Int64Counter    `metric:"storage_paste_create_total,Number of pastes created"`
-//		PasteSize     metric.Int64Histogram  `metric:"storage_paste_size_bytes,Size of pastes in bytes"`
+//		CreatePaste   metrics.IntCounter    `metric:"storage_paste_create_total,Number of pastes created"`
+//		PasteSize     metrics.IntHistogram  `metric:"storage_paste_size_bytes,Size of pastes in bytes"`
 //	}
 //
 //	// and reference them in the main package struct

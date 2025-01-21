@@ -2,10 +2,13 @@ package tracing
 
 import (
 	"context"
+	"fmt"
 
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdk "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.25.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.27.0"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -43,7 +46,7 @@ func NewTracer(service, env, version string, opts ...TracerOption) (*Tracer, fun
 			resource.NewWithAttributes(
 				semconv.SchemaURL,
 				semconv.ServiceName(service),
-				semconv.DeploymentEnvironment(env),
+				semconv.DeploymentEnvironmentName(env),
 				semconv.ServiceVersion(version),
 			),
 		),
@@ -62,4 +65,46 @@ func NewTracer(service, env, version string, opts ...TracerOption) (*Tracer, fun
 		}
 		return nil
 	}, nil
+}
+
+// StartSpan starts a new span with the given operation name and attributes.
+//
+// The returned context contains the new span and should be passed to downstream functions.
+// The returned function must be called when the operation is complete, typically using defer.
+// The returned function accepts a pointer to an error which will be recorded if non-nil,
+// along with any additional attributes to add to the span before it ends.
+//
+// Example usage:
+//
+//	ctx, finish := tracer.StartSpan(ctx, trace.SpanKindServer, "my-operation")
+//	defer finish(&err)
+func (t *Tracer) StartSpan(
+	ctx context.Context,
+	kind trace.SpanKind, operation string,
+	attributes ...attribute.KeyValue,
+) (context.Context, func(*error, ...attribute.KeyValue)) {
+	ctx, span := t.tracer.Start(ctx, operation, trace.WithSpanKind(kind), trace.WithAttributes(attributes...))
+
+	return ctx, func(err *error, extra ...attribute.KeyValue) {
+		if len(extra) > 0 {
+			span.SetAttributes(extra...)
+		}
+		// span status is unset by default
+		// the opentelemetry semconv specify that unset should be treated as ok
+		// so only error has to be set
+		//
+		// this is important because if other function got this span from context
+		// and already set the status to error, but finish is being called with nil error
+		// if we'd unconditionally set status to ok here it would override the error, as ok
+		// has higher code
+		if err != nil && *err != nil {
+			span.SetStatus(codes.Error, (*err).Error())
+			span.SetAttributes(
+				semconv.ExceptionMessage((*err).Error()),
+				semconv.ExceptionType(fmt.Sprintf("%T", *err)),
+			)
+			// todo: add stack trace from cause
+		}
+		span.End()
+	}
 }

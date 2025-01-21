@@ -4,14 +4,10 @@ import (
 	"context"
 
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
-	semconv "go.opentelemetry.io/otel/semconv/v1.25.0"
 	"go.opentelemetry.io/otel/trace"
 )
 
 const ctxKeyTracer = "tracer"
-
-type CloseSpanFn func(err *error)
 
 // NewContext returns a new context where the specified tracer has been
 // injected to as value.
@@ -27,22 +23,11 @@ func FromContext(
 	ctx context.Context,
 	kind trace.SpanKind, operation string,
 	attributes ...attribute.KeyValue,
-) (context.Context, func(err *error)) {
+) (context.Context, func(*error, ...attribute.KeyValue)) {
 	tracer, ok := ctx.Value(ctxKeyTracer).(*Tracer)
 	if tracer == nil || !ok {
-		return ctx, func(err *error) {}
+		return ctx, func(*error, ...attribute.KeyValue) {}
 	}
 
-	ctx, span := tracer.tracer.Start(ctx, operation, trace.WithSpanKind(kind), trace.WithAttributes(attributes...))
-
-	return ctx, func(err *error) {
-		span.SetStatus(codes.Ok, "")
-		if err != nil && *err != nil {
-			span.SetStatus(codes.Error, (*err).Error())
-			span.SetAttributes(
-				semconv.ExceptionMessage((*err).Error()),
-			)
-		}
-		span.End()
-	}
+	return tracer.StartSpan(ctx, kind, operation, attributes...)
 }

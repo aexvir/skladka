@@ -4,24 +4,21 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/aexvir/skladka/internal/config"
 	"github.com/aexvir/skladka/internal/errors"
 	"github.com/aexvir/skladka/internal/logging"
-	"github.com/aexvir/skladka/internal/metrics"
 	"github.com/aexvir/skladka/internal/paste"
 	"github.com/aexvir/skladka/internal/storage/sql"
 	"github.com/aexvir/skladka/internal/tracing"
 )
 
 type PostgresStorage struct {
-	conn    *pgxpool.Pool
-	db      *sql.Queries
-	cipher  *Cipher
-	metrics *Metrics
+	conn   *pgxpool.Pool
+	db     *sql.Queries
+	cipher *Cipher
 }
 
 type PostgresStorageOption func(*PostgresStorage)
@@ -51,16 +48,10 @@ func NewPostgresStorage(ctx context.Context, cfg config.Config, opts ...Postgres
 		return nil, err
 	}
 
-	met := new(Metrics)
-	if err := metrics.FromContext(ctx).Register(met); err != nil {
-		return nil, errors.Wrap(err, "registering metrics")
-	}
-
 	store := PostgresStorage{
-		conn:    conn,
-		db:      sql.New(conn),
-		metrics: met,
-		cipher:  NewCipher(cfg.EncryptionKey, cfg.EncryptionSalt),
+		conn:   conn,
+		db:     sql.New(conn),
+		cipher: NewCipher(cfg.EncryptionKey, cfg.EncryptionSalt),
 	}
 
 	for _, opt := range opts {
@@ -77,7 +68,6 @@ func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (s
 
 	ref, err := s.ref(10)
 	if err != nil {
-		s.metrics.PasteErrors.Add(ctx, 1)
 		return "", err
 	}
 
@@ -106,12 +96,8 @@ func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (s
 	)
 
 	if err != nil {
-		s.metrics.PasteErrors.Add(ctx, 1)
 		return "", err
 	}
-
-	s.metrics.PasteCreated.Add(ctx, 1)
-	s.metrics.PasteSize.Record(ctx, int64(len(row.Content)))
 
 	return ref, nil
 }
@@ -125,11 +111,6 @@ func (s *PostgresStorage) GetPaste(ctx context.Context, ref string) (paste.Paste
 
 	row, err := s.db.GetPasteByReference(ctx, ref)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			s.metrics.PasteNotFound.Add(ctx, 1)
-		} else {
-			s.metrics.PasteErrors.Add(ctx, 1)
-		}
 		return empty, err
 	}
 
@@ -137,8 +118,6 @@ func (s *PostgresStorage) GetPaste(ctx context.Context, ref string) (paste.Paste
 	if err := s.DecryptPaste(&paste); err != nil {
 		return empty, errors.Wrap(err, "failed to decrypt data")
 	}
-
-	s.metrics.PasteRetrieved.Add(ctx, 1)
 
 	return paste, nil
 }
