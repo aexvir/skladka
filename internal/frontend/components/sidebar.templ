@@ -19,7 +19,7 @@ templ Sidebar() {
 						@PasswordInput("password", "password", "")
 					}
 					@ToggleWithContent("toggle-expiration", "", "expiration", icons.Clock(14, 14, "text-muted")) {
-						@SelectInput("expiration", "", icons.Clock(14, 14, "text-muted"), "1m", "5m", "10m", "30m", "1h", "1d", "5d", "30d", "1y")
+						@SelectInput("expiration", "", icons.Clock(14, 14, "text-muted"), "no expiration", "1m", "5m", "10m", "30m", "1h", "1d", "5d", "30d", "1y")
 					}
 					@Toggle("toggle-unlisted", "unlisted", "unlisted", icons.Eye(14, 14, "text-muted"))
 					<input type="hidden" name="content" id="editor-content"/>

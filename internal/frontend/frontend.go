@@ -114,7 +114,7 @@ func DashboardRouter(ctx context.Context, storage Storage) chi.Router {
 					p.Password = &password
 				}
 
-				if expiration := r.FormValue("expiration"); expiration != "" {
+				if expiration := r.FormValue("expiration"); expiration != "no expiration" {
 					delta, err := time.ParseDuration(expiration)
 					if err != nil {
 						return errors.NewHTTPError(http.StatusBadRequest, "invalid expiration value", err)
