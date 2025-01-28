@@ -85,7 +85,7 @@ func (q *Queries) DeleteExpiredPastes(ctx context.Context) ([]string, error) {
 }
 
 const getPasteByID = `-- name: GetPasteByID :one
-select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
+select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
 from pastes
 where id = $1
     and deleted_at is null
@@ -93,7 +93,7 @@ where id = $1
 
 // GetPasteByID
 //
-//	select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
+//	select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
 //	from pastes
 //	where id = $1
 //	    and deleted_at is null
@@ -114,6 +114,7 @@ func (q *Queries) GetPasteByID(ctx context.Context, id int64) (Paste, error) {
 		&i.DeletedAt,
 		&i.Views,
 		&i.Password,
+		&i.Owner,
 	)
 	return i, err
 }
@@ -123,7 +124,7 @@ update pastes
 set views = views + 1
 where reference = $1
     and deleted_at is null
-returning id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
+returning id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
 `
 
 // GetPasteByReference
@@ -132,7 +133,7 @@ returning id, reference, title, content, syntax, tags, expiration, public, creat
 //	set views = views + 1
 //	where reference = $1
 //	    and deleted_at is null
-//	returning id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
+//	returning id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
 func (q *Queries) GetPasteByReference(ctx context.Context, reference string) (Paste, error) {
 	row := q.db.QueryRow(ctx, getPasteByReference, reference)
 	var i Paste
@@ -150,12 +151,13 @@ func (q *Queries) GetPasteByReference(ctx context.Context, reference string) (Pa
 		&i.DeletedAt,
 		&i.Views,
 		&i.Password,
+		&i.Owner,
 	)
 	return i, err
 }
 
 const listPublicPastes = `-- name: ListPublicPastes :many
-select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
+select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
 from pastes
 where public = true
     and deleted_at is null
@@ -164,7 +166,7 @@ order by created_at desc
 
 // ListPublicPastes
 //
-//	select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
+//	select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
 //	from pastes
 //	where public = true
 //	    and deleted_at is null
@@ -192,6 +194,7 @@ func (q *Queries) ListPublicPastes(ctx context.Context) ([]Paste, error) {
 			&i.DeletedAt,
 			&i.Views,
 			&i.Password,
+			&i.Owner,
 		); err != nil {
 			return nil, err
 		}

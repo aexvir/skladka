@@ -23,6 +23,7 @@ type Config struct {
 	Core
 	Postgres
 	Observability
+	WebAuthn
 }
 
 type Core struct {
@@ -34,6 +35,12 @@ type Core struct {
 	EncryptionSalt string `conf:"encryption-salt,env:ENCRYPTION_SALT"`
 	// Environment the application is running in.
 	Environment string `conf:"env,env:ENVIRONMENT,default:dev"`
+}
+
+type WebAuthn struct {
+	RelyingPartyServerID     string `conf:"rpid,env:RPID"`
+	RelyingPartyDisplayName  string `conf:"rpname,env:RPNAME"`
+	RelyingPartyServerOrigin string `conf:"rporigin,env:RPORIGIN"`
 }
 
 type Postgres struct {

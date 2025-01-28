@@ -38,7 +38,9 @@ Views are designed to work with the \[layouts\] package for consistent page stru
 - [func Archive\(title string, pastes \[\]paste.Paste\) templ.Component](<#Archive>)
 - [func Creation\(name string\) templ.Component](<#Creation>)
 - [func Document\(paste paste.Paste\) templ.Component](<#Document>)
+- [func Login\(\) templ.Component](<#Login>)
 - [func PasswordPrompt\(reference string\) templ.Component](<#PasswordPrompt>)
+- [func Profile\(user \*auth.User\) templ.Component](<#Profile>)
 - [func RawPasswordPrompt\(reference string\) templ.Component](<#RawPasswordPrompt>)
 
 
@@ -69,11 +71,29 @@ func Document(paste paste.Paste) templ.Component
 
 
 
+<a name="Login"></a>
+## func [Login](<https://github.com/aexvir/skladka/blob/master/internal/frontend/views/login_templ.go#L12>)
+
+```go
+func Login() templ.Component
+```
+
+
+
 <a name="PasswordPrompt"></a>
 ## func [PasswordPrompt](<https://github.com/aexvir/skladka/blob/master/internal/frontend/views/password_templ.go#L12>)
 
 ```go
 func PasswordPrompt(reference string) templ.Component
+```
+
+
+
+<a name="Profile"></a>
+## func [Profile](<https://github.com/aexvir/skladka/blob/master/internal/frontend/views/profile_templ.go#L15>)
+
+```go
+func Profile(user *auth.User) templ.Component
 ```
 
 

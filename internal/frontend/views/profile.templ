@@ -1,0 +1,25 @@
+package views
+
+import (
+	"github.com/aexvir/skladka/internal/auth"
+	"github.com/aexvir/skladka/internal/frontend/icons"
+)
+
+templ Profile(user *auth.User) {
+	<div class="h-full w-full flex flex-row items-center justify-center bg-main">
+		<div class="p-8 space-y-4 bg-muted border border-main rounded-lg shadow-xl">
+			<h2 class="text-2xl font-bold inline-flex items-center gap-2">
+				@icons.Hand(24, 24, "text-muted")
+				hi there &#64;{ user.Username }
+			</h2>
+			<div class="flex flex-col lg:flex-row w-full gap-2 lg:gap-0">
+				<a
+					href="/u/logout"
+					class="h-10 w-full px-4 py-2 rounded bg-accent text-accent-muted hover:bg-accent-muted transition-all duration-200"
+				>
+					logout
+				</a>
+			</div>
+		</div>
+	</div>
+}

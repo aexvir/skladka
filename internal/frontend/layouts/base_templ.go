@@ -8,11 +8,12 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
+	"github.com/aexvir/skladka/internal/auth"
 	"github.com/aexvir/skladka/internal/frontend/components"
 	"github.com/aexvir/skladka/internal/frontend/icons"
 )
 
-func Base(content templ.Component) templ.Component {
+func Base(user *auth.User, content templ.Component) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -51,8 +52,8 @@ func Base(content templ.Component) templ.Component {
 		}
 		templ_7745c5c3_Err = components.Nav(
 			"skladka",
+			user,
 			components.Link{Icon: icons.Clock(16, 16, "text-muted"), Text: "recent", URL: templ.SafeURL("/archive")},
-			components.Link{Icon: icons.Cog(16, 16, "text-muted"), Text: "settings", URL: templ.SafeURL("/settings")},
 		).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

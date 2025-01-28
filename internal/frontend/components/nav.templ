@@ -1,12 +1,17 @@
 package components
 
+import (
+	"github.com/aexvir/skladka/internal/auth"
+	"github.com/aexvir/skladka/internal/frontend/icons"
+)
+
 type Link struct {
 	Icon templ.Component
 	Text string
 	URL  templ.SafeURL
 }
 
-templ Nav(name string, links ...Link) {
+templ Nav(name string, user *auth.User, links ...Link) {
 	<nav class="bg-muted text-main px-4 py-2 flex justify-between items-center lowercase block border-b border-main ">
 		<a class="flex flex-row items-center gap-4 transition-all text-main hover:text-accent" href="/">
 			<img src="/static/landfill.svg" class="h-auto w-8" id="nav-logo"/>
@@ -19,6 +24,20 @@ templ Nav(name string, links ...Link) {
 						@link.Icon
 					}
 					{ link.Text }
+				</a>
+			}
+			if user == nil {
+				<a href="/u/login" class="hover:text-accent text-main transition-colors flex items-center gap-2">
+					@icons.User(16, 16, "text-muted")
+					login
+				</a>
+			}
+			if user != nil {
+				<a
+					href="/u/profile"
+					class="hover:text-accent text-main transition-colors flex items-center gap-2"
+				>
+					&#64;{ user.Username }
 				</a>
 			}
 		</div>

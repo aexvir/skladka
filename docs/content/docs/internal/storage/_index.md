@@ -41,11 +41,16 @@ if err != nil {
 - [type PostgresStorage](<#PostgresStorage>)
   - [func NewPostgresStorage\(ctx context.Context, cfg config.Config, opts ...PostgresStorageOption\) \(\*PostgresStorage, error\)](<#NewPostgresStorage>)
   - [func \(s \*PostgresStorage\) CreatePaste\(ctx context.Context, paste paste.Paste\) \(string, error\)](<#PostgresStorage.CreatePaste>)
+  - [func \(s \*PostgresStorage\) CreateSession\(ctx context.Context, ssn auth.Session\) \(err error\)](<#PostgresStorage.CreateSession>)
+  - [func \(s \*PostgresStorage\) CreateUser\(ctx context.Context, user auth.User\) \(err error\)](<#PostgresStorage.CreateUser>)
   - [func \(s \*PostgresStorage\) DecryptPaste\(paste \*paste.Paste\) error](<#PostgresStorage.DecryptPaste>)
   - [func \(s \*PostgresStorage\) EncryptPaste\(paste \*paste.Paste\) error](<#PostgresStorage.EncryptPaste>)
   - [func \(s \*PostgresStorage\) GetPaste\(ctx context.Context, ref string\) \(paste.Paste, error\)](<#PostgresStorage.GetPaste>)
   - [func \(s \*PostgresStorage\) GetPasteWithPassword\(ctx context.Context, ref, password string\) \(\*paste.Paste, error\)](<#PostgresStorage.GetPasteWithPassword>)
+  - [func \(s \*PostgresStorage\) GetSessionByToken\(ctx context.Context, token string\) \(session auth.Session, err error\)](<#PostgresStorage.GetSessionByToken>)
+  - [func \(s \*PostgresStorage\) GetUserByUsername\(ctx context.Context, username string\) \(user auth.User, err error\)](<#PostgresStorage.GetUserByUsername>)
   - [func \(s \*PostgresStorage\) ListPastes\(ctx context.Context\) \(\[\]paste.Paste, error\)](<#PostgresStorage.ListPastes>)
+  - [func \(s \*PostgresStorage\) UpdateUserCredentials\(ctx context.Context, user auth.User\) \(err error\)](<#PostgresStorage.UpdateUserCredentials>)
 - [type PostgresStorageOption](<#PostgresStorageOption>)
 
 
@@ -106,7 +111,7 @@ func (c *Cipher) Verify(password, encoded string) bool
 
 
 <a name="PostgresStorage"></a>
-## type [PostgresStorage](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L20-L24>)
+## type [PostgresStorage](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L22-L26>)
 
 
 
@@ -117,7 +122,7 @@ type PostgresStorage struct {
 ```
 
 <a name="NewPostgresStorage"></a>
-### func [NewPostgresStorage](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L28>)
+### func [NewPostgresStorage](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L30>)
 
 ```go
 func NewPostgresStorage(ctx context.Context, cfg config.Config, opts ...PostgresStorageOption) (*PostgresStorage, error)
@@ -164,7 +169,7 @@ func main() error {
 </details>
 
 <a name="PostgresStorage.CreatePaste"></a>
-### func \(\*PostgresStorage\) [CreatePaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L68>)
+### func \(\*PostgresStorage\) [CreatePaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L162>)
 
 ```go
 func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (string, error)
@@ -172,8 +177,26 @@ func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (s
 
 
 
+<a name="PostgresStorage.CreateSession"></a>
+### func \(\*PostgresStorage\) [CreateSession](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L123>)
+
+```go
+func (s *PostgresStorage) CreateSession(ctx context.Context, ssn auth.Session) (err error)
+```
+
+CreateSession creates a new user session in the database with the provided \[auth.Session\] data. Returns an error if the database operation fails.
+
+<a name="PostgresStorage.CreateUser"></a>
+### func \(\*PostgresStorage\) [CreateUser](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L71>)
+
+```go
+func (s *PostgresStorage) CreateUser(ctx context.Context, user auth.User) (err error)
+```
+
+CreateUser creates a new user in the database with the provided \[auth.User\] data.
+
 <a name="PostgresStorage.DecryptPaste"></a>
-### func \(\*PostgresStorage\) [DecryptPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L185>)
+### func \(\*PostgresStorage\) [DecryptPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L279>)
 
 ```go
 func (s *PostgresStorage) DecryptPaste(paste *paste.Paste) error
@@ -182,7 +205,7 @@ func (s *PostgresStorage) DecryptPaste(paste *paste.Paste) error
 
 
 <a name="PostgresStorage.EncryptPaste"></a>
-### func \(\*PostgresStorage\) [EncryptPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L173>)
+### func \(\*PostgresStorage\) [EncryptPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L267>)
 
 ```go
 func (s *PostgresStorage) EncryptPaste(paste *paste.Paste) error
@@ -191,7 +214,7 @@ func (s *PostgresStorage) EncryptPaste(paste *paste.Paste) error
 
 
 <a name="PostgresStorage.GetPaste"></a>
-### func \(\*PostgresStorage\) [GetPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L109>)
+### func \(\*PostgresStorage\) [GetPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L203>)
 
 ```go
 func (s *PostgresStorage) GetPaste(ctx context.Context, ref string) (paste.Paste, error)
@@ -200,7 +223,7 @@ func (s *PostgresStorage) GetPaste(ctx context.Context, ref string) (paste.Paste
 
 
 <a name="PostgresStorage.GetPasteWithPassword"></a>
-### func \(\*PostgresStorage\) [GetPasteWithPassword](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L129>)
+### func \(\*PostgresStorage\) [GetPasteWithPassword](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L223>)
 
 ```go
 func (s *PostgresStorage) GetPasteWithPassword(ctx context.Context, ref, password string) (*paste.Paste, error)
@@ -208,8 +231,26 @@ func (s *PostgresStorage) GetPasteWithPassword(ctx context.Context, ref, passwor
 
 
 
+<a name="PostgresStorage.GetSessionByToken"></a>
+### func \(\*PostgresStorage\) [GetSessionByToken](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L145>)
+
+```go
+func (s *PostgresStorage) GetSessionByToken(ctx context.Context, token string) (session auth.Session, err error)
+```
+
+GetSessionByToken retrieves a session from the database using the provided token string. Returns the session data as an \[auth.Session\] object if found, or an error if the token is invalid or the session cannot be retrieved.
+
+<a name="PostgresStorage.GetUserByUsername"></a>
+### func \(\*PostgresStorage\) [GetUserByUsername](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L91>)
+
+```go
+func (s *PostgresStorage) GetUserByUsername(ctx context.Context, username string) (user auth.User, err error)
+```
+
+GetUserByUsername retrieves a user from the database by their username. It returns the user data as an \[auth.User\] object and any error that occurred during the operation.
+
 <a name="PostgresStorage.ListPastes"></a>
-### func \(\*PostgresStorage\) [ListPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L146>)
+### func \(\*PostgresStorage\) [ListPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L240>)
 
 ```go
 func (s *PostgresStorage) ListPastes(ctx context.Context) ([]paste.Paste, error)
@@ -217,8 +258,17 @@ func (s *PostgresStorage) ListPastes(ctx context.Context) ([]paste.Paste, error)
 
 
 
+<a name="PostgresStorage.UpdateUserCredentials"></a>
+### func \(\*PostgresStorage\) [UpdateUserCredentials](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L106>)
+
+```go
+func (s *PostgresStorage) UpdateUserCredentials(ctx context.Context, user auth.User) (err error)
+```
+
+UpdateUserCredentials updates the stored credentials for a user in the database. It expects the \[auth.User\] object to have the new value for Credentials already set. Returns an error if the update operation fails.
+
 <a name="PostgresStorageOption"></a>
-## type [PostgresStorageOption](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L26>)
+## type [PostgresStorageOption](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L28>)
 
 
 

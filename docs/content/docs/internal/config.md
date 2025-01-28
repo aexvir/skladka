@@ -36,6 +36,7 @@ fmt.Printf("Database host: %s:%d\n", cfg.Postgres.Host, cfg.Postgres.Port)
 - [type Observability](<#Observability>)
 - [type Otlp](<#Otlp>)
 - [type Postgres](<#Postgres>)
+- [type WebAuthn](<#WebAuthn>)
 
 
 ## Variables
@@ -57,7 +58,7 @@ var ErrHelpWanted = errors.New("help requested")
 ```
 
 <a name="Config"></a>
-## type [Config](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L20-L26>)
+## type [Config](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L20-L27>)
 
 
 
@@ -68,11 +69,12 @@ type Config struct {
     Core
     Postgres
     Observability
+    WebAuthn
 }
 ```
 
 <a name="Load"></a>
-### func [Load](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L69>)
+### func [Load](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L76>)
 
 ```go
 func Load() (Config, error)
@@ -81,7 +83,7 @@ func Load() (Config, error)
 
 
 <a name="Core"></a>
-## type [Core](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L28-L37>)
+## type [Core](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L29-L38>)
 
 
 
@@ -99,7 +101,7 @@ type Core struct {
 ```
 
 <a name="Observability"></a>
-## type [Observability](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L54-L58>)
+## type [Observability](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L61-L65>)
 
 
 
@@ -112,7 +114,7 @@ type Observability struct {
 ```
 
 <a name="Otlp"></a>
-## type [Otlp](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L60-L67>)
+## type [Otlp](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L67-L74>)
 
 
 
@@ -128,7 +130,7 @@ type Otlp struct {
 ```
 
 <a name="Postgres"></a>
-## type [Postgres](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L39-L52>)
+## type [Postgres](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L46-L59>)
 
 
 
@@ -146,6 +148,19 @@ type Postgres struct {
     Database string `conf:"db,env:POSTGRES_DB"`
     // URL is the full postgres connection URL in the format: postgres://user:pass@host:port/db
     URL string `conf:"url,env:POSTGRES_DB_URL"`
+}
+```
+
+<a name="WebAuthn"></a>
+## type [WebAuthn](<https://github.com/aexvir/skladka/blob/master/internal/config/config.go#L40-L44>)
+
+
+
+```go
+type WebAuthn struct {
+    RelyingPartyServerID     string `conf:"rpid,env:RPID"`
+    RelyingPartyDisplayName  string `conf:"rpname,env:RPNAME"`
+    RelyingPartyServerOrigin string `conf:"rporigin,env:RPORIGIN"`
 }
 ```
 

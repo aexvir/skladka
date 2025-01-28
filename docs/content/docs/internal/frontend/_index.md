@@ -40,16 +40,16 @@ The frontend package automatically handles static asset serving, page routing, a
 
 ## Index
 
-- [func DashboardRouter\(ctx context.Context, storage Storage\) chi.Router](<#DashboardRouter>)
+- [func DashboardRouter\(ctx context.Context, storage Storage, authsvc \*auth.Service\) chi.Router](<#DashboardRouter>)
 - [type Metrics](<#Metrics>)
 - [type Storage](<#Storage>)
 
 
 <a name="DashboardRouter"></a>
-## func [DashboardRouter](<https://github.com/aexvir/skladka/blob/master/internal/frontend/frontend.go#L48>)
+## func [DashboardRouter](<https://github.com/aexvir/skladka/blob/master/internal/frontend/frontend.go#L51>)
 
 ```go
-func DashboardRouter(ctx context.Context, storage Storage) chi.Router
+func DashboardRouter(ctx context.Context, storage Storage, authsvc *auth.Service) chi.Router
 ```
 
 DashboardRouter returns a chi.Router that handles all frontend routes. It sets up routes for static assets and implements the main application endpoints.
@@ -75,7 +75,7 @@ type Metrics struct {
 ```
 
 <a name="Storage"></a>
-## type [Storage](<https://github.com/aexvir/skladka/blob/master/internal/frontend/frontend.go#L25-L37>)
+## type [Storage](<https://github.com/aexvir/skladka/blob/master/internal/frontend/frontend.go#L28-L40>)
 
 Storage defines the interface for paste storage operations required by the frontend. This interface allows the frontend to be decoupled from the actual storage implementation, making it easier to test and maintain.
 

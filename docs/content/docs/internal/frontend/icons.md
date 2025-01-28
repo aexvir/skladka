@@ -19,10 +19,12 @@ import "github.com/aexvir/skladka/internal/frontend/icons"
 - [func Cog\(width, height int, classes ...string\) templ.Component](<#Cog>)
 - [func Document\(width, height int, classes ...string\) templ.Component](<#Document>)
 - [func Eye\(width, height int, classes ...string\) templ.Component](<#Eye>)
+- [func Hand\(width, height int, classes ...string\) templ.Component](<#Hand>)
 - [func List\(width, height int, classes ...string\) templ.Component](<#List>)
 - [func Lock\(width, height int, classes ...string\) templ.Component](<#Lock>)
 - [func Paperclip\(width, height int, classes ...string\) templ.Component](<#Paperclip>)
 - [func Tag\(width, height int, classes ...string\) templ.Component](<#Tag>)
+- [func User\(width, height int, classes ...string\) templ.Component](<#User>)
 
 
 <a name="Bookmark"></a>
@@ -124,6 +126,15 @@ func Eye(width, height int, classes ...string) templ.Component
 
 
 
+<a name="Hand"></a>
+## func [Hand](<https://github.com/aexvir/skladka/blob/master/internal/frontend/icons/hand_templ.go#L15>)
+
+```go
+func Hand(width, height int, classes ...string) templ.Component
+```
+
+
+
 <a name="List"></a>
 ## func [List](<https://github.com/aexvir/skladka/blob/master/internal/frontend/icons/list_templ.go#L15>)
 
@@ -156,6 +167,15 @@ func Paperclip(width, height int, classes ...string) templ.Component
 
 ```go
 func Tag(width, height int, classes ...string) templ.Component
+```
+
+
+
+<a name="User"></a>
+## func [User](<https://github.com/aexvir/skladka/blob/master/internal/frontend/icons/user_templ.go#L15>)
+
+```go
+func User(width, height int, classes ...string) templ.Component
 ```
 
 

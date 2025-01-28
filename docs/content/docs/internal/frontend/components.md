@@ -49,7 +49,7 @@ Components are designed to work seamlessly with the [templ](<https://github.com/
 - [func Editor\(content, syntax string, readonly bool\) templ.Component](<#Editor>)
 - [func InputLabel\(name string, icon templ.Component\) templ.Component](<#InputLabel>)
 - [func Metadata\(paste paste.Paste\) templ.Component](<#Metadata>)
-- [func Nav\(name string, links ...Link\) templ.Component](<#Nav>)
+- [func Nav\(name string, user \*auth.User, links ...Link\) templ.Component](<#Nav>)
 - [func PasswordInput\(id, label, placeholder string\) templ.Component](<#PasswordInput>)
 - [func PasteEntry\(paste paste.Paste\) templ.Component](<#PasteEntry>)
 - [func SelectInput\(id, label string, icon templ.Component, options ...string\) templ.Component](<#SelectInput>)
@@ -99,10 +99,10 @@ func Metadata(paste paste.Paste) templ.Component
 
 
 <a name="Nav"></a>
-## func [Nav](<https://github.com/aexvir/skladka/blob/master/internal/frontend/components/nav_templ.go#L16>)
+## func [Nav](<https://github.com/aexvir/skladka/blob/master/internal/frontend/components/nav_templ.go#L21>)
 
 ```go
-func Nav(name string, links ...Link) templ.Component
+func Nav(name string, user *auth.User, links ...Link) templ.Component
 ```
 
 
@@ -189,7 +189,7 @@ func ToggleWithContent(id string, name string, label string, icon templ.Componen
 
 
 <a name="Link"></a>
-## type [Link](<https://github.com/aexvir/skladka/blob/master/internal/frontend/components/nav_templ.go#L10-L14>)
+## type [Link](<https://github.com/aexvir/skladka/blob/master/internal/frontend/components/nav_templ.go#L15-L19>)
 
 
 

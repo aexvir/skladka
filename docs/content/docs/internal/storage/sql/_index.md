@@ -9,6 +9,8 @@ import "github.com/aexvir/skladka/internal/storage/sql"
 ## Index
 
 - [type CreatePasteParams](<#CreatePasteParams>)
+- [type CreateSessionParams](<#CreateSessionParams>)
+- [type CreateUserParams](<#CreateUserParams>)
 - [type DBTX](<#DBTX>)
 - [type Paste](<#Paste>)
   - [func \(Paste\) FromDomain\(domain paste.Paste\) \*Paste](<#Paste.FromDomain>)
@@ -16,11 +18,26 @@ import "github.com/aexvir/skladka/internal/storage/sql"
 - [type Queries](<#Queries>)
   - [func New\(db DBTX\) \*Queries](<#New>)
   - [func \(q \*Queries\) CreatePaste\(ctx context.Context, arg CreatePasteParams\) \(int64, error\)](<#Queries.CreatePaste>)
+  - [func \(q \*Queries\) CreateSession\(ctx context.Context, arg CreateSessionParams\) \(Session, error\)](<#Queries.CreateSession>)
+  - [func \(q \*Queries\) CreateUser\(ctx context.Context, arg CreateUserParams\) \(User, error\)](<#Queries.CreateUser>)
   - [func \(q \*Queries\) DeleteExpiredPastes\(ctx context.Context\) \(\[\]string, error\)](<#Queries.DeleteExpiredPastes>)
+  - [func \(q \*Queries\) DeleteExpiredSessions\(ctx context.Context\) error](<#Queries.DeleteExpiredSessions>)
+  - [func \(q \*Queries\) DeleteSession\(ctx context.Context, token pgtype.UUID\) error](<#Queries.DeleteSession>)
+  - [func \(q \*Queries\) DeleteUser\(ctx context.Context, id int64\) error](<#Queries.DeleteUser>)
   - [func \(q \*Queries\) GetPasteByID\(ctx context.Context, id int64\) \(Paste, error\)](<#Queries.GetPasteByID>)
   - [func \(q \*Queries\) GetPasteByReference\(ctx context.Context, reference string\) \(Paste, error\)](<#Queries.GetPasteByReference>)
+  - [func \(q \*Queries\) GetSessionByToken\(ctx context.Context, token pgtype.UUID\) \(Session, error\)](<#Queries.GetSessionByToken>)
+  - [func \(q \*Queries\) GetUserByUsername\(ctx context.Context, username string\) \(User, error\)](<#Queries.GetUserByUsername>)
   - [func \(q \*Queries\) ListPublicPastes\(ctx context.Context\) \(\[\]Paste, error\)](<#Queries.ListPublicPastes>)
+  - [func \(q \*Queries\) UpdateUserCredentials\(ctx context.Context, arg UpdateUserCredentialsParams\) error](<#Queries.UpdateUserCredentials>)
   - [func \(q \*Queries\) WithTx\(tx pgx.Tx\) \*Queries](<#Queries.WithTx>)
+- [type Session](<#Session>)
+  - [func \(Session\) FromDomain\(domain auth.Session\) Session](<#Session.FromDomain>)
+  - [func \(db Session\) ToDomain\(\) auth.Session](<#Session.ToDomain>)
+- [type UpdateUserCredentialsParams](<#UpdateUserCredentialsParams>)
+- [type User](<#User>)
+  - [func \(User\) FromDomain\(domain auth.User\) User](<#User.FromDomain>)
+  - [func \(db User\) ToDomain\(\) auth.User](<#User.ToDomain>)
 
 
 <a name="CreatePasteParams"></a>
@@ -41,6 +58,33 @@ type CreatePasteParams struct {
 }
 ```
 
+<a name="CreateSessionParams"></a>
+## type [CreateSessionParams](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/sessions.sql.go#L21-L26>)
+
+
+
+```go
+type CreateSessionParams struct {
+    Token     pgtype.UUID      `db:"token" json:"token"`
+    Username  string           `db:"username" json:"username"`
+    Data      []byte           `db:"data" json:"data"`
+    ExpiresAt pgtype.Timestamp `db:"expires_at" json:"expires_at"`
+}
+```
+
+<a name="CreateUserParams"></a>
+## type [CreateUserParams](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/users.sql.go#L21-L25>)
+
+
+
+```go
+type CreateUserParams struct {
+    Username    string      `db:"username" json:"username"`
+    Uuid        pgtype.UUID `db:"uuid" json:"uuid"`
+    Credentials []byte      `db:"credentials" json:"credentials"`
+}
+```
+
 <a name="DBTX"></a>
 ## type [DBTX](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/db.go#L14-L18>)
 
@@ -55,7 +99,7 @@ type DBTX interface {
 ```
 
 <a name="Paste"></a>
-## type [Paste](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/models.go#L11-L25>)
+## type [Paste](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/models.go#L11-L26>)
 
 
 
@@ -74,11 +118,12 @@ type Paste struct {
     DeletedAt  pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
     Views      pgtype.Int4      `db:"views" json:"views"`
     Password   pgtype.Text      `db:"password" json:"password"`
+    Owner      pgtype.Int8      `db:"owner" json:"owner"`
 }
 ```
 
 <a name="Paste.FromDomain"></a>
-### func \(Paste\) [FromDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L41>)
+### func \(Paste\) [FromDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L106>)
 
 ```go
 func (Paste) FromDomain(domain paste.Paste) *Paste
@@ -87,7 +132,7 @@ func (Paste) FromDomain(domain paste.Paste) *Paste
 
 
 <a name="Paste.ToDomain"></a>
-### func \(Paste\) [ToDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L11>)
+### func \(Paste\) [ToDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L76>)
 
 ```go
 func (db Paste) ToDomain() paste.Paste
@@ -131,6 +176,38 @@ values ($1, $2, $3, $4, $5, $6, $7, $8)
 returning id
 ```
 
+<a name="Queries.CreateSession"></a>
+### func \(\*Queries\) [CreateSession](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/sessions.sql.go#L34>)
+
+```go
+func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
+```
+
+CreateSession
+
+```
+insert into sessions
+(token, username, data, expires_at)
+values ($1, $2, $3, $4)
+returning id, token, username, data, created_at, expires_at
+```
+
+<a name="Queries.CreateUser"></a>
+### func \(\*Queries\) [CreateUser](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/users.sql.go#L33>)
+
+```go
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+```
+
+CreateUser
+
+```
+insert into users
+(username, uuid, credentials)
+values ($1, $2, $3)
+returning id, username, uuid, credentials, created_at, updated_at, deleted_at
+```
+
 <a name="Queries.DeleteExpiredPastes"></a>
 ### func \(\*Queries\) [DeleteExpiredPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L67>)
 
@@ -147,6 +224,49 @@ where expiration < now() and deleted_at is null
 returning reference
 ```
 
+<a name="Queries.DeleteExpiredSessions"></a>
+### func \(\*Queries\) [DeleteExpiredSessions](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/sessions.sql.go#L62>)
+
+```go
+func (q *Queries) DeleteExpiredSessions(ctx context.Context) error
+```
+
+DeleteExpiredSessions
+
+```
+delete from sessions
+where expires_at <= now()
+```
+
+<a name="Queries.DeleteSession"></a>
+### func \(\*Queries\) [DeleteSession](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/sessions.sql.go#L76>)
+
+```go
+func (q *Queries) DeleteSession(ctx context.Context, token pgtype.UUID) error
+```
+
+DeleteSession
+
+```
+delete from sessions
+where token = $1
+```
+
+<a name="Queries.DeleteUser"></a>
+### func \(\*Queries\) [DeleteUser](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/users.sql.go#L59>)
+
+```go
+func (q *Queries) DeleteUser(ctx context.Context, id int64) error
+```
+
+DeleteUser
+
+```
+update users
+set deleted_at = now()
+where id = $1
+```
+
 <a name="Queries.GetPasteByID"></a>
 ### func \(\*Queries\) [GetPasteByID](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L100>)
 
@@ -157,14 +277,14 @@ func (q *Queries) GetPasteByID(ctx context.Context, id int64) (Paste, error)
 GetPasteByID
 
 ```
-select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
+select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
 from pastes
 where id = $1
     and deleted_at is null
 ```
 
 <a name="Queries.GetPasteByReference"></a>
-### func \(\*Queries\) [GetPasteByReference](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L136>)
+### func \(\*Queries\) [GetPasteByReference](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L137>)
 
 ```go
 func (q *Queries) GetPasteByReference(ctx context.Context, reference string) (Paste, error)
@@ -177,11 +297,43 @@ update pastes
 set views = views + 1
 where reference = $1
     and deleted_at is null
-returning id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
+returning id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
+```
+
+<a name="Queries.GetSessionByToken"></a>
+### func \(\*Queries\) [GetSessionByToken](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/sessions.sql.go#L94>)
+
+```go
+func (q *Queries) GetSessionByToken(ctx context.Context, token pgtype.UUID) (Session, error)
+```
+
+GetSessionByToken
+
+```
+select id, token, username, data, created_at, expires_at
+from sessions
+where token = $1
+    and expires_at > now()
+```
+
+<a name="Queries.GetUserByUsername"></a>
+### func \(\*Queries\) [GetUserByUsername](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/users.sql.go#L77>)
+
+```go
+func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error)
+```
+
+GetUserByUsername
+
+```
+select id, username, uuid, credentials, created_at, updated_at, deleted_at
+from users
+where username = $1
+    and deleted_at is null
 ```
 
 <a name="Queries.ListPublicPastes"></a>
-### func \(\*Queries\) [ListPublicPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L172>)
+### func \(\*Queries\) [ListPublicPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L174>)
 
 ```go
 func (q *Queries) ListPublicPastes(ctx context.Context) ([]Paste, error)
@@ -190,11 +342,26 @@ func (q *Queries) ListPublicPastes(ctx context.Context) ([]Paste, error)
 ListPublicPastes
 
 ```
-select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password
+select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
 from pastes
 where public = true
     and deleted_at is null
 order by created_at desc
+```
+
+<a name="Queries.UpdateUserCredentials"></a>
+### func \(\*Queries\) [UpdateUserCredentials](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/users.sql.go#L108>)
+
+```go
+func (q *Queries) UpdateUserCredentials(ctx context.Context, arg UpdateUserCredentialsParams) error
+```
+
+UpdateUserCredentials
+
+```
+update users
+set credentials = $2
+where username = $1
 ```
 
 <a name="Queries.WithTx"></a>
@@ -202,6 +369,87 @@ order by created_at desc
 
 ```go
 func (q *Queries) WithTx(tx pgx.Tx) *Queries
+```
+
+
+
+<a name="Session"></a>
+## type [Session](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/models.go#L28-L35>)
+
+
+
+```go
+type Session struct {
+    ID        int64            `db:"id" json:"id"`
+    Token     pgtype.UUID      `db:"token" json:"token"`
+    Username  string           `db:"username" json:"username"`
+    Data      []byte           `db:"data" json:"data"`
+    CreatedAt pgtype.Timestamp `db:"created_at" json:"created_at"`
+    ExpiresAt pgtype.Timestamp `db:"expires_at" json:"expires_at"`
+}
+```
+
+<a name="Session.FromDomain"></a>
+### func \(Session\) [FromDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L59>)
+
+```go
+func (Session) FromDomain(domain auth.Session) Session
+```
+
+
+
+<a name="Session.ToDomain"></a>
+### func \(Session\) [ToDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L45>)
+
+```go
+func (db Session) ToDomain() auth.Session
+```
+
+
+
+<a name="UpdateUserCredentialsParams"></a>
+## type [UpdateUserCredentialsParams](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/users.sql.go#L98-L101>)
+
+
+
+```go
+type UpdateUserCredentialsParams struct {
+    Username    string `db:"username" json:"username"`
+    Credentials []byte `db:"credentials" json:"credentials"`
+}
+```
+
+<a name="User"></a>
+## type [User](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/models.go#L37-L45>)
+
+
+
+```go
+type User struct {
+    ID          int64            `db:"id" json:"id"`
+    Username    string           `db:"username" json:"username"`
+    Uuid        pgtype.UUID      `db:"uuid" json:"uuid"`
+    Credentials []byte           `db:"credentials" json:"credentials"`
+    CreatedAt   pgtype.Timestamp `db:"created_at" json:"created_at"`
+    UpdatedAt   pgtype.Timestamp `db:"updated_at" json:"updated_at"`
+    DeletedAt   pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
+}
+```
+
+<a name="User.FromDomain"></a>
+### func \(User\) [FromDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L27>)
+
+```go
+func (User) FromDomain(domain auth.User) User
+```
+
+
+
+<a name="User.ToDomain"></a>
+### func \(User\) [ToDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L14>)
+
+```go
+func (db User) ToDomain() auth.User
 ```
 
 

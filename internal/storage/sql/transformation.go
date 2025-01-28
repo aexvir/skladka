@@ -1,12 +1,77 @@
 package sql
 
 import (
+	"encoding/json"
 	"time"
 
+	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/jackc/pgx/v5/pgtype"
 
+	"github.com/aexvir/skladka/internal/auth"
 	"github.com/aexvir/skladka/internal/paste"
 )
+
+func (db User) ToDomain() auth.User {
+	var credentials []webauthn.Credential
+	if err := json.Unmarshal(db.Credentials, &credentials); err != nil {
+		panic(err)
+	}
+
+	return auth.User{
+		Username:    db.Username,
+		UUID:        db.Uuid.String(),
+		Credentials: credentials,
+	}
+}
+
+func (User) FromDomain(domain auth.User) User {
+	var uuid pgtype.UUID
+	if err := uuid.Scan(domain.UUID); err != nil {
+		panic(err)
+	}
+
+	credentials, err := json.Marshal(domain.Credentials)
+	if err != nil {
+		panic(err)
+	}
+
+	return User{
+		Username:    domain.Username,
+		Uuid:        uuid,
+		Credentials: credentials,
+	}
+}
+
+func (db Session) ToDomain() auth.Session {
+	var expiration *time.Time
+	if db.ExpiresAt.Valid {
+		expiration = &db.ExpiresAt.Time
+	}
+
+	return auth.Session{
+		Token:     db.Token.String(),
+		Username:  db.Username,
+		Data:      db.Data,
+		ExpiresAt: *expiration,
+	}
+}
+
+func (Session) FromDomain(domain auth.Session) Session {
+	var token pgtype.UUID
+	if err := token.Scan(domain.Token); err != nil {
+		panic(err)
+	}
+
+	return Session{
+		Username: domain.Username,
+		Token:    token,
+		Data:     domain.Data,
+		ExpiresAt: pgtype.Timestamp{
+			Time:  domain.ExpiresAt,
+			Valid: true,
+		},
+	}
+}
 
 func (db Paste) ToDomain() paste.Paste {
 	syntax := "plaintext"

@@ -22,4 +22,24 @@ type Paste struct {
 	DeletedAt  pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
 	Views      pgtype.Int4      `db:"views" json:"views"`
 	Password   pgtype.Text      `db:"password" json:"password"`
+	Owner      pgtype.Int8      `db:"owner" json:"owner"`
+}
+
+type Session struct {
+	ID        int64            `db:"id" json:"id"`
+	Token     pgtype.UUID      `db:"token" json:"token"`
+	Username  string           `db:"username" json:"username"`
+	Data      []byte           `db:"data" json:"data"`
+	CreatedAt pgtype.Timestamp `db:"created_at" json:"created_at"`
+	ExpiresAt pgtype.Timestamp `db:"expires_at" json:"expires_at"`
+}
+
+type User struct {
+	ID          int64            `db:"id" json:"id"`
+	Username    string           `db:"username" json:"username"`
+	Uuid        pgtype.UUID      `db:"uuid" json:"uuid"`
+	Credentials []byte           `db:"credentials" json:"credentials"`
+	CreatedAt   pgtype.Timestamp `db:"created_at" json:"created_at"`
+	UpdatedAt   pgtype.Timestamp `db:"updated_at" json:"updated_at"`
+	DeletedAt   pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
 }

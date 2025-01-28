@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
+	"github.com/aexvir/skladka/internal/auth"
 	"github.com/aexvir/skladka/internal/config"
 	"github.com/aexvir/skladka/internal/errors"
 	"github.com/aexvir/skladka/internal/logging"
@@ -63,6 +65,98 @@ func NewPostgresStorage(ctx context.Context, cfg config.Config, opts ...Postgres
 	go store.expiration(ctx, 5*time.Second)
 
 	return &store, nil
+}
+
+// CreateUser creates a new user in the database with the provided [auth.User] data.
+func (s *PostgresStorage) CreateUser(ctx context.Context, user auth.User) (err error) {
+	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "PostgresStorage.CreateUser")
+	defer finish(&err)
+
+	row := new(sql.User).FromDomain(user)
+
+	_, err = s.db.CreateUser(
+		ctx,
+		sql.CreateUserParams{
+			Username:    row.Username,
+			Uuid:        row.Uuid,
+			Credentials: row.Credentials,
+		},
+	)
+
+	return err
+}
+
+// GetUserByUsername retrieves a user from the database by their username.
+// It returns the user data as an [auth.User] object and any error that occurred during the operation.
+func (s *PostgresStorage) GetUserByUsername(ctx context.Context, username string) (user auth.User, err error) {
+	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "PostgresStorage.GetUserByUsername")
+	defer finish(&err)
+
+	row, err := s.db.GetUserByUsername(ctx, username)
+	if err != nil {
+		return user, err
+	}
+
+	return row.ToDomain(), nil
+}
+
+// UpdateUserCredentials updates the stored credentials for a user in the database.
+// It expects the [auth.User] object to have the new value for Credentials already set.
+// Returns an error if the update operation fails.
+func (s *PostgresStorage) UpdateUserCredentials(ctx context.Context, user auth.User) (err error) {
+	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "PostgresStorage.UpdateUserCredentials")
+	defer finish(&err)
+
+	row := new(sql.User).FromDomain(user)
+
+	return s.db.UpdateUserCredentials(
+		ctx,
+		sql.UpdateUserCredentialsParams{
+			Username:    row.Username,
+			Credentials: row.Credentials,
+		},
+	)
+}
+
+// CreateSession creates a new user session in the database with the provided [auth.Session] data.
+// Returns an error if the database operation fails.
+func (s *PostgresStorage) CreateSession(ctx context.Context, ssn auth.Session) (err error) {
+	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "PostgresStorage.CreateSession")
+	defer finish(&err)
+
+	row := new(sql.Session).FromDomain(ssn)
+
+	_, err = s.db.CreateSession(
+		ctx,
+		sql.CreateSessionParams{
+			Token:     row.Token,
+			Username:  row.Username,
+			Data:      row.Data,
+			ExpiresAt: row.ExpiresAt,
+		},
+	)
+
+	return err
+}
+
+// GetSessionByToken retrieves a session from the database using the provided token string.
+// Returns the session data as an [auth.Session] object if found, or an error if the token
+// is invalid or the session cannot be retrieved.
+func (s *PostgresStorage) GetSessionByToken(ctx context.Context, token string) (session auth.Session, err error) {
+	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "PostgresStorage.GetSessionByToken")
+	defer finish(&err)
+
+	var uuid pgtype.UUID
+	if err := uuid.Scan(token); err != nil {
+		return session, errors.Wrap(err, "failed to convert session uuid to pg type")
+	}
+
+	row, err := s.db.GetSessionByToken(ctx, uuid)
+	if err != nil {
+		return session, err
+	}
+
+	return row.ToDomain(), nil
 }
 
 func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (string, error) {

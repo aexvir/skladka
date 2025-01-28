@@ -16,6 +16,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/aexvir/skladka/internal/api"
+	"github.com/aexvir/skladka/internal/auth"
 	"github.com/aexvir/skladka/internal/config"
 	"github.com/aexvir/skladka/internal/errors"
 	"github.com/aexvir/skladka/internal/frontend"
@@ -52,6 +53,12 @@ func main() {
 		return
 	}
 
+	authsvc, err := auth.NewService(rootctx, db, cfg.WebAuthn)
+	if err != nil {
+		logger.Error(err, "init.auth", "failed to initialize auth service")
+		return
+	}
+
 	router := NewRouter()
 	router.Use(middleware.RequestID)
 	router.Use(middleware.Heartbeat("/health"))
@@ -59,7 +66,7 @@ func main() {
 	router.Use(api.WithMetrics(meter))
 	router.Use(api.WithLogging(logger))
 
-	router.Mount("/", frontend.DashboardRouter(rootctx, db))
+	router.Mount("/", frontend.DashboardRouter(rootctx, db, authsvc))
 	router.Handle("/metrics", metrics.Handler())
 
 	server := &http.Server{
