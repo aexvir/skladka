@@ -159,8 +159,15 @@ func (s *PostgresStorage) GetSessionByToken(ctx context.Context, token string) (
 	return row.ToDomain(), nil
 }
 
-func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (string, error) {
-	var err error
+// CreatePaste stores a new paste in the database. It generates a unique reference identifier,
+// encrypts the paste content and title if needed, and hashes any provided password.
+//
+// Returns:
+//   - reference: The unique reference string used to identify the paste
+//   - err: Any error that occurred during the operation
+//
+// The method will attempt to generate a unique reference up to 10 times before failing.
+func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (reference string, err error) {
 	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "PostgresStorage.CreatePaste")
 	defer finish(&err)
 
@@ -174,7 +181,7 @@ func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (s
 		paste.Password = &hash
 	}
 
-	if err := s.EncryptPaste(&paste); err != nil {
+	if err := s.EncryptPaste(ctx, &paste); err != nil {
 		return "", errors.Wrap(err, "failed to encrypt data")
 	}
 
@@ -200,27 +207,43 @@ func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (s
 	return ref, nil
 }
 
-func (s *PostgresStorage) GetPaste(ctx context.Context, ref string) (paste.Paste, error) {
-	var err error
+// GetPaste retrieves a paste from the database using its reference identifier.
+// It fetches the encrypted paste data and decrypts it before returning.
+//
+// Returns:
+//   - paste.Paste: The decrypted paste if found
+//   - error: Any error that occurred during fetching or decryption
+//
+// If the paste cannot be found or decrypted, returns an empty paste and the error.
+func (s *PostgresStorage) GetPaste(ctx context.Context, ref string) (paste paste.Paste, err error) {
 	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "PostgresStorage.GetPaste")
 	defer finish(&err)
 
-	var empty paste.Paste
-
 	row, err := s.db.GetPasteByReference(ctx, ref)
 	if err != nil {
-		return empty, err
+		return paste, err
 	}
 
-	paste := row.ToDomain()
-	if err := s.DecryptPaste(&paste); err != nil {
-		return empty, errors.Wrap(err, "failed to decrypt data")
+	paste = row.ToDomain()
+	if err := s.DecryptPaste(ctx, &paste); err != nil {
+		return paste, errors.Wrap(err, "failed to decrypt data")
 	}
 
 	return paste, nil
 }
 
+// GetPasteWithPassword retrieves a password-protected paste from storage and verifies the provided password.
+// It first fetches the paste using the reference identifier, then checks if it's password protected
+// and verifies the supplied password matches.
+//
+// Returns:
+//   - *paste.Paste: The paste if found and password verified, nil if password invalid
+//   - error: Error if paste not found, has no password, or other errors occur
 func (s *PostgresStorage) GetPasteWithPassword(ctx context.Context, ref, password string) (*paste.Paste, error) {
+	var err error
+	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "PostgresStorage.GetPasteWithPassword")
+	defer finish(&err)
+
 	paste, err := s.GetPaste(ctx, ref)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get paste")
@@ -237,9 +260,19 @@ func (s *PostgresStorage) GetPasteWithPassword(ctx context.Context, ref, passwor
 	return &paste, nil
 }
 
-func (s *PostgresStorage) ListPastes(ctx context.Context) ([]paste.Paste, error) {
-	var err error
-	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "storage.ListPastes")
+// ListPastes retrieves all public pastes from the database and decrypts their contents.
+//
+// This method:
+// 1. Fetches all public pastes from the database
+// 2. Converts each database row to domain model
+// 3. Attempts to decrypt the content and title of each paste
+// 4. Skips any pastes that fail decryption
+//
+// Returns:
+// - []paste.Paste: Slice containing all successfully retrieved and decrypted public pastes
+// - error: Any error encountered while fetching pastes from the database
+func (s *PostgresStorage) ListPastes(ctx context.Context) (pastes []paste.Paste, err error) {
+	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "PostgresStorage.ListPastes")
 	defer finish(&err)
 
 	logger := logging.FromContext(ctx)
@@ -250,11 +283,11 @@ func (s *PostgresStorage) ListPastes(ctx context.Context) ([]paste.Paste, error)
 		return nil, errors.Wrap(err, "failed to list public pastes")
 	}
 
-	pastes := make([]paste.Paste, len(dbPastes))
+	pastes = make([]paste.Paste, len(dbPastes))
 	for i, row := range dbPastes {
 		paste := row.ToDomain()
 
-		if err := s.DecryptPaste(&paste); err != nil {
+		if err := s.DecryptPaste(ctx, &paste); err != nil {
 			continue
 		}
 
@@ -264,7 +297,15 @@ func (s *PostgresStorage) ListPastes(ctx context.Context) ([]paste.Paste, error)
 	return pastes, nil
 }
 
-func (s *PostgresStorage) EncryptPaste(paste *paste.Paste) error {
+// EncryptPaste encrypts both the title and content of a paste using the storage's cipher.
+// The encryption is done in-place, modifying the provided paste object directly.
+//
+// The method will attempt to encrypt both fields even if one fails, then return any errors
+// that occurred during either operation.
+func (s *PostgresStorage) EncryptPaste(ctx context.Context, paste *paste.Paste) (err error) {
+	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "PostgresStorage.EncryptPaste")
+	defer finish(&err)
+
 	var errt, errc error
 	paste.Title, errt = s.cipher.Encrypt(paste.Title)
 	paste.Content, errc = s.cipher.Encrypt(paste.Content)
@@ -276,7 +317,15 @@ func (s *PostgresStorage) EncryptPaste(paste *paste.Paste) error {
 	return nil
 }
 
-func (s *PostgresStorage) DecryptPaste(paste *paste.Paste) error {
+// DecryptPaste decrypts both the title and content of a paste using the storage's cipher.
+// The decryption is done in-place, modifying the provided paste object directly.
+//
+// The method will attempt to decrypt both fields even if one fails, then return any errors
+// that occurred during either operation joined together.
+func (s *PostgresStorage) DecryptPaste(ctx context.Context, paste *paste.Paste) (err error) {
+	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "PostgresStorage.DecryptPaste")
+	defer finish(&err)
+
 	var errt, errc error
 	paste.Title, errt = s.cipher.Decrypt(paste.Title)
 	paste.Content, errc = s.cipher.Decrypt(paste.Content)
@@ -321,6 +370,7 @@ func (s *PostgresStorage) expiration(ctx context.Context, interval time.Duration
 	}
 }
 
+// ref attempts to generate a unique reference identifier by making multiple attempts.
 func (s *PostgresStorage) ref(attempts int) (string, error) {
 	attempt := 0
 

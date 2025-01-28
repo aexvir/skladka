@@ -40,16 +40,16 @@ if err != nil {
   - [func \(c \*Cipher\) Verify\(password, encoded string\) bool](<#Cipher.Verify>)
 - [type PostgresStorage](<#PostgresStorage>)
   - [func NewPostgresStorage\(ctx context.Context, cfg config.Config, opts ...PostgresStorageOption\) \(\*PostgresStorage, error\)](<#NewPostgresStorage>)
-  - [func \(s \*PostgresStorage\) CreatePaste\(ctx context.Context, paste paste.Paste\) \(string, error\)](<#PostgresStorage.CreatePaste>)
+  - [func \(s \*PostgresStorage\) CreatePaste\(ctx context.Context, paste paste.Paste\) \(reference string, err error\)](<#PostgresStorage.CreatePaste>)
   - [func \(s \*PostgresStorage\) CreateSession\(ctx context.Context, ssn auth.Session\) \(err error\)](<#PostgresStorage.CreateSession>)
   - [func \(s \*PostgresStorage\) CreateUser\(ctx context.Context, user auth.User\) \(err error\)](<#PostgresStorage.CreateUser>)
-  - [func \(s \*PostgresStorage\) DecryptPaste\(paste \*paste.Paste\) error](<#PostgresStorage.DecryptPaste>)
-  - [func \(s \*PostgresStorage\) EncryptPaste\(paste \*paste.Paste\) error](<#PostgresStorage.EncryptPaste>)
-  - [func \(s \*PostgresStorage\) GetPaste\(ctx context.Context, ref string\) \(paste.Paste, error\)](<#PostgresStorage.GetPaste>)
+  - [func \(s \*PostgresStorage\) DecryptPaste\(ctx context.Context, paste \*paste.Paste\) \(err error\)](<#PostgresStorage.DecryptPaste>)
+  - [func \(s \*PostgresStorage\) EncryptPaste\(ctx context.Context, paste \*paste.Paste\) \(err error\)](<#PostgresStorage.EncryptPaste>)
+  - [func \(s \*PostgresStorage\) GetPaste\(ctx context.Context, ref string\) \(paste paste.Paste, err error\)](<#PostgresStorage.GetPaste>)
   - [func \(s \*PostgresStorage\) GetPasteWithPassword\(ctx context.Context, ref, password string\) \(\*paste.Paste, error\)](<#PostgresStorage.GetPasteWithPassword>)
   - [func \(s \*PostgresStorage\) GetSessionByToken\(ctx context.Context, token string\) \(session auth.Session, err error\)](<#PostgresStorage.GetSessionByToken>)
   - [func \(s \*PostgresStorage\) GetUserByUsername\(ctx context.Context, username string\) \(user auth.User, err error\)](<#PostgresStorage.GetUserByUsername>)
-  - [func \(s \*PostgresStorage\) ListPastes\(ctx context.Context\) \(\[\]paste.Paste, error\)](<#PostgresStorage.ListPastes>)
+  - [func \(s \*PostgresStorage\) ListPastes\(ctx context.Context\) \(pastes \[\]paste.Paste, err error\)](<#PostgresStorage.ListPastes>)
   - [func \(s \*PostgresStorage\) UpdateUserCredentials\(ctx context.Context, user auth.User\) \(err error\)](<#PostgresStorage.UpdateUserCredentials>)
 - [type PostgresStorageOption](<#PostgresStorageOption>)
 
@@ -169,13 +169,20 @@ func main() error {
 </details>
 
 <a name="PostgresStorage.CreatePaste"></a>
-### func \(\*PostgresStorage\) [CreatePaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L162>)
+### func \(\*PostgresStorage\) [CreatePaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L170>)
 
 ```go
-func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (string, error)
+func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (reference string, err error)
 ```
 
+CreatePaste stores a new paste in the database. It generates a unique reference identifier, encrypts the paste content and title if needed, and hashes any provided password.
 
+Returns:
+
+- reference: The unique reference string used to identify the paste
+- err: Any error that occurred during the operation
+
+The method will attempt to generate a unique reference up to 10 times before failing.
 
 <a name="PostgresStorage.CreateSession"></a>
 ### func \(\*PostgresStorage\) [CreateSession](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L123>)
@@ -196,40 +203,56 @@ func (s *PostgresStorage) CreateUser(ctx context.Context, user auth.User) (err e
 CreateUser creates a new user in the database with the provided \[auth.User\] data.
 
 <a name="PostgresStorage.DecryptPaste"></a>
-### func \(\*PostgresStorage\) [DecryptPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L279>)
+### func \(\*PostgresStorage\) [DecryptPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L325>)
 
 ```go
-func (s *PostgresStorage) DecryptPaste(paste *paste.Paste) error
+func (s *PostgresStorage) DecryptPaste(ctx context.Context, paste *paste.Paste) (err error)
 ```
 
+DecryptPaste decrypts both the title and content of a paste using the storage's cipher. The decryption is done in\-place, modifying the provided paste object directly.
 
+The method will attempt to decrypt both fields even if one fails, then return any errors that occurred during either operation joined together.
 
 <a name="PostgresStorage.EncryptPaste"></a>
-### func \(\*PostgresStorage\) [EncryptPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L267>)
+### func \(\*PostgresStorage\) [EncryptPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L305>)
 
 ```go
-func (s *PostgresStorage) EncryptPaste(paste *paste.Paste) error
+func (s *PostgresStorage) EncryptPaste(ctx context.Context, paste *paste.Paste) (err error)
 ```
 
+EncryptPaste encrypts both the title and content of a paste using the storage's cipher. The encryption is done in\-place, modifying the provided paste object directly.
 
+The method will attempt to encrypt both fields even if one fails, then return any errors that occurred during either operation.
 
 <a name="PostgresStorage.GetPaste"></a>
-### func \(\*PostgresStorage\) [GetPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L203>)
+### func \(\*PostgresStorage\) [GetPaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L218>)
 
 ```go
-func (s *PostgresStorage) GetPaste(ctx context.Context, ref string) (paste.Paste, error)
+func (s *PostgresStorage) GetPaste(ctx context.Context, ref string) (paste paste.Paste, err error)
 ```
 
+GetPaste retrieves a paste from the database using its reference identifier. It fetches the encrypted paste data and decrypts it before returning.
 
+Returns:
+
+- paste.Paste: The decrypted paste if found
+- error: Any error that occurred during fetching or decryption
+
+If the paste cannot be found or decrypted, returns an empty paste and the error.
 
 <a name="PostgresStorage.GetPasteWithPassword"></a>
-### func \(\*PostgresStorage\) [GetPasteWithPassword](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L223>)
+### func \(\*PostgresStorage\) [GetPasteWithPassword](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L242>)
 
 ```go
 func (s *PostgresStorage) GetPasteWithPassword(ctx context.Context, ref, password string) (*paste.Paste, error)
 ```
 
+GetPasteWithPassword retrieves a password\-protected paste from storage and verifies the provided password. It first fetches the paste using the reference identifier, then checks if it's password protected and verifies the supplied password matches.
 
+Returns:
+
+- \*paste.Paste: The paste if found and password verified, nil if password invalid
+- error: Error if paste not found, has no password, or other errors occur
 
 <a name="PostgresStorage.GetSessionByToken"></a>
 ### func \(\*PostgresStorage\) [GetSessionByToken](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L145>)
@@ -250,13 +273,17 @@ func (s *PostgresStorage) GetUserByUsername(ctx context.Context, username string
 GetUserByUsername retrieves a user from the database by their username. It returns the user data as an \[auth.User\] object and any error that occurred during the operation.
 
 <a name="PostgresStorage.ListPastes"></a>
-### func \(\*PostgresStorage\) [ListPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L240>)
+### func \(\*PostgresStorage\) [ListPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L274>)
 
 ```go
-func (s *PostgresStorage) ListPastes(ctx context.Context) ([]paste.Paste, error)
+func (s *PostgresStorage) ListPastes(ctx context.Context) (pastes []paste.Paste, err error)
 ```
 
+ListPastes retrieves all public pastes from the database and decrypts their contents.
 
+This method: 1. Fetches all public pastes from the database 2. Converts each database row to domain model 3. Attempts to decrypt the content and title of each paste 4. Skips any pastes that fail decryption
+
+Returns: \- \[\]paste.Paste: Slice containing all successfully retrieved and decrypted public pastes \- error: Any error encountered while fetching pastes from the database
 
 <a name="PostgresStorage.UpdateUserCredentials"></a>
 ### func \(\*PostgresStorage\) [UpdateUserCredentials](<https://github.com/aexvir/skladka/blob/master/internal/storage/postgres.go#L106>)

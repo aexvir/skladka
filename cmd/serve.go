@@ -22,6 +22,7 @@ import (
 	"github.com/aexvir/skladka/internal/frontend"
 	"github.com/aexvir/skladka/internal/logging"
 	"github.com/aexvir/skladka/internal/metrics"
+	"github.com/aexvir/skladka/internal/paste"
 	"github.com/aexvir/skladka/internal/storage"
 	"github.com/aexvir/skladka/internal/tracing"
 )
@@ -53,6 +54,12 @@ func main() {
 		return
 	}
 
+	pastesvc, err := paste.NewService(rootctx, db)
+	if err != nil {
+		logger.Error(err, "init.paste", "failed to initialize paste service")
+		return
+	}
+
 	authsvc, err := auth.NewService(rootctx, db, cfg.WebAuthn)
 	if err != nil {
 		logger.Error(err, "init.auth", "failed to initialize auth service")
@@ -66,7 +73,7 @@ func main() {
 	router.Use(api.WithMetrics(meter))
 	router.Use(api.WithLogging(logger))
 
-	router.Mount("/", frontend.DashboardRouter(rootctx, db, authsvc))
+	router.Mount("/", frontend.DashboardRouter(rootctx, pastesvc, authsvc))
 	router.Handle("/metrics", metrics.Handler())
 
 	server := &http.Server{

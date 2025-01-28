@@ -1,4 +1,4 @@
-package frontend
+package paste
 
 import (
 	"github.com/aexvir/skladka/internal/metrics"

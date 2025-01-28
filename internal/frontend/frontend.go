@@ -11,33 +11,14 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/aexvir/skladka/internal/attributes"
 	"github.com/aexvir/skladka/internal/auth"
 	"github.com/aexvir/skladka/internal/config"
 	"github.com/aexvir/skladka/internal/errors"
 	"github.com/aexvir/skladka/internal/frontend/layouts"
 	"github.com/aexvir/skladka/internal/frontend/views"
 	"github.com/aexvir/skladka/internal/logging"
-	"github.com/aexvir/skladka/internal/metrics"
 	"github.com/aexvir/skladka/internal/paste"
 )
-
-// Storage defines the interface for paste storage operations required by the frontend.
-// This interface allows the frontend to be decoupled from the actual storage implementation,
-// making it easier to test and maintain.
-type Storage interface {
-	// GetPaste retrieves a paste by its reference.
-	GetPaste(context.Context, string) (paste.Paste, error)
-
-	// GetPasteWithPassword retrieves a paste by its reference.
-	GetPasteWithPassword(context.Context, string, string) (*paste.Paste, error)
-
-	// CreatePaste stores a new paste and returns its reference.
-	CreatePaste(context.Context, paste.Paste) (string, error)
-
-	// ListPastes returns all public pastes.
-	ListPastes(context.Context) ([]paste.Paste, error)
-}
 
 //go:embed static/*
 var static embed.FS
@@ -48,13 +29,8 @@ var static embed.FS
 //
 // The router uses the provided Storage implementation for paste operations
 // and automatically handles template rendering and static asset serving.
-func DashboardRouter(ctx context.Context, storage Storage, authsvc *auth.Service) chi.Router {
+func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth.Service) chi.Router {
 	router := chi.NewRouter()
-
-	met := new(Metrics)
-	if err := metrics.FromContext(ctx).Register(met); err != nil {
-		panic(errors.Wrap(err, "error initializing frontend metrics"))
-	}
 
 	router.Use(authsvc.UserSessionMiddleware())
 
@@ -100,46 +76,31 @@ func DashboardRouter(ctx context.Context, storage Storage, authsvc *auth.Service
 					return errors.NewHTTPError(http.StatusBadRequest, "error parsing form", err)
 				}
 
-				// Create paste object
-				p := paste.Paste{
-					Title:   r.FormValue("title"),
-					Content: r.FormValue("content"),
-					Syntax:  r.FormValue("syntax"),
-					Public:  r.FormValue("unlisted") != "on",
+				var password *string
+				if value := r.FormValue("password"); value != "" {
+					password = &value
 				}
 
-				if tags := r.FormValue("tags"); tags != "" {
-					p.Tags = strings.Split(tags, ",")
+				var tags []string
+				if value := r.FormValue("tags"); value != "" {
+					tags = strings.Split(value, ",")
 				}
 
-				if password := r.FormValue("password"); password != "" {
-					p.Password = &password
-				}
+				paste, err := pastesvc.CreatePaste(r.Context(),
+					r.FormValue("title"),
+					r.FormValue("content"),
+					r.FormValue("syntax"),
+					r.FormValue("unlisted") != "on",
+					tags,
+					password,
+					r.FormValue("expiration"),
+				)
 
-				if expiration := r.FormValue("expiration"); expiration != "no expiration" {
-					delta, err := time.ParseDuration(expiration)
-					if err != nil {
-						return errors.NewHTTPError(http.StatusBadRequest, "invalid expiration value", err)
-					}
-					deadline := time.Now().Add(delta)
-					p.Expiration = &deadline
-				}
-
-				if err := p.Validate(); err != nil {
-					return errors.NewHTTPError(http.StatusBadRequest, "invalid paste", err)
-				}
-
-				// Save to storage
-				ref, err := storage.CreatePaste(r.Context(), p)
 				if err != nil {
 					return errors.NewHTTPError(http.StatusInternalServerError, "error creating paste", err)
 				}
 
-				met.PasteCreations.Add(r.Context(), 1, attributes.Status("ok"))
-				met.PasteSize.Record(r.Context(), int(p.SizeBytes()))
-
-				// Redirect to the paste view
-				http.Redirect(w, r, fmt.Sprintf("/%s", ref), http.StatusSeeOther)
+				http.Redirect(w, r, fmt.Sprintf("/%s", paste.Reference), http.StatusSeeOther)
 				return nil
 			},
 		),
@@ -151,13 +112,11 @@ func DashboardRouter(ctx context.Context, storage Storage, authsvc *auth.Service
 				logger := logging.FromContext(r.Context())
 				logger.Info("frontend.archive", "rendering archive page")
 
-				pastes, err := storage.ListPastes(r.Context())
+				pastes, err := pastesvc.ListPastes(r.Context())
 				if err != nil {
 					logger.Error(err, "frontend.archive", "error listing pastes")
 					return errors.AsHTTPError(err)
 				}
-
-				met.PasteRetrievals.Add(r.Context(), len(pastes), attributes.Status(attributes.ValueStatusOk))
 
 				return layouts.Base(
 					auth.UserFromContext(r.Context()),
@@ -172,7 +131,7 @@ func DashboardRouter(ctx context.Context, storage Storage, authsvc *auth.Service
 			func(w http.ResponseWriter, r *http.Request) error {
 				ref := chi.URLParam(r, "ref")
 
-				paste, err := storage.GetPaste(r.Context(), ref)
+				paste, err := pastesvc.GetPaste(r.Context(), ref)
 				if err != nil {
 					return errors.NewHTTPError(
 						http.StatusUnprocessableEntity,
@@ -212,7 +171,7 @@ func DashboardRouter(ctx context.Context, storage Storage, authsvc *auth.Service
 				ref := chi.URLParam(r, "ref")
 				password := r.FormValue("password")
 
-				paste, err := storage.GetPasteWithPassword(r.Context(), ref, password)
+				paste, err := pastesvc.GetPasteWithPassword(r.Context(), ref, password)
 				if err != nil {
 					return errors.NewHTTPError(
 						http.StatusUnprocessableEntity,
@@ -249,7 +208,7 @@ func DashboardRouter(ctx context.Context, storage Storage, authsvc *auth.Service
 				ref := chi.URLParam(r, "ref")
 				password := r.Header.Get("x-skd-password")
 
-				paste, err := storage.GetPaste(r.Context(), ref)
+				paste, err := pastesvc.GetPaste(r.Context(), ref)
 				if err != nil {
 					return errors.NewHTTPError(
 						http.StatusUnprocessableEntity,
@@ -266,7 +225,7 @@ func DashboardRouter(ctx context.Context, storage Storage, authsvc *auth.Service
 						).Render(r.Context(), w)
 					}
 
-					paste, err := storage.GetPasteWithPassword(r.Context(), ref, password)
+					paste, err := pastesvc.GetPasteWithPassword(r.Context(), ref, password)
 					if err != nil {
 						return errors.NewHTTPError(
 							http.StatusUnprocessableEntity,

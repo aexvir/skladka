@@ -30,11 +30,13 @@ import "github.com/aexvir/skladka/internal/storage/sql"
   - [func \(q \*Queries\) GetUserByUsername\(ctx context.Context, username string\) \(User, error\)](<#Queries.GetUserByUsername>)
   - [func \(q \*Queries\) ListPublicPastes\(ctx context.Context\) \(\[\]Paste, error\)](<#Queries.ListPublicPastes>)
   - [func \(q \*Queries\) UpdateUserCredentials\(ctx context.Context, arg UpdateUserCredentialsParams\) error](<#Queries.UpdateUserCredentials>)
+  - [func \(q \*Queries\) UpdateUserEmail\(ctx context.Context, arg UpdateUserEmailParams\) error](<#Queries.UpdateUserEmail>)
   - [func \(q \*Queries\) WithTx\(tx pgx.Tx\) \*Queries](<#Queries.WithTx>)
 - [type Session](<#Session>)
   - [func \(Session\) FromDomain\(domain auth.Session\) Session](<#Session.FromDomain>)
   - [func \(db Session\) ToDomain\(\) auth.Session](<#Session.ToDomain>)
 - [type UpdateUserCredentialsParams](<#UpdateUserCredentialsParams>)
+- [type UpdateUserEmailParams](<#UpdateUserEmailParams>)
 - [type User](<#User>)
   - [func \(User\) FromDomain\(domain auth.User\) User](<#User.FromDomain>)
   - [func \(db User\) ToDomain\(\) auth.User](<#User.ToDomain>)
@@ -205,7 +207,7 @@ CreateUser
 insert into users
 (username, uuid, credentials)
 values ($1, $2, $3)
-returning id, username, uuid, credentials, created_at, updated_at, deleted_at
+returning id, username, uuid, credentials, created_at, updated_at, deleted_at, email
 ```
 
 <a name="Queries.DeleteExpiredPastes"></a>
@@ -253,7 +255,7 @@ where token = $1
 ```
 
 <a name="Queries.DeleteUser"></a>
-### func \(\*Queries\) [DeleteUser](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/users.sql.go#L59>)
+### func \(\*Queries\) [DeleteUser](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/users.sql.go#L60>)
 
 ```go
 func (q *Queries) DeleteUser(ctx context.Context, id int64) error
@@ -317,7 +319,7 @@ where token = $1
 ```
 
 <a name="Queries.GetUserByUsername"></a>
-### func \(\*Queries\) [GetUserByUsername](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/users.sql.go#L77>)
+### func \(\*Queries\) [GetUserByUsername](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/users.sql.go#L78>)
 
 ```go
 func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error)
@@ -326,7 +328,7 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 GetUserByUsername
 
 ```
-select id, username, uuid, credentials, created_at, updated_at, deleted_at
+select id, username, uuid, credentials, created_at, updated_at, deleted_at, email
 from users
 where username = $1
     and deleted_at is null
@@ -350,7 +352,7 @@ order by created_at desc
 ```
 
 <a name="Queries.UpdateUserCredentials"></a>
-### func \(\*Queries\) [UpdateUserCredentials](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/users.sql.go#L108>)
+### func \(\*Queries\) [UpdateUserCredentials](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/users.sql.go#L110>)
 
 ```go
 func (q *Queries) UpdateUserCredentials(ctx context.Context, arg UpdateUserCredentialsParams) error
@@ -361,6 +363,21 @@ UpdateUserCredentials
 ```
 update users
 set credentials = $2
+where username = $1
+```
+
+<a name="Queries.UpdateUserEmail"></a>
+### func \(\*Queries\) [UpdateUserEmail](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/users.sql.go#L131>)
+
+```go
+func (q *Queries) UpdateUserEmail(ctx context.Context, arg UpdateUserEmailParams) error
+```
+
+UpdateUserEmail
+
+```
+update users
+set email =$2
 where username = $1
 ```
 
@@ -408,7 +425,7 @@ func (db Session) ToDomain() auth.Session
 
 
 <a name="UpdateUserCredentialsParams"></a>
-## type [UpdateUserCredentialsParams](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/users.sql.go#L98-L101>)
+## type [UpdateUserCredentialsParams](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/users.sql.go#L100-L103>)
 
 
 
@@ -419,8 +436,20 @@ type UpdateUserCredentialsParams struct {
 }
 ```
 
+<a name="UpdateUserEmailParams"></a>
+## type [UpdateUserEmailParams](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/users.sql.go#L121-L124>)
+
+
+
+```go
+type UpdateUserEmailParams struct {
+    Username string      `db:"username" json:"username"`
+    Email    pgtype.Text `db:"email" json:"email"`
+}
+```
+
 <a name="User"></a>
-## type [User](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/models.go#L37-L45>)
+## type [User](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/models.go#L37-L46>)
 
 
 
@@ -433,6 +462,7 @@ type User struct {
     CreatedAt   pgtype.Timestamp `db:"created_at" json:"created_at"`
     UpdatedAt   pgtype.Timestamp `db:"updated_at" json:"updated_at"`
     DeletedAt   pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
+    Email       pgtype.Text      `db:"email" json:"email"`
 }
 ```
 
