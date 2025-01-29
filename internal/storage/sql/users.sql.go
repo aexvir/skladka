@@ -15,7 +15,7 @@ const createUser = `-- name: CreateUser :one
 insert into users
 (username, uuid, credentials)
 values ($1, $2, $3)
-returning id, username, uuid, credentials, created_at, updated_at, deleted_at
+returning id, username, uuid, credentials, created_at, updated_at, deleted_at, email
 `
 
 type CreateUserParams struct {
@@ -29,7 +29,7 @@ type CreateUserParams struct {
 //	insert into users
 //	(username, uuid, credentials)
 //	values ($1, $2, $3)
-//	returning id, username, uuid, credentials, created_at, updated_at, deleted_at
+//	returning id, username, uuid, credentials, created_at, updated_at, deleted_at, email
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, createUser, arg.Username, arg.Uuid, arg.Credentials)
 	var i User
@@ -41,6 +41,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.Email,
 	)
 	return i, err
 }
@@ -62,7 +63,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-select id, username, uuid, credentials, created_at, updated_at, deleted_at
+select id, username, uuid, credentials, created_at, updated_at, deleted_at, email
 from users
 where username = $1
     and deleted_at is null
@@ -70,7 +71,7 @@ where username = $1
 
 // GetUserByUsername
 //
-//	select id, username, uuid, credentials, created_at, updated_at, deleted_at
+//	select id, username, uuid, credentials, created_at, updated_at, deleted_at, email
 //	from users
 //	where username = $1
 //	    and deleted_at is null
@@ -85,6 +86,7 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.Email,
 	)
 	return i, err
 }
@@ -107,5 +109,26 @@ type UpdateUserCredentialsParams struct {
 //	where username = $1
 func (q *Queries) UpdateUserCredentials(ctx context.Context, arg UpdateUserCredentialsParams) error {
 	_, err := q.db.Exec(ctx, updateUserCredentials, arg.Username, arg.Credentials)
+	return err
+}
+
+const updateUserEmail = `-- name: UpdateUserEmail :exec
+update users
+set email =$2
+where username = $1
+`
+
+type UpdateUserEmailParams struct {
+	Username string      `db:"username" json:"username"`
+	Email    pgtype.Text `db:"email" json:"email"`
+}
+
+// UpdateUserEmail
+//
+//	update users
+//	set email =$2
+//	where username = $1
+func (q *Queries) UpdateUserEmail(ctx context.Context, arg UpdateUserEmailParams) error {
+	_, err := q.db.Exec(ctx, updateUserEmail, arg.Username, arg.Email)
 	return err
 }

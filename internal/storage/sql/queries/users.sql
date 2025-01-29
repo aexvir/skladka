@@ -15,6 +15,11 @@ update users
 set credentials = $2
 where username = $1;
 
+-- name: UpdateUserEmail :exec
+update users
+set email =$2
+where username = $1;
+
 -- name: DeleteUser :exec
 update users
 set deleted_at = now()

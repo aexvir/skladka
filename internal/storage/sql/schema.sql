@@ -4,6 +4,7 @@ create table users (
     username varchar(255) not null unique,
     uuid uuid not null unique,
     credentials bytea not null,
+    email varchar(255) null,
 
     created_at timestamp not null default now(),
     updated_at timestamp null,
