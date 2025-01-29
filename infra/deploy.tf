@@ -102,6 +102,10 @@ resource "kubernetes_config_map" "skladka" {
   data = {
     SKD_ENVIRONMENT = "production"
 
+    SKD_RPID = "xvr.sh"
+    SKD_RPNAME = "skladka"
+    SKD_RPORIGIN = "https://paste.xvr.sh"
+
     SKD_METRICS_ENABLED = "true"
     SKD_METRICS_HOST    = "grafana-k8s-monitoring-alloy-receiver.observability.svc.cluster.local"
     SKD_METRICS_PORT    = "4317"
