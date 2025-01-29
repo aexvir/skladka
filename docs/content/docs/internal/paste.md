@@ -47,10 +47,10 @@ Field validation rules:
   - [func \(p \*Paste\) Validate\(\) error](<#Paste.Validate>)
 - [type Service](<#Service>)
   - [func NewService\(ctx context.Context, store Storage\) \(\*Service, error\)](<#NewService>)
-  - [func \(svc \*Service\) CreatePaste\(ctx context.Context, title, content, syntax string, public bool, tags \[\]string, password \*string, expiration string\) \(paste Paste, err error\)](<#Service.CreatePaste>)
-  - [func \(svc \*Service\) GetPaste\(ctx context.Context, ref string\) \(paste Paste, err error\)](<#Service.GetPaste>)
-  - [func \(svc \*Service\) GetPasteWithPassword\(ctx context.Context, ref, password string\) \(paste \*Paste, err error\)](<#Service.GetPasteWithPassword>)
-  - [func \(svc \*Service\) ListPastes\(ctx context.Context\) \(pastes \[\]Paste, err error\)](<#Service.ListPastes>)
+  - [func \(svc \*Service\) CreatePaste\(ctx context.Context, user \*auth.User, title, content, syntax string, public bool, tags \[\]string, password \*string, expiration string\) \(paste Paste, err error\)](<#Service.CreatePaste>)
+  - [func \(svc \*Service\) GetPaste\(ctx context.Context, \_ \*auth.User, ref string\) \(paste Paste, err error\)](<#Service.GetPaste>)
+  - [func \(svc \*Service\) GetPasteWithPassword\(ctx context.Context, \_ \*auth.User, ref, password string\) \(paste \*Paste, err error\)](<#Service.GetPasteWithPassword>)
+  - [func \(svc \*Service\) ListPastes\(ctx context.Context, \_ \*auth.User\) \(pastes \[\]Paste, err error\)](<#Service.ListPastes>)
 - [type Storage](<#Storage>)
 
 
@@ -73,13 +73,14 @@ type Metrics struct {
 ```
 
 <a name="Paste"></a>
-## type [Paste](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L10-L21>)
+## type [Paste](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L10-L22>)
 
 
 
 ```go
 type Paste struct {
     Reference  string     `json:"reference"`
+    Owner      *string    `json:"owner"`
     Title      string     `json:"title"`
     Content    string     `json:"content"`
     Syntax     string     `json:"syntax"`
@@ -93,7 +94,7 @@ type Paste struct {
 ```
 
 <a name="Paste.SizeBytes"></a>
-### func \(Paste\) [SizeBytes](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L23>)
+### func \(Paste\) [SizeBytes](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L24>)
 
 ```go
 func (p Paste) SizeBytes() float64
@@ -102,7 +103,7 @@ func (p Paste) SizeBytes() float64
 
 
 <a name="Paste.Validate"></a>
-### func \(\*Paste\) [Validate](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L29>)
+### func \(\*Paste\) [Validate](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L30>)
 
 ```go
 func (p *Paste) Validate() error
@@ -111,7 +112,7 @@ func (p *Paste) Validate() error
 Validate checks if the paste meets all validation rules. It returns an error if any rule is violated.
 
 <a name="Service"></a>
-## type [Service](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L14-L17>)
+## type [Service](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L15-L18>)
 
 
 
@@ -122,7 +123,7 @@ type Service struct {
 ```
 
 <a name="NewService"></a>
-### func [NewService](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L34>)
+### func [NewService](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L35>)
 
 ```go
 func NewService(ctx context.Context, store Storage) (*Service, error)
@@ -131,43 +132,43 @@ func NewService(ctx context.Context, store Storage) (*Service, error)
 NewService creates a new paste service with the provided storage.
 
 <a name="Service.CreatePaste"></a>
-### func \(\*Service\) [CreatePaste](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L48-L55>)
+### func \(\*Service\) [CreatePaste](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L49-L57>)
 
 ```go
-func (svc *Service) CreatePaste(ctx context.Context, title, content, syntax string, public bool, tags []string, password *string, expiration string) (paste Paste, err error)
+func (svc *Service) CreatePaste(ctx context.Context, user *auth.User, title, content, syntax string, public bool, tags []string, password *string, expiration string) (paste Paste, err error)
 ```
 
 CreatePaste creates a new paste with the given parameters. Returns a [Paste](<#Paste>) instance with its reference populated.
 
 <a name="Service.GetPaste"></a>
-### func \(\*Service\) [GetPaste](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L94>)
+### func \(\*Service\) [GetPaste](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L100>)
 
 ```go
-func (svc *Service) GetPaste(ctx context.Context, ref string) (paste Paste, err error)
+func (svc *Service) GetPaste(ctx context.Context, _ *auth.User, ref string) (paste Paste, err error)
 ```
 
 GetPaste retrieves a paste by its reference.
 
 <a name="Service.GetPasteWithPassword"></a>
-### func \(\*Service\) [GetPasteWithPassword](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L109>)
+### func \(\*Service\) [GetPasteWithPassword](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L115>)
 
 ```go
-func (svc *Service) GetPasteWithPassword(ctx context.Context, ref, password string) (paste *Paste, err error)
+func (svc *Service) GetPasteWithPassword(ctx context.Context, _ *auth.User, ref, password string) (paste *Paste, err error)
 ```
 
 GetPasteWithPassword retrieves a password\-protected paste by its reference.
 
 <a name="Service.ListPastes"></a>
-### func \(\*Service\) [ListPastes](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L125>)
+### func \(\*Service\) [ListPastes](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L131>)
 
 ```go
-func (svc *Service) ListPastes(ctx context.Context) (pastes []Paste, err error)
+func (svc *Service) ListPastes(ctx context.Context, _ *auth.User) (pastes []Paste, err error)
 ```
 
 ListPastes retrieves all public pastes from the storage. The function returns a slice of Paste objects and any error that occurred during the operation.
 
 <a name="Storage"></a>
-## type [Storage](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L19-L31>)
+## type [Storage](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L20-L32>)
 
 
 

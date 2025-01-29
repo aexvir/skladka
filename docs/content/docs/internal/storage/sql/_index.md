@@ -43,13 +43,14 @@ import "github.com/aexvir/skladka/internal/storage/sql"
 
 
 <a name="CreatePasteParams"></a>
-## type [CreatePasteParams](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L21-L30>)
+## type [CreatePasteParams](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L21-L31>)
 
 
 
 ```go
 type CreatePasteParams struct {
     Reference  string           `db:"reference" json:"reference"`
+    Owner      pgtype.Text      `db:"owner" json:"owner"`
     Title      string           `db:"title" json:"title"`
     Content    string           `db:"content" json:"content"`
     Syntax     pgtype.Text      `db:"syntax" json:"syntax"`
@@ -120,12 +121,12 @@ type Paste struct {
     DeletedAt  pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
     Views      pgtype.Int4      `db:"views" json:"views"`
     Password   pgtype.Text      `db:"password" json:"password"`
-    Owner      pgtype.Int8      `db:"owner" json:"owner"`
+    Owner      pgtype.Text      `db:"owner" json:"owner"`
 }
 ```
 
 <a name="Paste.FromDomain"></a>
-### func \(Paste\) [FromDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L106>)
+### func \(Paste\) [FromDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L112>)
 
 ```go
 func (Paste) FromDomain(domain paste.Paste) *Paste
@@ -163,7 +164,7 @@ func New(db DBTX) *Queries
 
 
 <a name="Queries.CreatePaste"></a>
-### func \(\*Queries\) [CreatePaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L38>)
+### func \(\*Queries\) [CreatePaste](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L39>)
 
 ```go
 func (q *Queries) CreatePaste(ctx context.Context, arg CreatePasteParams) (int64, error)
@@ -173,8 +174,8 @@ CreatePaste
 
 ```
 insert into pastes
-(reference, title, content, syntax, tags, expiration, public, password)
-values ($1, $2, $3, $4, $5, $6, $7, $8)
+(reference, owner, title, content, syntax, tags, expiration, public, password)
+values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 returning id
 ```
 
@@ -211,7 +212,7 @@ returning id, username, uuid, credentials, created_at, updated_at, deleted_at, e
 ```
 
 <a name="Queries.DeleteExpiredPastes"></a>
-### func \(\*Queries\) [DeleteExpiredPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L67>)
+### func \(\*Queries\) [DeleteExpiredPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L69>)
 
 ```go
 func (q *Queries) DeleteExpiredPastes(ctx context.Context) ([]string, error)
@@ -270,7 +271,7 @@ where id = $1
 ```
 
 <a name="Queries.GetPasteByID"></a>
-### func \(\*Queries\) [GetPasteByID](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L100>)
+### func \(\*Queries\) [GetPasteByID](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L102>)
 
 ```go
 func (q *Queries) GetPasteByID(ctx context.Context, id int64) (Paste, error)
@@ -286,7 +287,7 @@ where id = $1
 ```
 
 <a name="Queries.GetPasteByReference"></a>
-### func \(\*Queries\) [GetPasteByReference](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L137>)
+### func \(\*Queries\) [GetPasteByReference](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L139>)
 
 ```go
 func (q *Queries) GetPasteByReference(ctx context.Context, reference string) (Paste, error)
@@ -335,7 +336,7 @@ where username = $1
 ```
 
 <a name="Queries.ListPublicPastes"></a>
-### func \(\*Queries\) [ListPublicPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L174>)
+### func \(\*Queries\) [ListPublicPastes](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/pastes.sql.go#L176>)
 
 ```go
 func (q *Queries) ListPublicPastes(ctx context.Context) ([]Paste, error)

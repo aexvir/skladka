@@ -87,6 +87,7 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 				}
 
 				paste, err := pastesvc.CreatePaste(r.Context(),
+					auth.UserFromContext(r.Context()),
 					r.FormValue("title"),
 					r.FormValue("content"),
 					r.FormValue("syntax"),
@@ -95,7 +96,6 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 					password,
 					r.FormValue("expiration"),
 				)
-
 				if err != nil {
 					return errors.NewHTTPError(http.StatusInternalServerError, "error creating paste", err)
 				}
@@ -112,15 +112,16 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 				logger := logging.FromContext(r.Context())
 				logger.Info("frontend.archive", "rendering archive page")
 
-				pastes, err := pastesvc.ListPastes(r.Context())
+				user := auth.UserFromContext(r.Context())
+
+				pastes, err := pastesvc.ListPastes(r.Context(), user)
 				if err != nil {
 					logger.Error(err, "frontend.archive", "error listing pastes")
 					return errors.AsHTTPError(err)
 				}
 
 				return layouts.Base(
-					auth.UserFromContext(r.Context()),
-					views.Archive("Recent Pastes", pastes),
+					user, views.Archive("Recent Pastes", pastes),
 				).Render(r.Context(), w)
 			},
 		),
@@ -130,8 +131,9 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 		errors.WithErrorHandler(
 			func(w http.ResponseWriter, r *http.Request) error {
 				ref := chi.URLParam(r, "ref")
+				user := auth.UserFromContext(r.Context())
 
-				paste, err := pastesvc.GetPaste(r.Context(), ref)
+				paste, err := pastesvc.GetPaste(r.Context(), user, ref)
 				if err != nil {
 					return errors.NewHTTPError(
 						http.StatusUnprocessableEntity,
@@ -142,8 +144,7 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 
 				if paste.Password != nil {
 					return layouts.Base(
-						auth.UserFromContext(r.Context()),
-						views.PasswordPrompt(ref),
+						user, views.PasswordPrompt(ref),
 					).Render(r.Context(), w)
 				}
 
@@ -158,8 +159,7 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 					)
 
 				return layouts.Base(
-					auth.UserFromContext(r.Context()),
-					views.Document(paste),
+					user, views.Document(paste),
 				).Render(r.Context(), w)
 			},
 		),
@@ -170,8 +170,9 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 			func(w http.ResponseWriter, r *http.Request) error {
 				ref := chi.URLParam(r, "ref")
 				password := r.FormValue("password")
+				user := auth.UserFromContext(r.Context())
 
-				paste, err := pastesvc.GetPasteWithPassword(r.Context(), ref, password)
+				paste, err := pastesvc.GetPasteWithPassword(r.Context(), user, ref, password)
 				if err != nil {
 					return errors.NewHTTPError(
 						http.StatusUnprocessableEntity,
@@ -195,8 +196,7 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 					)
 
 				return layouts.Base(
-					auth.UserFromContext(r.Context()),
-					views.Document(*paste),
+					user, views.Document(*paste),
 				).Render(r.Context(), w)
 			},
 		),
@@ -207,8 +207,9 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 			func(w http.ResponseWriter, r *http.Request) error {
 				ref := chi.URLParam(r, "ref")
 				password := r.Header.Get("x-skd-password")
+				user := auth.UserFromContext(r.Context())
 
-				paste, err := pastesvc.GetPaste(r.Context(), ref)
+				paste, err := pastesvc.GetPaste(r.Context(), user, ref)
 				if err != nil {
 					return errors.NewHTTPError(
 						http.StatusUnprocessableEntity,
@@ -220,12 +221,11 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 				if paste.Password != nil {
 					if password == "" {
 						return layouts.Base(
-							auth.UserFromContext(r.Context()),
-							views.RawPasswordPrompt(ref),
+							user, views.RawPasswordPrompt(ref),
 						).Render(r.Context(), w)
 					}
 
-					paste, err := pastesvc.GetPasteWithPassword(r.Context(), ref, password)
+					paste, err := pastesvc.GetPasteWithPassword(r.Context(), user, ref, password)
 					if err != nil {
 						return errors.NewHTTPError(
 							http.StatusUnprocessableEntity,

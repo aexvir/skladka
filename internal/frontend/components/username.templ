@@ -1,0 +1,12 @@
+package components
+
+templ Username(value *string) {
+	{{
+		author, color := "anonymous", "text-muted"
+		if value != nil {
+			author = "@" + *value
+			color = "text-blue-400"
+		}
+	}}
+	<span class={ color }>{ author }</span>
+}

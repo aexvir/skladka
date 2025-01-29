@@ -22,7 +22,7 @@ type Paste struct {
 	DeletedAt  pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
 	Views      pgtype.Int4      `db:"views" json:"views"`
 	Password   pgtype.Text      `db:"password" json:"password"`
-	Owner      pgtype.Int8      `db:"owner" json:"owner"`
+	Owner      pgtype.Text      `db:"owner" json:"owner"`
 }
 
 type Session struct {

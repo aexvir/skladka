@@ -190,6 +190,7 @@ func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (r
 	_, err = s.db.CreatePaste(
 		ctx, sql.CreatePasteParams{
 			Reference:  ref,
+			Owner:      row.Owner,
 			Title:      row.Title,
 			Content:    row.Content,
 			Syntax:     row.Syntax,
@@ -199,7 +200,6 @@ func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (r
 			Password:   row.Password,
 		},
 	)
-
 	if err != nil {
 		return "", err
 	}

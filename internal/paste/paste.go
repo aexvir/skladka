@@ -9,6 +9,7 @@ import (
 
 type Paste struct {
 	Reference  string     `json:"reference"`
+	Owner      *string    `json:"owner"`
 	Title      string     `json:"title"`
 	Content    string     `json:"content"`
 	Syntax     string     `json:"syntax"`

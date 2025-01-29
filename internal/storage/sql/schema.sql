@@ -16,7 +16,7 @@ create table pastes (
 
     reference varchar(8) not null,
     title varchar(255) not null,
-    owner bigint references users(id),
+    owner text references users(username),
 
     content text not null,
 

@@ -13,13 +13,14 @@ import (
 
 const createPaste = `-- name: CreatePaste :one
 insert into pastes
-(reference, title, content, syntax, tags, expiration, public, password)
-values ($1, $2, $3, $4, $5, $6, $7, $8)
+(reference, owner, title, content, syntax, tags, expiration, public, password)
+values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 returning id
 `
 
 type CreatePasteParams struct {
 	Reference  string           `db:"reference" json:"reference"`
+	Owner      pgtype.Text      `db:"owner" json:"owner"`
 	Title      string           `db:"title" json:"title"`
 	Content    string           `db:"content" json:"content"`
 	Syntax     pgtype.Text      `db:"syntax" json:"syntax"`
@@ -32,12 +33,13 @@ type CreatePasteParams struct {
 // CreatePaste
 //
 //	insert into pastes
-//	(reference, title, content, syntax, tags, expiration, public, password)
-//	values ($1, $2, $3, $4, $5, $6, $7, $8)
+//	(reference, owner, title, content, syntax, tags, expiration, public, password)
+//	values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 //	returning id
 func (q *Queries) CreatePaste(ctx context.Context, arg CreatePasteParams) (int64, error) {
 	row := q.db.QueryRow(ctx, createPaste,
 		arg.Reference,
+		arg.Owner,
 		arg.Title,
 		arg.Content,
 		arg.Syntax,

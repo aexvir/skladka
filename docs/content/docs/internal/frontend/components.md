@@ -59,6 +59,7 @@ Components are designed to work seamlessly with the [templ](<https://github.com/
 - [func Toast\(\) templ.Component](<#Toast>)
 - [func Toggle\(id string, name string, label string, icon templ.Component\) templ.Component](<#Toggle>)
 - [func ToggleWithContent\(id string, name string, label string, icon templ.Component\) templ.Component](<#ToggleWithContent>)
+- [func Username\(value \*string\) templ.Component](<#Username>)
 - [type Link](<#Link>)
 
 
@@ -184,6 +185,15 @@ func Toggle(id string, name string, label string, icon templ.Component) templ.Co
 
 ```go
 func ToggleWithContent(id string, name string, label string, icon templ.Component) templ.Component
+```
+
+
+
+<a name="Username"></a>
+## func [Username](<https://github.com/aexvir/skladka/blob/master/internal/frontend/components/username_templ.go#L10>)
+
+```go
+func Username(value *string) templ.Component
 ```
 
 

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/aexvir/skladka/internal/attributes"
+	"github.com/aexvir/skladka/internal/auth"
 	"github.com/aexvir/skladka/internal/errors"
 	"github.com/aexvir/skladka/internal/metrics"
 	"github.com/aexvir/skladka/internal/tracing"
@@ -47,6 +48,7 @@ func NewService(ctx context.Context, store Storage) (*Service, error) {
 // Returns a [Paste] instance with its reference populated.
 func (svc *Service) CreatePaste(
 	ctx context.Context,
+	user *auth.User,
 	title, content, syntax string,
 	public bool,
 	tags []string,
@@ -73,6 +75,10 @@ func (svc *Service) CreatePaste(
 		Password: password,
 	}
 
+	if user != nil {
+		paste.Owner = &user.Username
+	}
+
 	if expiration != "no expiration" {
 		delta, err := time.ParseDuration(expiration)
 		if err != nil {
@@ -91,7 +97,7 @@ func (svc *Service) CreatePaste(
 }
 
 // GetPaste retrieves a paste by its reference.
-func (svc *Service) GetPaste(ctx context.Context, ref string) (paste Paste, err error) {
+func (svc *Service) GetPaste(ctx context.Context, _ *auth.User, ref string) (paste Paste, err error) {
 	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "paste.Service.GetPaste")
 	defer func() {
 		finish(&err)
@@ -106,7 +112,7 @@ func (svc *Service) GetPaste(ctx context.Context, ref string) (paste Paste, err 
 }
 
 // GetPasteWithPassword retrieves a password-protected paste by its reference.
-func (svc *Service) GetPasteWithPassword(ctx context.Context, ref, password string) (paste *Paste, err error) {
+func (svc *Service) GetPasteWithPassword(ctx context.Context, _ *auth.User, ref, password string) (paste *Paste, err error) {
 	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "paste.Service.GetPasteWithPassword")
 	defer func() {
 		finish(&err)
@@ -122,7 +128,7 @@ func (svc *Service) GetPasteWithPassword(ctx context.Context, ref, password stri
 
 // ListPastes retrieves all public pastes from the storage.
 // The function returns a slice of Paste objects and any error that occurred during the operation.
-func (svc *Service) ListPastes(ctx context.Context) (pastes []Paste, err error) {
+func (svc *Service) ListPastes(ctx context.Context, _ *auth.User) (pastes []Paste, err error) {
 	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "paste.Service.ListPastes")
 	defer func() {
 		finish(&err)

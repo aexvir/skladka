@@ -74,6 +74,11 @@ func (Session) FromDomain(domain auth.Session) Session {
 }
 
 func (db Paste) ToDomain() paste.Paste {
+	var owner *string
+	if db.Owner.Valid {
+		owner = &db.Owner.String
+	}
+
 	syntax := "plaintext"
 	if db.Syntax.Valid {
 		syntax = db.Syntax.String
@@ -91,6 +96,7 @@ func (db Paste) ToDomain() paste.Paste {
 
 	return paste.Paste{
 		Reference:  db.Reference,
+		Owner:      owner,
 		Title:      db.Title,
 		Content:    db.Content,
 		Syntax:     syntax,
@@ -104,6 +110,14 @@ func (db Paste) ToDomain() paste.Paste {
 }
 
 func (Paste) FromDomain(domain paste.Paste) *Paste {
+	var owner pgtype.Text
+	if domain.Owner != nil {
+		owner = pgtype.Text{
+			String: *domain.Owner,
+			Valid:  true,
+		}
+	}
+
 	var syntax pgtype.Text
 	if domain.Syntax != "" {
 		syntax = pgtype.Text{
@@ -130,6 +144,7 @@ func (Paste) FromDomain(domain paste.Paste) *Paste {
 
 	return &Paste{
 		Reference:  domain.Reference,
+		Owner:      owner,
 		Title:      domain.Title,
 		Content:    domain.Content,
 		Syntax:     syntax,
