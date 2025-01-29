@@ -24,6 +24,12 @@ where public = true
     and deleted_at is null
 order by created_at desc;
 
+-- name: DeletePaste :exec
+update pastes
+set deleted_at = now()
+where reference = $1
+    and deleted_at is null;
+
 -- name: DeleteExpiredPastes :many
 update pastes
 set deleted_at = now()

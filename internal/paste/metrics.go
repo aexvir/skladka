@@ -13,4 +13,7 @@ type Metrics struct {
 
 	// PasteRetrievals counts the number of paste retrievals
 	PasteRetrievals metrics.IntCounter `metric:"paste.retrievals,number of pastes retrieved"`
+
+	// PasteDeletions counts the number of pastes deleted
+	PasteDeletions metrics.IntCounter `metric:"paste.deletions,number of pastes deleted"`
 }

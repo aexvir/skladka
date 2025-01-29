@@ -24,6 +24,9 @@ type Storage interface {
 	// GetPasteWithPassword retrieves a paste by its reference.
 	GetPasteWithPassword(context.Context, string, string) (*Paste, error)
 
+	// DeletePaste deletes a paste by its reference.
+	DeletePaste(context.Context, string) error
+
 	// CreatePaste stores a new paste and returns its reference.
 	CreatePaste(context.Context, Paste) (string, error)
 
@@ -124,6 +127,35 @@ func (svc *Service) GetPasteWithPassword(ctx context.Context, _ *auth.User, ref,
 	}()
 
 	return svc.store.GetPasteWithPassword(ctx, ref, password)
+}
+
+// DeletePaste deletes a paste by its reference and owner username.
+func (svc *Service) DeletePaste(ctx context.Context, user *auth.User, ref string) (err error) {
+	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "paste.Service.DeletePaste")
+	defer func() {
+		finish(&err)
+		status := attributes.ValueStatusOk
+		if err != nil {
+			status = attributes.ValueStatusError
+		}
+		svc.met.PasteDeletions.Add(ctx, 1, attributes.Status(status))
+	}()
+
+	paste, err := svc.store.GetPaste(ctx, ref)
+	if err != nil {
+		return errors.Wrap(err, "error retrieving paste")
+	}
+
+	if paste.Owner == nil {
+		// will be deletable by admins later on, for now, reject
+		return errors.New("anonymous pastes cannot be deleted")
+	}
+
+	if user == nil || (*paste.Owner != user.Username) {
+		return errors.New("unauthorized")
+	}
+
+	return svc.store.DeletePaste(ctx, ref)
 }
 
 // ListPastes retrieves all public pastes from the storage.

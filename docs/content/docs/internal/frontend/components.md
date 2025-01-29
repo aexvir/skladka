@@ -48,7 +48,7 @@ Components are designed to work seamlessly with the [templ](<https://github.com/
 - [func CommandPalette\(\) templ.Component](<#CommandPalette>)
 - [func Editor\(content, syntax string, readonly bool\) templ.Component](<#Editor>)
 - [func InputLabel\(name string, icon templ.Component\) templ.Component](<#InputLabel>)
-- [func Metadata\(paste paste.Paste\) templ.Component](<#Metadata>)
+- [func Metadata\(user \*auth.User, paste paste.Paste\) templ.Component](<#Metadata>)
 - [func Nav\(name string, user \*auth.User, links ...Link\) templ.Component](<#Nav>)
 - [func PasswordInput\(id, label, placeholder string\) templ.Component](<#PasswordInput>)
 - [func PasteEntry\(paste paste.Paste\) templ.Component](<#PasteEntry>)
@@ -91,10 +91,10 @@ func InputLabel(name string, icon templ.Component) templ.Component
 
 
 <a name="Metadata"></a>
-## func [Metadata](<https://github.com/aexvir/skladka/blob/master/internal/frontend/components/sidebar_templ.go#L126>)
+## func [Metadata](<https://github.com/aexvir/skladka/blob/master/internal/frontend/components/sidebar_templ.go#L127>)
 
 ```go
-func Metadata(paste paste.Paste) templ.Component
+func Metadata(user *auth.User, paste paste.Paste) templ.Component
 ```
 
 
@@ -136,7 +136,7 @@ func SelectInput(id, label string, icon templ.Component, options ...string) temp
 
 
 <a name="Sidebar"></a>
-## func [Sidebar](<https://github.com/aexvir/skladka/blob/master/internal/frontend/components/sidebar_templ.go#L17>)
+## func [Sidebar](<https://github.com/aexvir/skladka/blob/master/internal/frontend/components/sidebar_templ.go#L18>)
 
 ```go
 func Sidebar() templ.Component

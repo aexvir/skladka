@@ -2,6 +2,7 @@ package components
 
 import (
 	"fmt"
+	"github.com/aexvir/skladka/internal/auth"
 	"github.com/aexvir/skladka/internal/frontend/icons"
 	"github.com/aexvir/skladka/internal/paste"
 	"strconv"
@@ -38,7 +39,7 @@ templ Sidebar() {
 	</div>
 }
 
-templ Metadata(paste paste.Paste) {
+templ Metadata(user *auth.User, paste paste.Paste) {
 	<div class="h-[90vh] lg:h-full lg:w-[300px] flex-none lg:border-l border-main fixed inset-x-0 -bottom-full lg:static transition-all duration-300" id="metadata-sidebar">
 		<div class="h-full">
 			<div class="h-full bg-main flex flex-col p-4 rounded-t-2xl lg:rounded-none shadow-xl lg:shadow-none">
@@ -76,6 +77,11 @@ templ Metadata(paste paste.Paste) {
 						</div>
 					}
 				</div>
+				if paste.Owner != nil && user != nil && *paste.Owner == user.Username {
+					<button onclick="deletePaste()" type="button" class="w-full text-center bg-red-500 hover:bg-red-600 text-white px-4 py-2 mb-2 rounded hover:shadow-md transition-all duration-200 whitespace-nowrap">
+						delete
+					</button>
+				}
 				<div class="flex flex-row w-full fixed inset-x-0 bottom-0 lg:static p-4 lg:p-0">
 					<div class="w-full flex flex-row border border-main rounded lg:border-none shadow-md lg:shadow-none rounded-r-none">
 						<button onclick="window.Editor.copyToClipboard()" type="button" class="rounded-l w-full text-center bg-muted hover:bg-accent text-main hover:text-accent-muted px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap">copy</button>
@@ -101,6 +107,23 @@ templ Metadata(paste paste.Paste) {
 
 							sidebar.style.bottom = '-100%'
 							expandicon.style.transform = 'rotate(0deg)'
+						}
+
+						const deletePaste = () => {
+							if (!confirm('Are you sure you want to delete this paste?')) {
+								return
+							}
+
+							fetch(window.location.pathname, { method: 'DELETE' })
+								.then(
+									response => {
+										if (response.status < 400) {
+											window.location.href = '/'
+											return
+										}
+										alert('Failed to delete paste')
+									}
+								)
 						}
 					</script>
 				</div>

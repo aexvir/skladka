@@ -86,6 +86,24 @@ func (q *Queries) DeleteExpiredPastes(ctx context.Context) ([]string, error) {
 	return items, nil
 }
 
+const deletePaste = `-- name: DeletePaste :exec
+update pastes
+set deleted_at = now()
+where reference = $1
+    and deleted_at is null
+`
+
+// DeletePaste
+//
+//	update pastes
+//	set deleted_at = now()
+//	where reference = $1
+//	    and deleted_at is null
+func (q *Queries) DeletePaste(ctx context.Context, reference string) error {
+	_, err := q.db.Exec(ctx, deletePaste, reference)
+	return err
+}
+
 const getPasteByID = `-- name: GetPasteByID :one
 select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
 from pastes

@@ -260,6 +260,13 @@ func (s *PostgresStorage) GetPasteWithPassword(ctx context.Context, ref, passwor
 	return &paste, nil
 }
 
+func (s *PostgresStorage) DeletePaste(ctx context.Context, ref string) (err error) {
+	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "PostgresStorage.DeletePaste")
+	defer finish(&err)
+
+	return s.db.DeletePaste(ctx, ref)
+}
+
 // ListPastes retrieves all public pastes from the database and decrypts their contents.
 //
 // This method:

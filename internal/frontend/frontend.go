@@ -159,7 +159,7 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 					)
 
 				return layouts.Base(
-					user, views.Document(paste),
+					user, views.Document(user, paste),
 				).Render(r.Context(), w)
 			},
 		),
@@ -196,7 +196,7 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 					)
 
 				return layouts.Base(
-					user, views.Document(*paste),
+					user, views.Document(user, *paste),
 				).Render(r.Context(), w)
 			},
 		),
@@ -252,6 +252,34 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 				w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 				_, err = w.Write([]byte(paste.Content))
 				return err
+			},
+		),
+	)
+
+	router.Delete(
+		"/{ref}",
+		errors.WithErrorHandler(
+			func(w http.ResponseWriter, r *http.Request) error {
+				ref := chi.URLParam(r, "ref")
+
+				logging.
+					FromContext(r.Context()).
+					Info(
+						"frontend.dashboard", "deleting paste",
+						"ref", ref,
+					)
+
+				ctx := r.Context()
+				if err := pastesvc.DeletePaste(ctx, auth.UserFromContext(ctx), ref); err != nil {
+					return errors.NewHTTPError(
+						http.StatusUnprocessableEntity,
+						fmt.Sprintf("error deleting paste %s", ref),
+						err,
+					)
+				}
+
+				http.Redirect(w, r, "/", http.StatusSeeOther)
+				return nil
 			},
 		),
 	)

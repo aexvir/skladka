@@ -37,7 +37,7 @@ Views are designed to work with the \[layouts\] package for consistent page stru
 
 - [func Archive\(title string, pastes \[\]paste.Paste\) templ.Component](<#Archive>)
 - [func Creation\(name string\) templ.Component](<#Creation>)
-- [func Document\(paste paste.Paste\) templ.Component](<#Document>)
+- [func Document\(user \*auth.User, paste paste.Paste\) templ.Component](<#Document>)
 - [func Login\(\) templ.Component](<#Login>)
 - [func PasswordPrompt\(reference string\) templ.Component](<#PasswordPrompt>)
 - [func Profile\(user \*auth.User\) templ.Component](<#Profile>)
@@ -63,10 +63,10 @@ func Creation(name string) templ.Component
 
 
 <a name="Document"></a>
-## func [Document](<https://github.com/aexvir/skladka/blob/master/internal/frontend/views/document_templ.go#L15>)
+## func [Document](<https://github.com/aexvir/skladka/blob/master/internal/frontend/views/document_templ.go#L16>)
 
 ```go
-func Document(paste paste.Paste) templ.Component
+func Document(user *auth.User, paste paste.Paste) templ.Component
 ```
 
 
