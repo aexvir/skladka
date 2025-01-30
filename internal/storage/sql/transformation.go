@@ -17,10 +17,16 @@ func (db User) ToDomain() auth.User {
 		panic(err)
 	}
 
+	var avatar string
+	if db.Avatar.Valid {
+		avatar = db.Avatar.String
+	}
+
 	return auth.User{
 		Username:    db.Username,
 		UUID:        db.Uuid.String(),
 		Credentials: credentials,
+		Avatar:      avatar,
 	}
 }
 
@@ -35,10 +41,19 @@ func (User) FromDomain(domain auth.User) User {
 		panic(err)
 	}
 
+	var avatar pgtype.Text
+	if domain.Avatar != "" {
+		avatar = pgtype.Text{
+			String: domain.Avatar,
+			Valid:  true,
+		}
+	}
+
 	return User{
 		Username:    domain.Username,
 		Uuid:        uuid,
 		Credentials: credentials,
+		Avatar:      avatar,
 	}
 }
 

@@ -44,7 +44,19 @@ templ Metadata(user *auth.User, paste paste.Paste) {
 		<div class="h-full">
 			<div class="h-full bg-main flex flex-col p-4 rounded-t-2xl lg:rounded-none shadow-xl lg:shadow-none">
 				<div class="flex-grow">
-					<h1 class="text-2xl text-main" id="paste-title">{ paste.Title }</h1>
+					<h1 class="w-full text-2xl text-main inline-flex items-center justify-between" id="paste-title">
+						{ paste.Title }
+						if !paste.Public {
+							<div class="flex-0">
+								@icons.Eye(18, 18, "text-muted")
+							</div>
+						}
+						if paste.Password != nil {
+							<div class="flex-0">
+								@icons.Lock(18, 18, "text-muted")
+							</div>
+						}
+					</h1>
 					<div class="flex flex-row w-full text-sm gap-2">
 						@Username(paste.Owner)
 						·

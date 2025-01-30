@@ -10,6 +10,7 @@ type User struct {
 	UUID        string
 	Username    string
 	Credentials []webauthn.Credential
+	Avatar      string
 }
 
 func (u *User) WebAuthnID() []byte {

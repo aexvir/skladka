@@ -15,6 +15,11 @@ update users
 set credentials = $2
 where username = $1;
 
+-- name: UpdateUserAvatar :exec
+update users
+set avatar = $2
+where username = $1;
+
 -- name: UpdateUserEmail :exec
 update users
 set email =$2

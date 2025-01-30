@@ -32,6 +32,9 @@ type Storage interface {
 
 	// ListPastes returns all public pastes.
 	ListPastes(context.Context) ([]Paste, error)
+
+	// ListUserPastes returns all pastes created by a specific user
+	ListUserPastes(context.Context, string) ([]Paste, error)
 }
 
 // NewService creates a new paste service with the provided storage.
@@ -172,4 +175,39 @@ func (svc *Service) ListPastes(ctx context.Context, _ *auth.User) (pastes []Past
 	}()
 
 	return svc.store.ListPastes(ctx)
+}
+
+// ListUserPastes retrieves all pastes for a specific user from the storage.
+// The function returns a slice of Paste objects and any error that occurred during the operation.
+func (svc *Service) ListUserPastes(ctx context.Context, user *auth.User, username string) (pastes []Paste, err error) {
+	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "paste.Service.ListUserPastes")
+	defer func() {
+		finish(&err)
+		status := attributes.ValueStatusOk
+		if err != nil {
+			status = attributes.ValueStatusError
+		}
+		svc.met.PasteRetrievals.Add(ctx, len(pastes), attributes.Status(status))
+	}()
+
+	pastes, err = svc.store.ListUserPastes(ctx, username)
+	if err != nil {
+		return nil, errors.Wrap(err, "error retrieving user pastes")
+	}
+
+	// the req is authenticated and the user is asking for their own pastes
+	// no filtering needed
+	if user != nil && username == user.Username {
+		return pastes, nil
+	}
+
+	// otherwise only public pastes are visible to other users
+	filtered := make([]Paste, 0, len(pastes))
+	for _, paste := range pastes {
+		if paste.Public {
+			filtered = append(filtered, paste)
+		}
+	}
+
+	return filtered, nil
 }

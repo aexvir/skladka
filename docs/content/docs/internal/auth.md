@@ -28,6 +28,9 @@ The package also provides a middleware that automatically populates the request 
 
 ## Index
 
+- [func GravatarUrlFromEmail\(email string\) string](<#GravatarUrlFromEmail>)
+- [func GravatarUrlFromHash\(hash string\) string](<#GravatarUrlFromHash>)
+- [func GravatarUrlFromUsername\(username string\) string](<#GravatarUrlFromUsername>)
 - [type Service](<#Service>)
   - [func NewService\(ctx context.Context, store Storage, cfg config.WebAuthn\) \(\*Service, error\)](<#NewService>)
   - [func \(svc \*Service\) BeginLogin\(ctx context.Context, username string\) \(\*protocol.CredentialAssertion, Session, error\)](<#Service.BeginLogin>)
@@ -48,8 +51,35 @@ The package also provides a middleware that automatically populates the request 
   - [func \(u \*User\) WebAuthnName\(\) string](<#User.WebAuthnName>)
 
 
+<a name="GravatarUrlFromEmail"></a>
+## func [GravatarUrlFromEmail](<https://github.com/aexvir/skladka/blob/master/internal/auth/gravatar.go#L14>)
+
+```go
+func GravatarUrlFromEmail(email string) string
+```
+
+
+
+<a name="GravatarUrlFromHash"></a>
+## func [GravatarUrlFromHash](<https://github.com/aexvir/skladka/blob/master/internal/auth/gravatar.go#L46>)
+
+```go
+func GravatarUrlFromHash(hash string) string
+```
+
+
+
+<a name="GravatarUrlFromUsername"></a>
+## func [GravatarUrlFromUsername](<https://github.com/aexvir/skladka/blob/master/internal/auth/gravatar.go#L23>)
+
+```go
+func GravatarUrlFromUsername(username string) string
+```
+
+
+
 <a name="Service"></a>
-## type [Service](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L20-L23>)
+## type [Service](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L22-L25>)
 
 
 
@@ -60,7 +90,7 @@ type Service struct {
 ```
 
 <a name="NewService"></a>
-### func [NewService](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L36>)
+### func [NewService](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L39>)
 
 ```go
 func NewService(ctx context.Context, store Storage, cfg config.WebAuthn) (*Service, error)
@@ -69,7 +99,7 @@ func NewService(ctx context.Context, store Storage, cfg config.WebAuthn) (*Servi
 NewService creates a new authentication service with the provided storage and WebAuthn configuration. It initializes the WebAuthn relying party with the specified server ID, display name and origins. Returns the configured service instance and any error encountered during initialization.
 
 <a name="Service.BeginLogin"></a>
-### func \(\*Service\) [BeginLogin](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L198>)
+### func \(\*Service\) [BeginLogin](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L216>)
 
 ```go
 func (svc *Service) BeginLogin(ctx context.Context, username string) (*protocol.CredentialAssertion, Session, error)
@@ -91,7 +121,7 @@ The method will return an error if:
 - Session creation fails
 
 <a name="Service.BeginRegister"></a>
-### func \(\*Service\) [BeginRegister](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L86>)
+### func \(\*Service\) [BeginRegister](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L89>)
 
 ```go
 func (svc *Service) BeginRegister(ctx context.Context, username string) (*protocol.CredentialCreation, Session, error)
@@ -112,7 +142,7 @@ The method will return an error if:
 - Session creation fails
 
 <a name="Service.FinishLogin"></a>
-### func \(\*Service\) [FinishLogin](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L246>)
+### func \(\*Service\) [FinishLogin](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L264>)
 
 ```go
 func (svc *Service) FinishLogin(ctx context.Context, token string, response *http.Request) (*Session, error)
@@ -134,7 +164,7 @@ The method will return an error if:
 - Session creation fails
 
 <a name="Service.FinishRegister"></a>
-### func \(\*Service\) [FinishRegister](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L139>)
+### func \(\*Service\) [FinishRegister](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L142>)
 
 ```go
 func (svc *Service) FinishRegister(ctx context.Context, token string, response *http.Request) (*Session, error)
@@ -154,7 +184,7 @@ The method will return an error if:
 - User creation or session storage fails
 
 <a name="Service.GetSession"></a>
-### func \(\*Service\) [GetSession](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L66>)
+### func \(\*Service\) [GetSession](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L69>)
 
 ```go
 func (svc *Service) GetSession(ctx context.Context, token string) (session Session, err error)
@@ -163,7 +193,7 @@ func (svc *Service) GetSession(ctx context.Context, token string) (session Sessi
 GetUser retrieves a session from storage by its token. It returns the Session object and any error encountered during the retrieval.
 
 <a name="Service.GetUser"></a>
-### func \(\*Service\) [GetUser](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L57>)
+### func \(\*Service\) [GetUser](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L60>)
 
 ```go
 func (svc *Service) GetUser(ctx context.Context, username string) (user User, err error)
@@ -211,7 +241,7 @@ func (s Session) IsExpired() bool
 IsExpired returns true if the session is expired.
 
 <a name="Storage"></a>
-## type [Storage](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L25-L31>)
+## type [Storage](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L27-L34>)
 
 
 
@@ -219,6 +249,7 @@ IsExpired returns true if the session is expired.
 type Storage interface {
     CreateUser(context.Context, User) error
     UpdateUserCredentials(context.Context, User) error
+    UpdateUserAvatar(context.Context, User) error
     GetSessionByToken(context.Context, string) (Session, error)
     CreateSession(context.Context, Session) error
     GetUserByUsername(context.Context, string) (User, error)
@@ -226,7 +257,7 @@ type Storage interface {
 ```
 
 <a name="User"></a>
-## type [User](<https://github.com/aexvir/skladka/blob/master/internal/auth/user.go#L9-L13>)
+## type [User](<https://github.com/aexvir/skladka/blob/master/internal/auth/user.go#L9-L14>)
 
 User represents a WebAuthn user. It implements the \[webauthn.User\] interface.
 
@@ -235,6 +266,7 @@ type User struct {
     UUID        string
     Username    string
     Credentials []webauthn.Credential
+    Avatar      string
 }
 ```
 
@@ -248,7 +280,7 @@ func UserFromContext(ctx context.Context) *User
 UserFromContext returns the user reference from the context, if it exists.
 
 <a name="User.WebAuthnCredentials"></a>
-### func \(\*User\) [WebAuthnCredentials](<https://github.com/aexvir/skladka/blob/master/internal/auth/user.go#L27>)
+### func \(\*User\) [WebAuthnCredentials](<https://github.com/aexvir/skladka/blob/master/internal/auth/user.go#L28>)
 
 ```go
 func (u *User) WebAuthnCredentials() []webauthn.Credential
@@ -257,7 +289,7 @@ func (u *User) WebAuthnCredentials() []webauthn.Credential
 
 
 <a name="User.WebAuthnDisplayName"></a>
-### func \(\*User\) [WebAuthnDisplayName](<https://github.com/aexvir/skladka/blob/master/internal/auth/user.go#L23>)
+### func \(\*User\) [WebAuthnDisplayName](<https://github.com/aexvir/skladka/blob/master/internal/auth/user.go#L24>)
 
 ```go
 func (u *User) WebAuthnDisplayName() string
@@ -266,7 +298,7 @@ func (u *User) WebAuthnDisplayName() string
 
 
 <a name="User.WebAuthnID"></a>
-### func \(\*User\) [WebAuthnID](<https://github.com/aexvir/skladka/blob/master/internal/auth/user.go#L15>)
+### func \(\*User\) [WebAuthnID](<https://github.com/aexvir/skladka/blob/master/internal/auth/user.go#L16>)
 
 ```go
 func (u *User) WebAuthnID() []byte
@@ -275,7 +307,7 @@ func (u *User) WebAuthnID() []byte
 
 
 <a name="User.WebAuthnName"></a>
-### func \(\*User\) [WebAuthnName](<https://github.com/aexvir/skladka/blob/master/internal/auth/user.go#L19>)
+### func \(\*User\) [WebAuthnName](<https://github.com/aexvir/skladka/blob/master/internal/auth/user.go#L20>)
 
 ```go
 func (u *User) WebAuthnName() string

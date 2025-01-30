@@ -8,10 +8,16 @@ import (
 )
 
 templ PasteEntry(paste paste.Paste) {
-	<a href={ templ.SafeURL("/" + paste.Reference) } class="block p-4 border-main bg-muted rounded-lg border hover:shadow-xl hover:text-accent transition-all duration-200">
+	<a
+		href={ templ.SafeURL("/" + paste.Reference) }
+		data-created-at={ paste.Creation.Format("2006-01-02 15:04") }
+		data-unlisted={ strconv.FormatBool(!paste.Public) }
+		data-password-protected={ strconv.FormatBool(paste.Password != nil) }
+		class="block p-4 border-main bg-muted rounded-lg border hover:shadow-xl hover:text-accent transition-all duration-200"
+	>
 		<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
 			<div class="flex flex-col">
-				<h3 class="text-lg font-medium">
+				<h3 class="text-lg font-medium inline-flex items-center gap-2">
 					{{
 						title := "untitled"
 						if paste.Title != "" {
@@ -19,6 +25,12 @@ templ PasteEntry(paste paste.Paste) {
 						}
 					}}
 					{ title }
+					if !paste.Public {
+						@icons.Eye(14, 14, "text-muted")
+					}
+					if paste.Password != nil {
+						@icons.Lock(14, 14, "text-muted")
+					}
 				</h3>
 				<div class="text-sm text-muted flex flex-row gap-2 my-2 lg:my-0">
 					@Username(paste.Owner)
@@ -29,7 +41,7 @@ templ PasteEntry(paste paste.Paste) {
 					</span>
 				</div>
 			</div>
-			<div class="flex flex-col items-center gap-2 lg:gap-0">
+			<div class="flex flex-col items-end gap-2 lg:gap-0">
 				<span class="text-sm text-muted">
 					{{ size := fmt.Sprintf("%.1f", paste.SizeBytes()/1024.0) }}
 					{ strconv.Itoa(paste.Views) } views | { paste.Syntax } | { size }kb

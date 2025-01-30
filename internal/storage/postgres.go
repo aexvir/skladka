@@ -118,6 +118,23 @@ func (s *PostgresStorage) UpdateUserCredentials(ctx context.Context, user auth.U
 	)
 }
 
+// UpdateUserAvatar updates the avatar image data for a user in the database.
+// Returns an error if the database update operation fails.
+func (s *PostgresStorage) UpdateUserAvatar(ctx context.Context, user auth.User) (err error) {
+	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "PostgresStorage.UpdateUserAvatar")
+	defer finish(&err)
+
+	row := new(sql.User).FromDomain(user)
+
+	return s.db.UpdateUserAvatar(
+		ctx,
+		sql.UpdateUserAvatarParams{
+			Username: row.Username,
+			Avatar:   row.Avatar,
+		},
+	)
+}
+
 // CreateSession creates a new user session in the database with the provided [auth.Session] data.
 // Returns an error if the database operation fails.
 func (s *PostgresStorage) CreateSession(ctx context.Context, ssn auth.Session) (err error) {
@@ -285,13 +302,45 @@ func (s *PostgresStorage) ListPastes(ctx context.Context) (pastes []paste.Paste,
 	logger := logging.FromContext(ctx)
 	logger.Info("storage.postgres", "listing public pastes")
 
-	dbPastes, err := s.db.ListPublicPastes(ctx)
+	rows, err := s.db.ListPublicPastes(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to list public pastes")
 	}
 
-	pastes = make([]paste.Paste, len(dbPastes))
-	for i, row := range dbPastes {
+	pastes = make([]paste.Paste, len(rows))
+	for i, row := range rows {
+		paste := row.ToDomain()
+
+		if err := s.DecryptPaste(ctx, &paste); err != nil {
+			continue
+		}
+
+		pastes[i] = paste
+	}
+
+	return pastes, nil
+}
+
+// ListUserPastes retrieves all pastes from the database that belong to the specified user.
+// It fetches the encrypted paste data and decrypts it before returning.
+//
+// Returns:
+//   - []paste.Paste: The decrypted pastes if found
+//   - error: Any error that occurred during fetching or decryption
+func (s *PostgresStorage) ListUserPastes(ctx context.Context, username string) (pastes []paste.Paste, err error) {
+	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "PostgresStorage.ListUserPastes")
+	defer finish(&err)
+
+	logger := logging.FromContext(ctx)
+	logger.Info("storage.postgres", "listing user pastes", "username", username)
+
+	rows, err := s.db.ListUserPastes(ctx, pgtype.Text{String: username, Valid: true})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to list user pastes")
+	}
+
+	pastes = make([]paste.Paste, len(rows))
+	for i, row := range rows {
 		paste := row.ToDomain()
 
 		if err := s.DecryptPaste(ctx, &paste); err != nil {

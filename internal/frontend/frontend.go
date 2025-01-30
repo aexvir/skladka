@@ -113,8 +113,19 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 				logger.Info("frontend.archive", "rendering archive page")
 
 				user := auth.UserFromContext(r.Context())
+				username := r.URL.Query().Get("username")
 
-				pastes, err := pastesvc.ListPastes(r.Context(), user)
+				var (
+					pastes []paste.Paste
+					err    error
+				)
+
+				if username != "" {
+					pastes, err = pastesvc.ListUserPastes(r.Context(), user, username)
+				} else {
+					pastes, err = pastesvc.ListPastes(r.Context(), user)
+				}
+
 				if err != nil {
 					logger.Error(err, "frontend.archive", "error listing pastes")
 					return errors.AsHTTPError(err)
@@ -295,7 +306,28 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 				}
 
 				return layouts.Base(
-					user, views.Profile(user),
+					user, views.Profile(*user, user),
+				).Render(r.Context(), w)
+			},
+		),
+	)
+
+	router.Get("/u/{username}",
+		errors.WithErrorHandler(
+			func(w http.ResponseWriter, r *http.Request) error {
+				user := auth.UserFromContext(r.Context())
+
+				profile, err := authsvc.GetUser(r.Context(), chi.URLParam(r, "username"))
+				if err != nil {
+					return errors.NewHTTPError(
+						http.StatusUnprocessableEntity,
+						fmt.Sprintf("error getting user %s", chi.URLParam(r, "username")),
+						err,
+					)
+				}
+
+				return layouts.Base(
+					user, views.Profile(profile, user),
 				).Render(r.Context(), w)
 			},
 		),

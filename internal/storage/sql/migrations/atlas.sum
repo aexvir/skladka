@@ -1,7 +1,8 @@
-h1:OwfBfLceCDTkaWtVqwISvVMjn29gt5gveIpqNll7UqQ=
+h1:uit/PD/gz/tBTVh6sAlLXz3aN8iM1SxmYa4VqLFm4Nk=
 20241209225033_init_pastes.sql h1:75caPAlJvTZa5uFIic76iMURL+Q3sPVSwIUjc0zkqW0=
 20241231171451_add_paste_counter.sql h1:qfG/e/kd7sdFkrlfrj1gonnBxilktrCF4LoEwXihtSA=
 20250103234554_add_paste_password.sql h1:2edjpHpeBsYjH/bmhHGytBMT7nJLoTSS12d6i6Q0bWg=
 20250127201354_add_users_and_auth.sql h1:9h0oXNcxTYLQY5C6yf3ARAgn7m02xWOLzciHXADBnJk=
 20250128114032_add_user_email.sql h1:GxfubmsvSlMsx6Hljvc60KPN7JSy/UwVhhzqiyDD67U=
 20250129174922_paste_uses_username.sql h1:MG60NVg8zwg59tpQC/KwNLBvPBwVeP8C54MR/684bYk=
+20250202211708_add_user_avatar.sql h1:I2C+XLEyc+DwjrP62mbRwDBM9cWMTDslaFFzlEUBDHc=

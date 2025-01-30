@@ -22,7 +22,9 @@ import "github.com/aexvir/skladka/internal/frontend/icons"
 - [func Hand\(width, height int, classes ...string\) templ.Component](<#Hand>)
 - [func List\(width, height int, classes ...string\) templ.Component](<#List>)
 - [func Lock\(width, height int, classes ...string\) templ.Component](<#Lock>)
+- [func LogOut\(width, height int, classes ...string\) templ.Component](<#LogOut>)
 - [func Paperclip\(width, height int, classes ...string\) templ.Component](<#Paperclip>)
+- [func Search\(width, height int, classes ...string\) templ.Component](<#Search>)
 - [func Tag\(width, height int, classes ...string\) templ.Component](<#Tag>)
 - [func User\(width, height int, classes ...string\) templ.Component](<#User>)
 
@@ -153,11 +155,29 @@ func Lock(width, height int, classes ...string) templ.Component
 
 
 
+<a name="LogOut"></a>
+## func [LogOut](<https://github.com/aexvir/skladka/blob/master/internal/frontend/icons/logout_templ.go#L15>)
+
+```go
+func LogOut(width, height int, classes ...string) templ.Component
+```
+
+
+
 <a name="Paperclip"></a>
 ## func [Paperclip](<https://github.com/aexvir/skladka/blob/master/internal/frontend/icons/paperclip_templ.go#L15>)
 
 ```go
 func Paperclip(width, height int, classes ...string) templ.Component
+```
+
+
+
+<a name="Search"></a>
+## func [Search](<https://github.com/aexvir/skladka/blob/master/internal/frontend/icons/search_templ.go#L15>)
+
+```go
+func Search(width, height int, classes ...string) templ.Component
 ```
 
 

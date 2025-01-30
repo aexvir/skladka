@@ -24,6 +24,13 @@ where public = true
     and deleted_at is null
 order by created_at desc;
 
+-- name: ListUserPastes :many
+select *
+from pastes
+where owner = $1
+    and deleted_at is null
+order by created_at desc;
+
 -- name: DeletePaste :exec
 update pastes
 set deleted_at = now()

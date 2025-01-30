@@ -35,9 +35,9 @@ templ Nav(name string, user *auth.User, links ...Link) {
 			if user != nil {
 				<a
 					href="/u/profile"
-					class="hover:text-accent text-main transition-colors flex items-center gap-2"
+					class="hover:text-accent text-main transition-colors"
 				>
-					&#64;{ user.Username }
+					<span class="text-muted">&#64;</span>{ user.Username }
 				</a>
 			}
 		</div>

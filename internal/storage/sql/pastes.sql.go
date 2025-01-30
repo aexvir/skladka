@@ -225,3 +225,53 @@ func (q *Queries) ListPublicPastes(ctx context.Context) ([]Paste, error) {
 	}
 	return items, nil
 }
+
+const listUserPastes = `-- name: ListUserPastes :many
+select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
+from pastes
+where owner = $1
+    and deleted_at is null
+order by created_at desc
+`
+
+// ListUserPastes
+//
+//	select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
+//	from pastes
+//	where owner = $1
+//	    and deleted_at is null
+//	order by created_at desc
+func (q *Queries) ListUserPastes(ctx context.Context, owner pgtype.Text) ([]Paste, error) {
+	rows, err := q.db.Query(ctx, listUserPastes, owner)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Paste
+	for rows.Next() {
+		var i Paste
+		if err := rows.Scan(
+			&i.ID,
+			&i.Reference,
+			&i.Title,
+			&i.Content,
+			&i.Syntax,
+			&i.Tags,
+			&i.Expiration,
+			&i.Public,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.Views,
+			&i.Password,
+			&i.Owner,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

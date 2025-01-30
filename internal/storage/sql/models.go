@@ -43,4 +43,5 @@ type User struct {
 	UpdatedAt   pgtype.Timestamp `db:"updated_at" json:"updated_at"`
 	DeletedAt   pgtype.Timestamp `db:"deleted_at" json:"deleted_at"`
 	Email       pgtype.Text      `db:"email" json:"email"`
+	Avatar      pgtype.Text      `db:"avatar" json:"avatar"`
 }

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 
 	"github.com/aexvir/skladka/internal/config"
 	"github.com/aexvir/skladka/internal/errors"
+	"github.com/aexvir/skladka/internal/logging"
 	"github.com/aexvir/skladka/internal/tracing"
 )
 
@@ -25,6 +27,7 @@ type Service struct {
 type Storage interface {
 	CreateUser(context.Context, User) error
 	UpdateUserCredentials(context.Context, User) error
+	UpdateUserAvatar(context.Context, User) error
 	GetSessionByToken(context.Context, string) (Session, error)
 	CreateSession(context.Context, Session) error
 	GetUserByUsername(context.Context, string) (User, error)
@@ -177,6 +180,21 @@ func (svc *Service) FinishRegister(ctx context.Context, token string, response *
 	if err := svc.store.CreateSession(ctx, authed); err != nil {
 		return nil, errors.Wrap(err, "error storing auth session")
 	}
+
+	// todo: for now fetched by username during register.
+	// later on users will be able to input email and hash will be computed.
+	go func() {
+		user.Avatar = GravatarUrlFromUsername(user.Username)
+		if err := svc.store.UpdateUserAvatar(context.Background(), user); err != nil {
+			logging.FromContext(ctx).
+				Error(
+					err,
+					"auth.service.avatar",
+					"failed to save avatar for user",
+					slog.String("user.username", user.Username),
+				)
+		}
+	}()
 
 	return &authed, svc.store.CreateUser(ctx, user)
 }

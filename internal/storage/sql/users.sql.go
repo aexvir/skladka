@@ -15,7 +15,7 @@ const createUser = `-- name: CreateUser :one
 insert into users
 (username, uuid, credentials)
 values ($1, $2, $3)
-returning id, username, uuid, credentials, created_at, updated_at, deleted_at, email
+returning id, username, uuid, credentials, created_at, updated_at, deleted_at, email, avatar
 `
 
 type CreateUserParams struct {
@@ -29,7 +29,7 @@ type CreateUserParams struct {
 //	insert into users
 //	(username, uuid, credentials)
 //	values ($1, $2, $3)
-//	returning id, username, uuid, credentials, created_at, updated_at, deleted_at, email
+//	returning id, username, uuid, credentials, created_at, updated_at, deleted_at, email, avatar
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, createUser, arg.Username, arg.Uuid, arg.Credentials)
 	var i User
@@ -42,6 +42,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.UpdatedAt,
 		&i.DeletedAt,
 		&i.Email,
+		&i.Avatar,
 	)
 	return i, err
 }
@@ -63,7 +64,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-select id, username, uuid, credentials, created_at, updated_at, deleted_at, email
+select id, username, uuid, credentials, created_at, updated_at, deleted_at, email, avatar
 from users
 where username = $1
     and deleted_at is null
@@ -71,7 +72,7 @@ where username = $1
 
 // GetUserByUsername
 //
-//	select id, username, uuid, credentials, created_at, updated_at, deleted_at, email
+//	select id, username, uuid, credentials, created_at, updated_at, deleted_at, email, avatar
 //	from users
 //	where username = $1
 //	    and deleted_at is null
@@ -87,8 +88,30 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 		&i.UpdatedAt,
 		&i.DeletedAt,
 		&i.Email,
+		&i.Avatar,
 	)
 	return i, err
+}
+
+const updateUserAvatar = `-- name: UpdateUserAvatar :exec
+update users
+set avatar = $2
+where username = $1
+`
+
+type UpdateUserAvatarParams struct {
+	Username string      `db:"username" json:"username"`
+	Avatar   pgtype.Text `db:"avatar" json:"avatar"`
+}
+
+// UpdateUserAvatar
+//
+//	update users
+//	set avatar = $2
+//	where username = $1
+func (q *Queries) UpdateUserAvatar(ctx context.Context, arg UpdateUserAvatarParams) error {
+	_, err := q.db.Exec(ctx, updateUserAvatar, arg.Username, arg.Avatar)
+	return err
 }
 
 const updateUserCredentials = `-- name: UpdateUserCredentials :exec
