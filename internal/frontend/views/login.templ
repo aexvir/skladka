@@ -15,6 +15,7 @@ templ Login() {
 					id="username"
 					name="username"
 					placeholder="username"
+					autocomplete="username webauthn"
 					required
 					class="h-10 p-2 flex-grow bg-muted text-main border border-main rounded lg:rounded-r-none focus:outline-none focus:border-accent"
 				/>
@@ -93,7 +94,8 @@ templ Login() {
 			}
 
 			const options = await response.json()
-			const payload = await operation({ optionsJSON: options.publicKey })
+			var failed = false
+			const payload = await operation({ optionsJSON: options.publicKey, useBrowserAutofill: true })
 				.catch(
 					error => {
 						window.Toaster.show(
@@ -102,8 +104,13 @@ templ Login() {
 								duration: 3000
 							}
 						)
+						failed = true
 					}
 				)
+
+			if (failed) {
+				return
+			}
 
 			const verification = await fetch(
 				`/u/${action}/finish`,
