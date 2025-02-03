@@ -150,6 +150,7 @@ func (s *PostgresStorage) CreateSession(ctx context.Context, ssn auth.Session) (
 			Username:  row.Username,
 			Data:      row.Data,
 			ExpiresAt: row.ExpiresAt,
+			Throwaway: row.Throwaway,
 		},
 	)
 

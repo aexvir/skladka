@@ -13,9 +13,9 @@ import (
 
 const createSession = `-- name: CreateSession :one
 insert into sessions
-(token, username, data, expires_at)
-values ($1, $2, $3, $4)
-returning id, token, username, data, created_at, expires_at
+(token, username, data, expires_at, throwaway)
+values ($1, $2, $3, $4, $5)
+returning id, token, username, data, created_at, expires_at, throwaway
 `
 
 type CreateSessionParams struct {
@@ -23,20 +23,22 @@ type CreateSessionParams struct {
 	Username  string           `db:"username" json:"username"`
 	Data      []byte           `db:"data" json:"data"`
 	ExpiresAt pgtype.Timestamp `db:"expires_at" json:"expires_at"`
+	Throwaway bool             `db:"throwaway" json:"throwaway"`
 }
 
 // CreateSession
 //
 //	insert into sessions
-//	(token, username, data, expires_at)
-//	values ($1, $2, $3, $4)
-//	returning id, token, username, data, created_at, expires_at
+//	(token, username, data, expires_at, throwaway)
+//	values ($1, $2, $3, $4, $5)
+//	returning id, token, username, data, created_at, expires_at, throwaway
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error) {
 	row := q.db.QueryRow(ctx, createSession,
 		arg.Token,
 		arg.Username,
 		arg.Data,
 		arg.ExpiresAt,
+		arg.Throwaway,
 	)
 	var i Session
 	err := row.Scan(
@@ -46,6 +48,7 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (S
 		&i.Data,
 		&i.CreatedAt,
 		&i.ExpiresAt,
+		&i.Throwaway,
 	)
 	return i, err
 }
@@ -79,7 +82,7 @@ func (q *Queries) DeleteSession(ctx context.Context, token pgtype.UUID) error {
 }
 
 const getSessionByToken = `-- name: GetSessionByToken :one
-select id, token, username, data, created_at, expires_at
+select id, token, username, data, created_at, expires_at, throwaway
 from sessions
 where token = $1
     and expires_at > now()
@@ -87,7 +90,7 @@ where token = $1
 
 // GetSessionByToken
 //
-//	select id, token, username, data, created_at, expires_at
+//	select id, token, username, data, created_at, expires_at, throwaway
 //	from sessions
 //	where token = $1
 //	    and expires_at > now()
@@ -101,6 +104,7 @@ func (q *Queries) GetSessionByToken(ctx context.Context, token pgtype.UUID) (Ses
 		&i.Data,
 		&i.CreatedAt,
 		&i.ExpiresAt,
+		&i.Throwaway,
 	)
 	return i, err
 }

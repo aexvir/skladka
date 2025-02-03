@@ -29,11 +29,13 @@ func (svc *Service) UserSessionMiddleware() func(http.Handler) http.Handler {
 					session, err := svc.store.GetSessionByToken(r.Context(), token.Value)
 					if err == nil { // and the session can be retrieved
 						if !session.IsExpired() { // and is not expired
-							user, err := svc.store.GetUserByUsername(r.Context(), session.Username)
-							if err == nil {
-								r = r.WithContext(
-									context.WithValue(r.Context(), ctxKeyUser, &user),
-								)
+							if !session.Throwaway { // and is not a throwaway session created during webauthn handshake
+								user, err := svc.store.GetUserByUsername(r.Context(), session.Username)
+								if err == nil {
+									r = r.WithContext(
+										context.WithValue(r.Context(), ctxKeyUser, &user),
+									)
+								}
 							}
 						}
 					}

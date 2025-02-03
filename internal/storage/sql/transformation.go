@@ -68,6 +68,7 @@ func (db Session) ToDomain() auth.Session {
 		Username:  db.Username,
 		Data:      db.Data,
 		ExpiresAt: *expiration,
+		Throwaway: db.Throwaway,
 	}
 }
 
@@ -85,6 +86,7 @@ func (Session) FromDomain(domain auth.Session) Session {
 			Time:  domain.ExpiresAt,
 			Valid: true,
 		},
+		Throwaway: domain.Throwaway,
 	}
 }
 

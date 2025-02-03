@@ -10,6 +10,7 @@ type Session struct {
 	Token     string
 	Data      []byte
 	ExpiresAt time.Time
+	Throwaway bool
 }
 
 // IsExpired returns true if the session is expired.

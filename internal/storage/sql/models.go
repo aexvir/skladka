@@ -32,6 +32,7 @@ type Session struct {
 	Data      []byte           `db:"data" json:"data"`
 	CreatedAt pgtype.Timestamp `db:"created_at" json:"created_at"`
 	ExpiresAt pgtype.Timestamp `db:"expires_at" json:"expires_at"`
+	Throwaway bool             `db:"throwaway" json:"throwaway"`
 }
 
 type User struct {

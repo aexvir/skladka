@@ -1,7 +1,7 @@
 -- name: CreateSession :one
 insert into sessions
-(token, username, data, expires_at)
-values ($1, $2, $3, $4)
+(token, username, data, expires_at, throwaway)
+values ($1, $2, $3, $4, $5)
 returning *;
 
 -- name: GetSessionByToken :one

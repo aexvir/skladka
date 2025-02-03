@@ -36,16 +36,11 @@ create table pastes (
 create table sessions (
     id bigserial primary key,
 
-    -- Session token used in cookies
     token uuid not null unique,
-
-    -- User that owns this session, nullable for registration sessions
     username text not null,
-
-    -- Session data stored as JSON
     data jsonb not null,
+    throwaway boolean not null default false,
 
-    -- Sessions expire after a certain time
     created_at timestamp not null default now(),
     expires_at timestamp not null
 );

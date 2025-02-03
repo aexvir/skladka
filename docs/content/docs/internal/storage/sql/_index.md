@@ -66,7 +66,7 @@ type CreatePasteParams struct {
 ```
 
 <a name="CreateSessionParams"></a>
-## type [CreateSessionParams](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/sessions.sql.go#L21-L26>)
+## type [CreateSessionParams](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/sessions.sql.go#L21-L27>)
 
 
 
@@ -76,6 +76,7 @@ type CreateSessionParams struct {
     Username  string           `db:"username" json:"username"`
     Data      []byte           `db:"data" json:"data"`
     ExpiresAt pgtype.Timestamp `db:"expires_at" json:"expires_at"`
+    Throwaway bool             `db:"throwaway" json:"throwaway"`
 }
 ```
 
@@ -130,7 +131,7 @@ type Paste struct {
 ```
 
 <a name="Paste.FromDomain"></a>
-### func \(Paste\) [FromDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L127>)
+### func \(Paste\) [FromDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L129>)
 
 ```go
 func (Paste) FromDomain(domain paste.Paste) *Paste
@@ -139,7 +140,7 @@ func (Paste) FromDomain(domain paste.Paste) *Paste
 
 
 <a name="Paste.ToDomain"></a>
-### func \(Paste\) [ToDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L91>)
+### func \(Paste\) [ToDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L93>)
 
 ```go
 func (db Paste) ToDomain() paste.Paste
@@ -184,7 +185,7 @@ returning id
 ```
 
 <a name="Queries.CreateSession"></a>
-### func \(\*Queries\) [CreateSession](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/sessions.sql.go#L34>)
+### func \(\*Queries\) [CreateSession](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/sessions.sql.go#L35>)
 
 ```go
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
@@ -194,9 +195,9 @@ CreateSession
 
 ```
 insert into sessions
-(token, username, data, expires_at)
-values ($1, $2, $3, $4)
-returning id, token, username, data, created_at, expires_at
+(token, username, data, expires_at, throwaway)
+values ($1, $2, $3, $4, $5)
+returning id, token, username, data, created_at, expires_at, throwaway
 ```
 
 <a name="Queries.CreateUser"></a>
@@ -232,7 +233,7 @@ returning reference
 ```
 
 <a name="Queries.DeleteExpiredSessions"></a>
-### func \(\*Queries\) [DeleteExpiredSessions](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/sessions.sql.go#L62>)
+### func \(\*Queries\) [DeleteExpiredSessions](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/sessions.sql.go#L65>)
 
 ```go
 func (q *Queries) DeleteExpiredSessions(ctx context.Context) error
@@ -262,7 +263,7 @@ where reference = $1
 ```
 
 <a name="Queries.DeleteSession"></a>
-### func \(\*Queries\) [DeleteSession](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/sessions.sql.go#L76>)
+### func \(\*Queries\) [DeleteSession](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/sessions.sql.go#L79>)
 
 ```go
 func (q *Queries) DeleteSession(ctx context.Context, token pgtype.UUID) error
@@ -324,7 +325,7 @@ returning id, reference, title, content, syntax, tags, expiration, public, creat
 ```
 
 <a name="Queries.GetSessionByToken"></a>
-### func \(\*Queries\) [GetSessionByToken](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/sessions.sql.go#L94>)
+### func \(\*Queries\) [GetSessionByToken](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/sessions.sql.go#L97>)
 
 ```go
 func (q *Queries) GetSessionByToken(ctx context.Context, token pgtype.UUID) (Session, error)
@@ -333,7 +334,7 @@ func (q *Queries) GetSessionByToken(ctx context.Context, token pgtype.UUID) (Ses
 GetSessionByToken
 
 ```
-select id, token, username, data, created_at, expires_at
+select id, token, username, data, created_at, expires_at, throwaway
 from sessions
 where token = $1
     and expires_at > now()
@@ -444,7 +445,7 @@ func (q *Queries) WithTx(tx pgx.Tx) *Queries
 
 
 <a name="Session"></a>
-## type [Session](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/models.go#L28-L35>)
+## type [Session](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/models.go#L28-L36>)
 
 
 
@@ -456,11 +457,12 @@ type Session struct {
     Data      []byte           `db:"data" json:"data"`
     CreatedAt pgtype.Timestamp `db:"created_at" json:"created_at"`
     ExpiresAt pgtype.Timestamp `db:"expires_at" json:"expires_at"`
+    Throwaway bool             `db:"throwaway" json:"throwaway"`
 }
 ```
 
 <a name="Session.FromDomain"></a>
-### func \(Session\) [FromDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L74>)
+### func \(Session\) [FromDomain](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/transformation.go#L75>)
 
 ```go
 func (Session) FromDomain(domain auth.Session) Session
@@ -514,7 +516,7 @@ type UpdateUserEmailParams struct {
 ```
 
 <a name="User"></a>
-## type [User](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/models.go#L37-L47>)
+## type [User](<https://github.com/aexvir/skladka/blob/master/internal/storage/sql/models.go#L38-L48>)
 
 
 

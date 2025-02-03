@@ -99,7 +99,7 @@ func NewService(ctx context.Context, store Storage, cfg config.WebAuthn) (*Servi
 NewService creates a new authentication service with the provided storage and WebAuthn configuration. It initializes the WebAuthn relying party with the specified server ID, display name and origins. Returns the configured service instance and any error encountered during initialization.
 
 <a name="Service.BeginLogin"></a>
-### func \(\*Service\) [BeginLogin](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L216>)
+### func \(\*Service\) [BeginLogin](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L217>)
 
 ```go
 func (svc *Service) BeginLogin(ctx context.Context, username string) (*protocol.CredentialAssertion, Session, error)
@@ -142,7 +142,7 @@ The method will return an error if:
 - Session creation fails
 
 <a name="Service.FinishLogin"></a>
-### func \(\*Service\) [FinishLogin](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L264>)
+### func \(\*Service\) [FinishLogin](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L266>)
 
 ```go
 func (svc *Service) FinishLogin(ctx context.Context, token string, response *http.Request) (*Session, error)
@@ -164,7 +164,7 @@ The method will return an error if:
 - Session creation fails
 
 <a name="Service.FinishRegister"></a>
-### func \(\*Service\) [FinishRegister](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L142>)
+### func \(\*Service\) [FinishRegister](<https://github.com/aexvir/skladka/blob/master/internal/auth/service.go#L143>)
 
 ```go
 func (svc *Service) FinishRegister(ctx context.Context, token string, response *http.Request) (*Session, error)
@@ -218,7 +218,7 @@ UserSessionMiddleware populates the context with a reference to the user that's 
 It doesn't prevent in any way the request from going through. In order to retrieve the populated user from the context, use [UserFromContext](<#UserFromContext>).
 
 <a name="Session"></a>
-## type [Session](<https://github.com/aexvir/skladka/blob/master/internal/auth/session.go#L8-L13>)
+## type [Session](<https://github.com/aexvir/skladka/blob/master/internal/auth/session.go#L8-L14>)
 
 Session represents a WebAuthn user session.
 
@@ -228,11 +228,12 @@ type Session struct {
     Token     string
     Data      []byte
     ExpiresAt time.Time
+    Throwaway bool
 }
 ```
 
 <a name="Session.IsExpired"></a>
-### func \(Session\) [IsExpired](<https://github.com/aexvir/skladka/blob/master/internal/auth/session.go#L16>)
+### func \(Session\) [IsExpired](<https://github.com/aexvir/skladka/blob/master/internal/auth/session.go#L17>)
 
 ```go
 func (s Session) IsExpired() bool
@@ -271,7 +272,7 @@ type User struct {
 ```
 
 <a name="UserFromContext"></a>
-### func [UserFromContext](<https://github.com/aexvir/skladka/blob/master/internal/auth/middleware.go#L49>)
+### func [UserFromContext](<https://github.com/aexvir/skladka/blob/master/internal/auth/middleware.go#L51>)
 
 ```go
 func UserFromContext(ctx context.Context) *User

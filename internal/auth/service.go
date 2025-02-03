@@ -118,6 +118,7 @@ func (svc *Service) BeginRegister(ctx context.Context, username string) (*protoc
 		Token:     uuid.NewString(),
 		Data:      sessdata.Bytes(),
 		ExpiresAt: time.Now().Add(5 * time.Minute),
+		Throwaway: true,
 	}
 
 	if err := svc.store.CreateSession(ctx, session); err != nil {
@@ -238,6 +239,7 @@ func (svc *Service) BeginLogin(ctx context.Context, username string) (*protocol.
 		Token:     uuid.New().String(),
 		Data:      sessdata.Bytes(),
 		ExpiresAt: time.Now().Add(5 * time.Minute),
+		Throwaway: true,
 	}
 
 	if err := svc.store.CreateSession(ctx, session); err != nil {
