@@ -100,7 +100,7 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 					return errors.NewHTTPError(http.StatusInternalServerError, "error creating paste", err)
 				}
 
-				http.Redirect(w, r, fmt.Sprintf("/%s", paste.Reference), http.StatusSeeOther)
+				http.Redirect(w, r, fmt.Sprintf("/p/%s", paste.Reference), http.StatusSeeOther)
 				return nil
 			},
 		),
@@ -138,7 +138,7 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 		),
 	)
 
-	router.Get("/{ref}",
+	router.Get("/p/{ref}",
 		errors.WithErrorHandler(
 			func(w http.ResponseWriter, r *http.Request) error {
 				ref := chi.URLParam(r, "ref")
@@ -176,7 +176,7 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 		),
 	)
 
-	router.Post("/{ref}/unlock",
+	router.Post("/p/{ref}/unlock",
 		errors.WithErrorHandler(
 			func(w http.ResponseWriter, r *http.Request) error {
 				ref := chi.URLParam(r, "ref")
@@ -213,7 +213,7 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 		),
 	)
 
-	router.Get("/{ref}/raw",
+	router.Get("/r/{ref}",
 		errors.WithErrorHandler(
 			func(w http.ResponseWriter, r *http.Request) error {
 				ref := chi.URLParam(r, "ref")
@@ -268,7 +268,7 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 	)
 
 	router.Delete(
-		"/{ref}",
+		"/p/{ref}",
 		errors.WithErrorHandler(
 			func(w http.ResponseWriter, r *http.Request) error {
 				ref := chi.URLParam(r, "ref")

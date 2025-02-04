@@ -9,7 +9,7 @@ import (
 
 templ PasteEntry(paste paste.Paste) {
 	<a
-		href={ templ.SafeURL("/" + paste.Reference) }
+		href={ templ.SafeURL("/p/" + paste.Reference) }
 		data-created-at={ paste.Creation.Format("2006-01-02 15:04") }
 		data-unlisted={ strconv.FormatBool(!paste.Public) }
 		data-password-protected={ strconv.FormatBool(paste.Password != nil) }
