@@ -2,7 +2,7 @@ package components
 
 templ InputLabel(name string, icon templ.Component) {
 	if name != "" {
-		<label class="text-sm text-main flex flex-row gap-2 items-center">
+		<label class="text-sm text-content flex flex-row gap-2 items-center">
 			if icon != nil {
 				@icon
 			}
@@ -19,7 +19,7 @@ templ TextInput(id, label, placeholder string, icon templ.Component) {
 			name={ id }
 			type="text"
 			placeholder={ placeholder }
-			class="h-10 w-full bg-muted text-main border-main border rounded p-2 focus:outline-none focus:border-accent"
+			class="h-10 w-full bg-surface-muted text-content border-content-muted/30 border rounded p-2 focus:outline-none focus:border-accent/70"
 		/>
 	</div>
 }
@@ -29,14 +29,14 @@ templ PasswordInput(id, label, placeholder string) {
 		id={ id }
 		name={ id }
 		type="password"
-		class="h-10 w-full bg-muted text-main border-main border rounded p-2 focus:outline-none focus:border-accent"
+		class="h-10 w-full bg-surface-muted text-content border-content-muted/30 border rounded p-2 focus:outline-none focus:border-accent/70"
 	/>
 }
 
 templ SelectInput(id, label string, icon templ.Component, options ...string) {
 	<div class="space-y-1">
 		@InputLabel(label, icon)
-		<select id={ id } name={ id } class="h-10 w-full bg-muted text-main border-main border rounded p-2 focus:outline-none focus:border-accent">
+		<select id={ id } name={ id } class="h-10 w-full bg-surface-muted text-content border-content-muted/30 border rounded p-2 focus:outline-none focus:border-accent/70">
 			for _, option := range options {
 				<option value={ option }>{ option }</option>
 			}
@@ -49,7 +49,7 @@ templ TagsInput(id, label string, icon templ.Component) {
 		@InputLabel(label, icon)
 		<div
 			id={ id }
-			class="min-h-10 w-full bg-muted text-main border-main border rounded px-2 py-1.5"
+			class="min-h-10 w-full bg-surface-muted text-content border-content-muted/30 border rounded px-2 py-1.5"
 		>
 			<div class="tags-container flex flex-wrap items-center gap-1 placeholder-text-small">
 				<input
@@ -85,10 +85,10 @@ script initTagsInput(inputId string) {
         const createTagElement = (value) => {
             const tag = document.createElement('span')
 
-            tag.className = 'inline-flex items-center border border-main text-base px-2 py-0.25 rounded'
+            tag.className = 'inline-flex items-center border border-content-muted/30 text-base px-2 py-0.25 rounded'
             tag.innerHTML = `
                 ${value}
-                <button type="button" class="ml-1.5 text-muted hover:text-main">&times</button>
+                <button type="button" class="ml-1.5 text-content-muted hover:text-content">&times</button>
             `
 
             tag.
@@ -157,15 +157,15 @@ script initTagsInput(inputId string) {
         // handle focus events
         input.addEventListener(
             'focus', () => {
-                wrapper.classList.remove('border-main')
-                wrapper.classList.add('border-accent')
+                wrapper.classList.remove('border-content-muted/30')
+                wrapper.classList.add('border-accent/70')
             }
         )
 
         input.addEventListener(
             'blur', () => {
-                wrapper.classList.remove('border-accent')
-                wrapper.classList.add('border-main')
+                wrapper.classList.remove('border-accent/70')
+                wrapper.classList.add('border-content-muted/30')
                 // add any remaining input as a tag
                 const tag = input.value.trim()
                 if (tag && !tags.includes(tag)) {

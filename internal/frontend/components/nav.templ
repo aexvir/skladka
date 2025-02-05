@@ -12,14 +12,14 @@ type Link struct {
 }
 
 templ Nav(name string, user *auth.User, links ...Link) {
-	<nav class="bg-muted text-main px-4 py-2 flex justify-between items-center lowercase block border-b border-main ">
-		<a class="flex flex-row items-center gap-4 transition-all text-main hover:text-accent" href="/">
+	<nav class="bg-surface-muted text-content px-4 py-2 flex justify-between items-center lowercase block border-b border-content-muted/30 ">
+		<a class="flex flex-row items-center gap-4 transition-all text-content hover:text-accent" href="/">
 			<img src="/static/landfill.svg" class="h-auto w-8" id="nav-logo"/>
 			<div class="text-2xl">{ name }</div>
 		</a>
 		<div class="flex items-center gap-x-6">
 			for _, link := range links {
-				<a href={ link.URL } class="hover:text-accent text-main transition-colors flex items-center gap-2">
+				<a href={ link.URL } class="hover:text-accent text-content transition-colors flex items-center gap-2">
 					if link.Icon != nil {
 						@link.Icon
 					}
@@ -27,17 +27,17 @@ templ Nav(name string, user *auth.User, links ...Link) {
 				</a>
 			}
 			if user == nil {
-				<a href="/u/login" class="hover:text-accent text-main transition-colors flex items-center gap-2">
-					@icons.User(16, 16, "text-muted")
+				<a href="/u/login" class="hover:text-accent text-content transition-colors flex items-center gap-2">
+					@icons.User(16, 16, "text-content-muted")
 					login
 				</a>
 			}
 			if user != nil {
 				<a
 					href="/u/profile"
-					class="hover:text-accent text-main transition-colors"
+					class="hover:text-accent text-content transition-colors"
 				>
-					<span class="text-muted">&#64;</span>{ user.Username }
+					<span class="text-content-muted">&#64;</span>{ user.Username }
 				</a>
 			}
 		</div>

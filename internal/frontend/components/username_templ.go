@@ -29,10 +29,10 @@ func Username(value *string) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 
-		author, color := "anonymous", "text-muted"
+		author, color := "anonymous", "text-content-muted"
 		if value != nil {
 			author = "@" + *value
-			color = "text-blue-400"
+			color = "text-complementary"
 		}
 		var templ_7745c5c3_Var2 = []any{color}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)

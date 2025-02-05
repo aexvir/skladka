@@ -83,7 +83,7 @@ func PasteEntry(paste paste.Paste) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"block p-4 border-main bg-muted rounded-lg border hover:shadow-xl hover:text-accent transition-all duration-200\"><div class=\"flex flex-col lg:flex-row lg:items-center lg:justify-between\"><div class=\"flex flex-col\"><h3 class=\"text-lg font-medium inline-flex items-center gap-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"block p-4 border-content-muted/30 bg-surface-muted rounded-lg border hover:shadow-xl hover:text-accent transition-all duration-200\"><div class=\"flex flex-col lg:flex-row lg:items-center lg:justify-between\"><div class=\"flex flex-col\"><h3 class=\"text-lg font-medium inline-flex items-center gap-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -106,18 +106,18 @@ func PasteEntry(paste paste.Paste) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if !paste.Public {
-			templ_7745c5c3_Err = icons.Eye(14, 14, "text-muted").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = icons.Eye(14, 14, "text-content-muted").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
 		if paste.Password != nil {
-			templ_7745c5c3_Err = icons.Lock(14, 14, "text-muted").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = icons.Lock(14, 14, "text-content-muted").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</h3><div class=\"text-sm text-muted flex flex-row gap-2 my-2 lg:my-0\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</h3><div class=\"text-sm text-content-muted flex flex-row gap-2 my-2 lg:my-0\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -129,7 +129,7 @@ func PasteEntry(paste paste.Paste) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = icons.Calendar(14, 14, "text-muted").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = icons.Calendar(14, 14, "text-content-muted").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -142,7 +142,7 @@ func PasteEntry(paste paste.Paste) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</span></div></div><div class=\"flex flex-col items-end gap-2 lg:gap-0\"><span class=\"text-sm text-muted\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</span></div></div><div class=\"flex flex-col items-end gap-2 lg:gap-0\"><span class=\"text-sm text-content-muted\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -187,14 +187,14 @@ func PasteEntry(paste paste.Paste) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		for _, tag := range paste.Tags {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<span class=\"bg-main text-muted px-2 py-0.5 rounded text-sm border border-main\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<span class=\"bg-surface text-content-muted px-2 py-0.5 rounded text-sm border border-content-muted/30\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(tag)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/entry.templ`, Line: 51, Col: 91}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/entry.templ`, Line: 51, Col: 114}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {

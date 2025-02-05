@@ -2,10 +2,10 @@ package components
 
 templ Username(value *string) {
 	{{
-		author, color := "anonymous", "text-muted"
+		author, color := "anonymous", "text-content-muted"
 		if value != nil {
 			author = "@" + *value
-			color = "text-blue-400"
+			color = "text-complementary"
 		}
 	}}
 	<span class={ color }>{ author }</span>

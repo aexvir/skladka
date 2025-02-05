@@ -36,19 +36,19 @@ func Sidebar() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"h-[90vh] lg:h-full w-full lg:w-[300px] flex-none lg:border-l border-main fixed inset-x-0 -bottom-full lg:static transition-all duration-300\" id=\"sidebar\"><div class=\"h-full\"><form method=\"POST\" action=\"/\" class=\"h-full bg-main p-4 flex flex-col lowercase rounded-t-2xl lg:rounded-none shadow-xl lg:shadow-none\" id=\"paste-form\"><div class=\"flex-grow space-y-4\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"h-[90vh] lg:h-full w-full lg:w-[300px] flex-none lg:border-l border-content-muted/30 fixed inset-x-0 -bottom-full lg:static transition-all duration-300\" id=\"sidebar\"><div class=\"h-full\"><form method=\"POST\" action=\"/\" class=\"h-full bg-surface p-4 flex flex-col lowercase rounded-t-2xl lg:rounded-none shadow-xl lg:shadow-none\" id=\"paste-form\"><div class=\"flex-grow space-y-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TextInput("title", "title", "", icons.Paperclip(14, 14, "text-muted")).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = TextInput("title", "title", "", icons.Paperclip(14, 14, "text-content-muted")).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TagsInput("tags", "tags", icons.Tag(14, 14, "text-muted")).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = TagsInput("tags", "tags", icons.Tag(14, 14, "text-content-muted")).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = SelectInput("syntax", "syntax highlight", icons.Code(14, 14, "text-muted"), "plaintext", "go", "python", "yaml", "hcl", "ocaml", "json", "yaml", "xml", "rust", "zig").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = SelectInput("syntax", "syntax highlight", icons.Code(14, 14, "text-content-muted"), "plaintext", "go", "python", "yaml", "hcl", "ocaml", "json", "yaml", "xml", "rust", "zig").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -70,7 +70,7 @@ func Sidebar() templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = ToggleWithContent("toggle-password", "", "password protection", icons.Lock(14, 14, "text-muted")).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ToggleWithContent("toggle-password", "", "password protection", icons.Lock(14, 14, "text-content-muted")).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -86,25 +86,25 @@ func Sidebar() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = SelectInput("expiration", "", icons.Clock(14, 14, "text-muted"), "no expiration", "1m", "5m", "10m", "30m", "1h", "1d", "5d", "30d", "1y").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = SelectInput("expiration", "", icons.Clock(14, 14, "text-content-muted"), "no expiration", "1m", "5m", "10m", "30m", "1h", "1d", "5d", "30d", "1y").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = ToggleWithContent("toggle-expiration", "", "expiration", icons.Clock(14, 14, "text-muted")).Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ToggleWithContent("toggle-expiration", "", "expiration", icons.Clock(14, 14, "text-content-muted")).Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = Toggle("toggle-unlisted", "unlisted", "unlisted", icons.Eye(14, 14, "text-muted")).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Toggle("toggle-unlisted", "unlisted", "unlisted", icons.Eye(14, 14, "text-content-muted")).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<input type=\"hidden\" name=\"content\" id=\"editor-content\"></div><div class=\"flex flex-row w-full fixed inset-x-0 bottom-0 lg:static p-4 lg:p-0\"><button type=\"submit\" class=\"w-full bg-accent text-accent-muted py-2 rounded-l lg:rounded transition-all duration-200 hover:bg-accent-muted hover:shadow-md\"><span class=\"flex-grow\">paste</span></button><div class=\"w-12 flex items-center justify-center border-l border-main cursor-pointer lg:hidden rounded-r bg-accent\" id=\"expand-sidebar\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<input type=\"hidden\" name=\"content\" id=\"editor-content\"></div><div class=\"flex flex-row w-full fixed inset-x-0 bottom-0 lg:static p-4 lg:p-0\"><button type=\"submit\" class=\"w-full bg-accent text-accent-contrast py-2 rounded-l lg:rounded transition-all duration-200 hover:bg-accent-muted hover:shadow-md\"><span class=\"flex-grow\">paste</span></button><div class=\"w-12 flex items-center justify-center border-l border-content-muted/30 cursor-pointer lg:hidden rounded-r bg-accent\" id=\"expand-sidebar\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = icons.ChevronUp(18, 18, "text-accent-muted transform transition-all duration-200").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = icons.ChevronUp(18, 18, "text-accent-contrast transform transition-all duration-200").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -145,7 +145,7 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"h-[90vh] lg:h-full lg:w-[300px] flex-none lg:border-l border-main fixed inset-x-0 -bottom-full lg:static transition-all duration-300\" id=\"metadata-sidebar\"><div class=\"h-full\"><div class=\"h-full bg-main flex flex-col p-4 rounded-t-2xl lg:rounded-none shadow-xl lg:shadow-none\"><div class=\"flex-grow\"><h1 class=\"w-full text-2xl text-main inline-flex items-center justify-between\" id=\"paste-title\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"h-[90vh] lg:h-full lg:w-[300px] flex-none lg:border-l border-content-muted/30 fixed inset-x-0 -bottom-full lg:static transition-all duration-300\" id=\"metadata-sidebar\"><div class=\"h-full\"><div class=\"h-full bg-surface flex flex-col p-4 rounded-t-2xl lg:rounded-none shadow-xl lg:shadow-none\"><div class=\"flex-grow\"><h1 class=\"w-full text-2xl text-content inline-flex items-center justify-between\" id=\"paste-title\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -167,7 +167,7 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = icons.Eye(18, 18, "text-muted").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = icons.Eye(18, 18, "text-content-muted").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -181,7 +181,7 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = icons.Lock(18, 18, "text-muted").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = icons.Lock(18, 18, "text-content-muted").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -198,11 +198,11 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "· <span class=\"text-muted flex flex-row items-center gap-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "· <span class=\"text-content-muted flex flex-row items-center gap-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = icons.Calendar(14, 14, "text-muted").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = icons.Calendar(14, 14, "text-content-muted").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -264,7 +264,7 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = icons.Tag(14, 14, "text-muted").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = icons.Tag(14, 14, "text-content-muted").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -273,14 +273,14 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			for _, tag := range paste.Tags {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<span class=\"bg-muted text-muted border border-main px-2 py-0.5 rounded text-sm\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<span class=\"bg-surface-muted text-content-muted border border-content-muted/30 px-2 py-0.5 rounded text-sm\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(tag)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/sidebar.templ`, Line: 80, Col: 95}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/sidebar.templ`, Line: 80, Col: 123}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -297,7 +297,7 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 			}
 		}
 		if paste.Expiration != nil {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"w-full mt-4 border-t border-main\"></div><div class=\"flex flex-row justify-center gap-2 py-4 text-red-400\">expires ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"w-full mt-4 border-t border-content-muted/30\"></div><div class=\"flex flex-row justify-center gap-2 py-4 text-red-400\">expires ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -320,12 +320,12 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if paste.Owner != nil && user != nil && *paste.Owner == user.Username {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<button onclick=\"deletePaste()\" type=\"button\" class=\"w-full text-center bg-red-500 hover:bg-red-600 text-white px-4 py-2 mb-2 rounded hover:shadow-md transition-all duration-200 whitespace-nowrap\">delete</button>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<button onclick=\"deletePaste()\" type=\"button\" class=\"w-full text-center bg-error hover:bg-error/70 text-white px-4 py-2 mb-2 rounded hover:shadow-md transition-all duration-200 whitespace-nowrap\">delete</button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<div class=\"flex flex-row w-full fixed inset-x-0 bottom-0 lg:static p-4 lg:p-0\"><div class=\"w-full flex flex-row border border-main rounded lg:border-none shadow-md lg:shadow-none rounded-r-none\"><button onclick=\"window.Editor.copyToClipboard()\" type=\"button\" class=\"rounded-l w-full text-center bg-muted hover:bg-accent text-main hover:text-accent-muted px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap\">copy</button> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<div class=\"flex flex-row w-full fixed inset-x-0 bottom-0 lg:static p-4 lg:p-0\"><div class=\"w-full flex flex-row border border-content-muted/30 rounded lg:border-none shadow-md lg:shadow-none rounded-r-none\"><button onclick=\"window.Editor.copyToClipboard()\" type=\"button\" class=\"rounded-l w-full text-center bg-surface-muted hover:bg-accent text-content hover:text-accent-contrast px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap\">copy</button> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -334,11 +334,11 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" class=\"w-full text-center bg-muted hover:bg-accent text-main hover:text-accent-muted px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap\">raw</a> <button onclick=\"window.Editor.downloadAsFile()\" type=\"button\" class=\"rounded-r w-full text-center bg-muted hover:bg-accent text-main hover:text-accent-muted px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap\">download</button></div><button onclick=\"toggleMetadata()\" type=\"button\" class=\"w-12 flex items-center justify-center border border-l-0 border-main cursor-pointer lg:hidden rounded-r bg-muted\" id=\"expand-metadata\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" class=\"w-full text-center bg-surface-muted hover:bg-accent text-content hover:text-accent-contrast px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap\">raw</a> <button onclick=\"window.Editor.downloadAsFile()\" type=\"button\" class=\"rounded-r w-full text-center bg-surface-muted hover:bg-accent text-content hover:text-accent-contrast px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap\">download</button></div><button onclick=\"toggleMetadata()\" type=\"button\" class=\"w-12 flex items-center justify-center border border-l-0 border-content-muted/30 cursor-pointer lg:hidden rounded-r bg-surface-muted\" id=\"expand-metadata\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = icons.ChevronUp(18, 18, "text-main transform transition-all duration-200").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = icons.ChevronUp(18, 18, "text-content transform transition-all duration-200").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

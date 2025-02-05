@@ -50,6 +50,17 @@ func Generate(ctx context.Context) error {
 				harness.WithArgs("generate", "-include-version=false"),
 			)
 		},
+		// generate styles
+		func(ctx context.Context) error {
+			return harness.Run(
+				ctx,
+				"tailwind",
+				harness.WithArgs(
+					"-i=internal/frontend/conf.css",
+					"-o=internal/frontend/static/style.css",
+				),
+			)
+		},
 		// generate documentation
 		func(ctx context.Context) error {
 			gomarkdoc, _ := bintool.NewGo(

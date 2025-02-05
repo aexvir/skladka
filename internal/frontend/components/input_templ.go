@@ -29,7 +29,7 @@ func InputLabel(name string, icon templ.Component) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		if name != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<label class=\"text-sm text-main flex flex-row gap-2 items-center\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<label class=\"text-sm text-content flex flex-row gap-2 items-center\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -125,7 +125,7 @@ func TextInput(id, label, placeholder string, icon templ.Component) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"h-10 w-full bg-muted text-main border-main border rounded p-2 focus:outline-none focus:border-accent\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"h-10 w-full bg-surface-muted text-content border-content-muted/30 border rounded p-2 focus:outline-none focus:border-accent/70\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -180,7 +180,7 @@ func PasswordInput(id, label, placeholder string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" type=\"password\" class=\"h-10 w-full bg-muted text-main border-main border rounded p-2 focus:outline-none focus:border-accent\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" type=\"password\" class=\"h-10 w-full bg-surface-muted text-content border-content-muted/30 border rounded p-2 focus:outline-none focus:border-accent/70\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -243,7 +243,7 @@ func SelectInput(id, label string, icon templ.Component, options ...string) temp
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" class=\"h-10 w-full bg-muted text-main border-main border rounded p-2 focus:outline-none focus:border-accent\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" class=\"h-10 w-full bg-surface-muted text-content border-content-muted/30 border rounded p-2 focus:outline-none focus:border-accent/70\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -329,7 +329,7 @@ func TagsInput(id, label string, icon templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"min-h-10 w-full bg-muted text-main border-main border rounded px-2 py-1.5\"><div class=\"tags-container flex flex-wrap items-center gap-1 placeholder-text-small\"><input type=\"text\" placeholder=\"type and press enter or comma\" class=\"bg-transparent outline-none text-base min-w-[50px] flex-1\"></div><input type=\"hidden\" name=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"min-h-10 w-full bg-surface-muted text-content border-content-muted/30 border rounded px-2 py-1.5\"><div class=\"tags-container flex flex-wrap items-center gap-1 placeholder-text-small\"><input type=\"text\" placeholder=\"type and press enter or comma\" class=\"bg-transparent outline-none text-base min-w-[50px] flex-1\"></div><input type=\"hidden\" name=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -360,8 +360,8 @@ func TagsInput(id, label string, icon templ.Component) templ.Component {
 
 func initTagsInput(inputId string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_initTagsInput_43dd`,
-		Function: `function __templ_initTagsInput_43dd(inputId){document.addEventListener('DOMContentLoaded', () => {
+		Name: `__templ_initTagsInput_b33f`,
+		Function: `function __templ_initTagsInput_b33f(inputId){document.addEventListener('DOMContentLoaded', () => {
         const wrapper = document.getElementById(inputId)
         const tagsContainer = wrapper.querySelector('.tags-container')
         const input = wrapper.querySelector('input[type="text"]')
@@ -381,10 +381,10 @@ func initTagsInput(inputId string) templ.ComponentScript {
         const createTagElement = (value) => {
             const tag = document.createElement('span')
 
-            tag.className = 'inline-flex items-center border border-main text-base px-2 py-0.25 rounded'
+            tag.className = 'inline-flex items-center border border-content-muted/30 text-base px-2 py-0.25 rounded'
             tag.innerHTML = ` + "`" + `
                 ${value}
-                <button type="button" class="ml-1.5 text-muted hover:text-main">&times</button>
+                <button type="button" class="ml-1.5 text-content-muted hover:text-content">&times</button>
             ` + "`" + `
 
             tag.
@@ -453,15 +453,15 @@ func initTagsInput(inputId string) templ.ComponentScript {
         // handle focus events
         input.addEventListener(
             'focus', () => {
-                wrapper.classList.remove('border-main')
-                wrapper.classList.add('border-accent')
+                wrapper.classList.remove('border-content-muted/30')
+                wrapper.classList.add('border-accent/70')
             }
         )
 
         input.addEventListener(
             'blur', () => {
-                wrapper.classList.remove('border-accent')
-                wrapper.classList.add('border-main')
+                wrapper.classList.remove('border-accent/70')
+                wrapper.classList.add('border-content-muted/30')
                 // add any remaining input as a tag
                 const tag = input.value.trim()
                 if (tag && !tags.includes(tag)) {
@@ -475,8 +475,8 @@ func initTagsInput(inputId string) templ.ComponentScript {
         )
     })
 }`,
-		Call:       templ.SafeScript(`__templ_initTagsInput_43dd`, inputId),
-		CallInline: templ.SafeScriptInline(`__templ_initTagsInput_43dd`, inputId),
+		Call:       templ.SafeScript(`__templ_initTagsInput_b33f`, inputId),
+		CallInline: templ.SafeScriptInline(`__templ_initTagsInput_b33f`, inputId),
 	}
 }
 

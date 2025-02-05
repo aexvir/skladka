@@ -1,0 +1,65 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&display=swap");
+
+@theme {
+    --font-*: initial;
+
+    --color-*: initial;
+
+    --color-surface: oklch(95.12% 0.0034 247.86);
+    --color-surface-muted: oklch(98.16% 0.0017 247.84);
+    --color-content: oklch(48.99% 0.0102 248.04);
+    --color-content-muted: oklch(65.35% 0.0144 251.62);
+
+    --color-accent: oklch(80.32% 0.1587 69.81);
+    --color-accent-muted: oklch(87.07% 0.1325 82.74);
+    --color-accent-contrast: oklch(46.28% 0.1043 64.41);
+    --color-complementary: oklch(61.93% 0.1215 250.09);
+
+    --color-error: oklch(63.63% 0.1862 24.08);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-*: initial;
+        --color-surface: oklch(28.19% 0.0251 268.36);
+        --color-surface-muted: oklch(26.09% 0.0238 267.11);
+        --color-content: oklch(83.83% 0.0112 95.19);
+        --color-content-muted: oklch(57.75% 0.0302 262.26);
+        --color-accent: oklch(87.07% 0.1325 82.74);
+        --color-accent-muted: oklch(80.32% 0.1587 69.81);
+        --color-accent-contrast: oklch(48.47% 0.1021 75.12);
+        --color-complementary: oklch(76.56% 0.1243 250.38);
+        --color-error: oklch(62.57% 0.164 23.07);
+    }
+}
+
+/* base styles */
+
+body {
+    background-color: var(--color-surface);
+    color: var(--color-content);
+    font-family: "JetBrains Mono", monospace;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+}
+
+/* other misc stuff */
+
+#nav-logo {
+    filter: invert(57%) sepia(14%) saturate(204%) hue-rotate(172deg)
+        brightness(98%) contrast(86%);
+}
+
+@media (prefers-color-scheme: dark) {
+    #nav-logo {
+        filter: invert(49%) sepia(5%) saturate(1258%) hue-rotate(180deg)
+            brightness(96%) contrast(88%);
+    }
+}
+
+/* peer-has-checked doesn't seem to work correctly */
+.toggle-checkbox:checked + .toggle-label {
+    background-color: var(--color-accent);
+}

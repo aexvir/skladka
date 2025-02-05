@@ -39,7 +39,7 @@ func Nav(name string, user *auth.User, links ...Link) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"bg-muted text-main px-4 py-2 flex justify-between items-center lowercase block border-b border-main \"><a class=\"flex flex-row items-center gap-4 transition-all text-main hover:text-accent\" href=\"/\"><img src=\"/static/landfill.svg\" class=\"h-auto w-8\" id=\"nav-logo\"><div class=\"text-2xl\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"bg-surface-muted text-content px-4 py-2 flex justify-between items-center lowercase block border-b border-content-muted/30 \"><a class=\"flex flex-row items-center gap-4 transition-all text-content hover:text-accent\" href=\"/\"><img src=\"/static/landfill.svg\" class=\"h-auto w-8\" id=\"nav-logo\"><div class=\"text-2xl\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -66,7 +66,7 @@ func Nav(name string, user *auth.User, links ...Link) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"hover:text-accent text-main transition-colors flex items-center gap-2\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"hover:text-accent text-content transition-colors flex items-center gap-2\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -91,11 +91,11 @@ func Nav(name string, user *auth.User, links ...Link) templ.Component {
 			}
 		}
 		if user == nil {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<a href=\"/u/login\" class=\"hover:text-accent text-main transition-colors flex items-center gap-2\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<a href=\"/u/login\" class=\"hover:text-accent text-content transition-colors flex items-center gap-2\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = icons.User(16, 16, "text-muted").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = icons.User(16, 16, "text-content-muted").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -105,14 +105,14 @@ func Nav(name string, user *auth.User, links ...Link) templ.Component {
 			}
 		}
 		if user != nil {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<a href=\"/u/profile\" class=\"hover:text-accent text-main transition-colors\"><span class=\"text-muted\">&#64;</span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<a href=\"/u/profile\" class=\"hover:text-accent text-content transition-colors\"><span class=\"text-content-muted\">&#64;</span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(user.Username)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/nav.templ`, Line: 40, Col: 57}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/nav.templ`, Line: 40, Col: 65}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {

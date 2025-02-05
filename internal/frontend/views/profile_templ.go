@@ -34,7 +34,7 @@ func Profile(user auth.User, viewer *auth.User) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"container mx-auto px-4 py-8 flex flex-col md:flex-row gap-4 items-stretch md:items-start\"><div class=\"w-full md:w-1/5 bg-muted rounded-lg border border-main p-4 flex flex-row md:flex-col gap-4\"><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"container mx-auto px-4 py-8 flex flex-col md:flex-row gap-4 items-stretch md:items-start\"><div class=\"w-full md:w-1/5 bg-surface-muted rounded-lg border border-content-muted/30 p-4 flex flex-row md:flex-col gap-4\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -47,24 +47,24 @@ func Profile(user auth.User, viewer *auth.User) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" class=\"w-1/3 md:w-full aspect-square rounded-lg object-cover\"><div class=\"flex flex-col w-full\"><div class=\"space-y-2 flex-1 md:pb-4\"><h1 class=\"text-2xl font-bold text-blue-400\">&#64;")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" class=\"w-1/3 md:w-full aspect-square rounded-lg object-cover\"><div class=\"flex flex-col w-full\"><div class=\"space-y-2 flex-1 md:pb-4\"><h1 class=\"text-2xl font-bold text-complementary\">&#64;")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(user.Username)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/views/profile.templ`, Line: 15, Col: 70}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/views/profile.templ`, Line: 15, Col: 75}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</h1><div class=\"text-sm text-muted-foreground\"><div class=\"flex items-center gap-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</h1><div class=\"text-sm text-content-muted-foreground\"><div class=\"flex items-center gap-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = icons.Calendar(16, 16, "text-muted").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = icons.Calendar(16, 16, "text-content-muted").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -86,7 +86,7 @@ func Profile(user auth.User, viewer *auth.User) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if viewer != nil && user.Username == viewer.Username {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<a href=\"/u/logout\" class=\"w-full flex items-center justify-center gap-2 px-4 py-2 rounded bg-accent text-accent-muted hover:bg-accent-muted transition-all duration-200\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<a href=\"/u/logout\" class=\"w-full flex items-center justify-center gap-2 px-4 py-2 rounded bg-accent text-accent-contrast hover:bg-accent-muted transition-all duration-200\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -99,15 +99,15 @@ func Profile(user auth.User, viewer *auth.User) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></div><div class=\"flex-1 space-y-4\"><div class=\"bg-muted rounded-lg border border-main p-4 w-full\"><div class=\"flex flex-col md:flex-row items-center w-full gap-2\"><div class=\"flex-1 relative w-full\"><input type=\"text\" placeholder=\"find a paste...\" id=\"paste-search-input\" class=\"w-full px-4 py-2 bg-main border border-main rounded focus:outline-none focus:border-accent\"><div class=\"absolute right-3 top-1/2 -translate-y-1/2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></div><div class=\"flex-1 space-y-4\"><div class=\"bg-surface-muted rounded-lg border border-content-muted/30 p-4 w-full\"><div class=\"flex flex-col md:flex-row items-center w-full gap-2\"><div class=\"flex-1 relative w-full\"><input type=\"text\" placeholder=\"find a paste...\" id=\"paste-search-input\" class=\"w-full px-4 py-2 bg-surface border border-content-muted/30 rounded focus:outline-none focus:border-accent/70\"><div class=\"absolute right-3 top-1/2 -translate-y-1/2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = icons.Search(16, 16, "text-muted").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = icons.Search(16, 16, "text-content-muted").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div><div class=\"w-full md:w-auto flex flex-row gap-2 items-stretch md:items-center\"><select id=\"paste-visibility-select\" class=\"bg-main border border-main rounded px-4 py-2 w-full md:w-auto\"><option>all</option> <option>public</option> <option>unlisted</option></select> <select id=\"paste-sort-select\" class=\"bg-main border border-main rounded px-4 py-2 w-full md:w-auto\"><option>most recent</option> <option>oldest</option></select></div><a class=\"px-4 py-2 rounded bg-accent text-accent-muted hover:bg-accent-muted transition-all duration-200 order-first md:order-last w-full md:w-auto\" href=\"/\">new paste</a></div><div id=\"pastes-container\" class=\"space-y-4 mt-4\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div><div class=\"w-full md:w-auto flex flex-row gap-2 items-stretch md:items-center\"><select id=\"paste-visibility-select\" class=\"bg-surface border border-content-muted/30 rounded px-4 py-2 w-full md:w-auto\"><option>all</option> <option>public</option> <option>unlisted</option></select> <select id=\"paste-sort-select\" class=\"bg-surface border border-content-muted/30 rounded px-4 py-2 w-full md:w-auto\"><option>most recent</option> <option>oldest</option></select></div><a class=\"px-4 py-2 rounded bg-accent text-accent-contrast hover:bg-accent-muted transition-all duration-200 order-first md:order-last w-full md:w-auto\" href=\"/\">new paste</a></div><div id=\"pastes-container\" class=\"space-y-4 mt-4\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -120,7 +120,7 @@ func Profile(user auth.User, viewer *auth.User) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-target=\"this\" hx-select=\"#pastes\" hx-trigger=\"load\" hx-indicator=\"#paste-loading\" hx-on::after-swap=\"filterAndSortPastes()\"><div id=\"paste-loading\" class=\"htmx-indicator flex items-center justify-center py-8\"><div class=\"animate-spin rounded-full h-8 w-8 border-2 border-accent\"></div></div></div></div></div></div><script>\n\t\tfunction filterAndSortPastes() {\n\t\t\tconsole.log(\"filtering and sorting\")\n\t\t\tvar filters = {\n\t\t\t\tname: document.getElementById('paste-search-input').value.toLowerCase(),\n\t\t\t\tvisibility: document.getElementById('paste-visibility-select').value.toLowerCase(),\n\t\t\t\torder: document.getElementById('paste-sort-select').value.toLowerCase(),\n\t\t\t}\n\n\t\t\tvar container = document.getElementById('pastes-container')\n\t\t\tvar entries = Array.from(container.querySelectorAll('a[data-created-at]'))\n\n\t\t\tentries.forEach(\n\t\t\t\tfunction(entry) {\n\t\t\t\t\tconst text = entry.innerText.toLowerCase()\n\t\t\t\t\tconst pasteNameMatches = text.includes(filters.name)\n\n\t\t\t\t\tconst pasteIsUnlisted = entry.getAttribute('data-unlisted') === 'true'\n\t\t\t\t\tconst pasteVisibilityMatches = (\n\t\t\t\t\t\tfilters.visibility === 'all' ||\n\t\t\t\t\t\t( pasteIsUnlisted ? filters.visibility === 'unlisted' : filters.visibility === 'public' )\n\t\t\t\t\t)\n\n\t\t\t\t\tentry.style.display = (pasteNameMatches && pasteVisibilityMatches) ? '' : 'none'\n\t\t\t\t}\n\t\t\t)\n\n\t\t\tentries.sort(\n\t\t\t\tfunction(left, right) {\n\t\t\t\t\tvar ldate = new Date(left.getAttribute('data-created-at'))\n\t\t\t\t\tvar rdate = new Date(right.getAttribute('data-created-at'))\n\t\t\t\t\tif (filters.order === 'most recent') {\n\t\t\t\t\t\treturn rdate - ldate\n\t\t\t\t\t}\n\t\t\t\t\treturn ldate - rdate\n\t\t\t\t}\n\t\t\t)\n\n\t\t\tfor (const [index, entry] of entries.entries()) {\n\t\t\t\tentry.style.order = index\n\t\t\t}\n\t\t}\n\n\t\tdocument.getElementById('paste-search-input').addEventListener('input', filterAndSortPastes)\n\t\tdocument.getElementById('paste-visibility-select').addEventListener('change', filterAndSortPastes)\n\t\tdocument.getElementById('paste-sort-select').addEventListener('change', filterAndSortPastes)\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-target=\"this\" hx-select=\"#pastes\" hx-trigger=\"load\" hx-indicator=\"#paste-loading\" hx-on::after-swap=\"filterAndSortPastes()\"><div id=\"paste-loading\" class=\"htmx-indicator flex items-center justify-center py-8\"><div class=\"animate-spin rounded-full h-8 w-8 border-2 border-accent/70\"></div></div></div></div></div></div><script>\n\t\tfunction filterAndSortPastes() {\n\t\t\tconsole.log(\"filtering and sorting\")\n\t\t\tvar filters = {\n\t\t\t\tname: document.getElementById('paste-search-input').value.toLowerCase(),\n\t\t\t\tvisibility: document.getElementById('paste-visibility-select').value.toLowerCase(),\n\t\t\t\torder: document.getElementById('paste-sort-select').value.toLowerCase(),\n\t\t\t}\n\n\t\t\tvar container = document.getElementById('pastes-container')\n\t\t\tvar entries = Array.from(container.querySelectorAll('a[data-created-at]'))\n\n\t\t\tentries.forEach(\n\t\t\t\tfunction(entry) {\n\t\t\t\t\tconst text = entry.innerText.toLowerCase()\n\t\t\t\t\tconst pasteNameMatches = text.includes(filters.name)\n\n\t\t\t\t\tconst pasteIsUnlisted = entry.getAttribute('data-unlisted') === 'true'\n\t\t\t\t\tconst pasteVisibilityMatches = (\n\t\t\t\t\t\tfilters.visibility === 'all' ||\n\t\t\t\t\t\t( pasteIsUnlisted ? filters.visibility === 'unlisted' : filters.visibility === 'public' )\n\t\t\t\t\t)\n\n\t\t\t\t\tentry.style.display = (pasteNameMatches && pasteVisibilityMatches) ? '' : 'none'\n\t\t\t\t}\n\t\t\t)\n\n\t\t\tentries.sort(\n\t\t\t\tfunction(left, right) {\n\t\t\t\t\tvar ldate = new Date(left.getAttribute('data-created-at'))\n\t\t\t\t\tvar rdate = new Date(right.getAttribute('data-created-at'))\n\t\t\t\t\tif (filters.order === 'most recent') {\n\t\t\t\t\t\treturn rdate - ldate\n\t\t\t\t\t}\n\t\t\t\t\treturn ldate - rdate\n\t\t\t\t}\n\t\t\t)\n\n\t\t\tfor (const [index, entry] of entries.entries()) {\n\t\t\t\tentry.style.order = index\n\t\t\t}\n\t\t}\n\n\t\tdocument.getElementById('paste-search-input').addEventListener('input', filterAndSortPastes)\n\t\tdocument.getElementById('paste-visibility-select').addEventListener('change', filterAndSortPastes)\n\t\tdocument.getElementById('paste-sort-select').addEventListener('change', filterAndSortPastes)\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

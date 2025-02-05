@@ -5,25 +5,25 @@ import "github.com/aexvir/skladka/internal/frontend/icons"
 templ CommandPalette() {
 	<div id="command-palette-overlay" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/30" role="dialog">
 		<div class="flex min-h-screen items-start justify-center px-4 pt-16 sm:px-6 sm:pt-32">
-			<div class="w-full max-w-2xl transform rounded-lg bg-main border border-main shadow-2xl transition-all" id="command-palette">
+			<div class="w-full max-w-2xl transform rounded-lg bg-surface border border-content-muted/30 shadow-2xl transition-all" id="command-palette">
 				<div class="p-4">
 					<input
 						type="text"
 						id="command-palette-input"
-						class="h-10 w-full bg-muted text-main border-main border rounded px-2 py-2 focus:outline-none focus:border-accent"
+						class="h-10 w-full bg-surface-muted text-content border-content-muted/30 border rounded px-2 py-2 focus:outline-none focus:border-accent/70"
 						placeholder="type to search"
 					/>
 					<div id="command-palette-links" class="mt-4 space-y-2">
-						<a href="/" class="block p-2 text-main border border-transparent hover:bg-muted hover:border-main rounded transition-colors flex flex-row items-center gap-2">
-							@icons.Clock(14, 14, "text-muted")
+						<a href="/" class="block p-2 text-content border border-transparent hover:bg-surface-muted hover:border-content-muted/30 rounded transition-colors flex flex-row items-center gap-2">
+							@icons.Clock(14, 14, "text-content-muted")
 							home
 						</a>
-						<a href="/archive" class="block p-2 text-main border border-transparent hover:bg-muted hover:border-main rounded transition-colors flex flex-row items-center gap-2">
-							@icons.Clock(14, 14, "text-muted")
+						<a href="/archive" class="block p-2 text-content border border-transparent hover:bg-surface-muted hover:border-content-muted/30 rounded transition-colors flex flex-row items-center gap-2">
+							@icons.Clock(14, 14, "text-content-muted")
 							recent pastes
 						</a>
-						<a href="/settings" class="block p-2 text-main border border-transparent hover:bg-muted hover:border-main rounded transition-colors flex flex-row items-center gap-2">
-							@icons.Cog(14, 14, "text-muted")
+						<a href="/settings" class="block p-2 text-content border border-transparent hover:bg-surface-muted hover:border-content-muted/30 rounded transition-colors flex flex-row items-center gap-2">
+							@icons.Cog(14, 14, "text-content-muted")
 							settings
 						</a>
 					</div>
@@ -61,9 +61,9 @@ script initCommandPalette() {
 
             const updateSelectedItem = () => {
                 for (const [index, link] of visibleLinksOnly().entries()) {
-                    link.classList.toggle('bg-muted', index === selectedIndex)
+                    link.classList.toggle('bg-surface-muted', index === selectedIndex)
                     link.classList.toggle('text-accent', index === selectedIndex)
-                    link.classList.toggle('border-main', index === selectedIndex)
+                    link.classList.toggle('border-content-muted/30', index === selectedIndex)
                 }
             }
 

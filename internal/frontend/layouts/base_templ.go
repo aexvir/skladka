@@ -34,7 +34,7 @@ func Base(user *auth.User, content templ.Component) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<html class=\"h-full\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>skladka</title><link rel=\"icon\" type=\"image/png\" href=\"/static/favicon-96x96.png\" sizes=\"96x96\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/favicon.svg\"><link rel=\"shortcut icon\" href=\"/static/favicon.ico\"><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"><meta name=\"apple-mobile-web-app-title\" content=\"skladka\"><link rel=\"manifest\" href=\"/static/site.webmanifest\"><script src=\"https://cdn.tailwindcss.com\"></script><script src=\"/static/htmx.js\"></script><link rel=\"stylesheet\" href=\"/static/style.css\"></head><body class=\"h-full flex flex-col\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<html class=\"h-full\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>skladka</title><link rel=\"icon\" type=\"image/png\" href=\"/static/favicon-96x96.png\" sizes=\"96x96\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/favicon.svg\"><link rel=\"shortcut icon\" href=\"/static/favicon.ico\"><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/apple-touch-icon.png\"><meta name=\"apple-mobile-web-app-title\" content=\"skladka\"><link rel=\"manifest\" href=\"/static/site.webmanifest\"><script src=\"/static/htmx.js\"></script><link rel=\"stylesheet\" href=\"/static/style.css\"></head><body class=\"h-full flex flex-col\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -53,7 +53,7 @@ func Base(user *auth.User, content templ.Component) templ.Component {
 		templ_7745c5c3_Err = components.Nav(
 			"skladka",
 			user,
-			components.Link{Icon: icons.Clock(16, 16, "text-muted"), Text: "recent", URL: templ.SafeURL("/archive")},
+			components.Link{Icon: icons.Clock(16, 16, "text-content-muted"), Text: "recent", URL: templ.SafeURL("/archive")},
 		).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

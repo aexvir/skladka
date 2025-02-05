@@ -13,7 +13,7 @@ templ PasteEntry(paste paste.Paste) {
 		data-created-at={ paste.Creation.Format("2006-01-02 15:04") }
 		data-unlisted={ strconv.FormatBool(!paste.Public) }
 		data-password-protected={ strconv.FormatBool(paste.Password != nil) }
-		class="block p-4 border-main bg-muted rounded-lg border hover:shadow-xl hover:text-accent transition-all duration-200"
+		class="block p-4 border-content-muted/30 bg-surface-muted rounded-lg border hover:shadow-xl hover:text-accent transition-all duration-200"
 	>
 		<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
 			<div class="flex flex-col">
@@ -26,29 +26,29 @@ templ PasteEntry(paste paste.Paste) {
 					}}
 					{ title }
 					if !paste.Public {
-						@icons.Eye(14, 14, "text-muted")
+						@icons.Eye(14, 14, "text-content-muted")
 					}
 					if paste.Password != nil {
-						@icons.Lock(14, 14, "text-muted")
+						@icons.Lock(14, 14, "text-content-muted")
 					}
 				</h3>
-				<div class="text-sm text-muted flex flex-row gap-2 my-2 lg:my-0">
+				<div class="text-sm text-content-muted flex flex-row gap-2 my-2 lg:my-0">
 					@Username(paste.Owner)
 					·
 					<span class="flex flex-row items-center gap-2">
-						@icons.Calendar(14, 14, "text-muted")
+						@icons.Calendar(14, 14, "text-content-muted")
 						{ paste.Creation.Format("Jan 2, 2006") }
 					</span>
 				</div>
 			</div>
 			<div class="flex flex-col items-end gap-2 lg:gap-0">
-				<span class="text-sm text-muted">
+				<span class="text-sm text-content-muted">
 					{{ size := fmt.Sprintf("%.1f", paste.SizeBytes()/1024.0) }}
 					{ strconv.Itoa(paste.Views) } views | { paste.Syntax } | { size }kb
 				</span>
 				<div class="flex flex-wrap gap-1">
 					for _, tag := range paste.Tags {
-						<span class="bg-main text-muted px-2 py-0.5 rounded text-sm border border-main">{ tag }</span>
+						<span class="bg-surface text-content-muted px-2 py-0.5 rounded text-sm border border-content-muted/30">{ tag }</span>
 					}
 				</div>
 			</div>

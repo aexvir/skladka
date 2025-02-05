@@ -62,7 +62,7 @@ func Toggle(id string, name string, label string, icon templ.Component) templ.Co
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer\"> <label for=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"toggle-checkbox peer absolute block size-[22px] rounded-full bg-content border-surface-muted checked:bg-accent-contrast checked:border-accent checked:right-0 border-4 m-px appearance-none cursor-pointer\"> <label for=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -75,7 +75,7 @@ func Toggle(id string, name string, label string, icon templ.Component) templ.Co
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer\"></label></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"toggle-label block overflow-hidden h-[24px] rounded-full bg-surface-muted border-content-muted/30 border peer-has-checked:bg-accent cursor-pointer\"></label></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -138,7 +138,7 @@ func ToggleWithContent(id string, name string, label string, icon templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer\"> <label for=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"toggle-checkbox peer absolute block size-[22px] rounded-full bg-content border-surface-muted checked:bg-accent-contrast checked:border-accent checked:right-0 border-4 m-px appearance-none cursor-pointer\"> <label for=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -151,7 +151,7 @@ func ToggleWithContent(id string, name string, label string, icon templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer\"></label></div></div><div id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"toggle-label block overflow-hidden h-[24px] rounded-full bg-surface-muted border-content-muted/30 border peer-has-checked:bg-accent cursor-pointer\"></label></div></div><div id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

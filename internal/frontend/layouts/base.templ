@@ -18,7 +18,6 @@ templ Base(user *auth.User, content templ.Component) {
 			<link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png"/>
 			<meta name="apple-mobile-web-app-title" content="skladka"/>
 			<link rel="manifest" href="/static/site.webmanifest"/>
-			<script src="https://cdn.tailwindcss.com"></script>
 			<script src="/static/htmx.js"></script>
 			<link rel="stylesheet" href="/static/style.css"/>
 		</head>
@@ -29,7 +28,7 @@ templ Base(user *auth.User, content templ.Component) {
 				@components.Nav(
 					"skladka",
 					user,
-					components.Link{Icon: icons.Clock(16, 16, "text-muted"), Text: "recent", URL: templ.SafeURL("/archive")},
+					components.Link{Icon: icons.Clock(16, 16, "text-content-muted"), Text: "recent", URL: templ.SafeURL("/archive")},
 				)
 				<div class="relative h-full w-full relative">
 					@content

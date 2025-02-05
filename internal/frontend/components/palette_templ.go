@@ -30,27 +30,27 @@ func CommandPalette() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"command-palette-overlay\" class=\"hidden fixed inset-0 z-50 overflow-y-auto bg-black/30\" role=\"dialog\"><div class=\"flex min-h-screen items-start justify-center px-4 pt-16 sm:px-6 sm:pt-32\"><div class=\"w-full max-w-2xl transform rounded-lg bg-main border border-main shadow-2xl transition-all\" id=\"command-palette\"><div class=\"p-4\"><input type=\"text\" id=\"command-palette-input\" class=\"h-10 w-full bg-muted text-main border-main border rounded px-2 py-2 focus:outline-none focus:border-accent\" placeholder=\"type to search\"><div id=\"command-palette-links\" class=\"mt-4 space-y-2\"><a href=\"/\" class=\"block p-2 text-main border border-transparent hover:bg-muted hover:border-main rounded transition-colors flex flex-row items-center gap-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"command-palette-overlay\" class=\"hidden fixed inset-0 z-50 overflow-y-auto bg-black/30\" role=\"dialog\"><div class=\"flex min-h-screen items-start justify-center px-4 pt-16 sm:px-6 sm:pt-32\"><div class=\"w-full max-w-2xl transform rounded-lg bg-surface border border-content-muted/30 shadow-2xl transition-all\" id=\"command-palette\"><div class=\"p-4\"><input type=\"text\" id=\"command-palette-input\" class=\"h-10 w-full bg-surface-muted text-content border-content-muted/30 border rounded px-2 py-2 focus:outline-none focus:border-accent/70\" placeholder=\"type to search\"><div id=\"command-palette-links\" class=\"mt-4 space-y-2\"><a href=\"/\" class=\"block p-2 text-content border border-transparent hover:bg-surface-muted hover:border-content-muted/30 rounded transition-colors flex flex-row items-center gap-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = icons.Clock(14, 14, "text-muted").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = icons.Clock(14, 14, "text-content-muted").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "home</a> <a href=\"/archive\" class=\"block p-2 text-main border border-transparent hover:bg-muted hover:border-main rounded transition-colors flex flex-row items-center gap-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "home</a> <a href=\"/archive\" class=\"block p-2 text-content border border-transparent hover:bg-surface-muted hover:border-content-muted/30 rounded transition-colors flex flex-row items-center gap-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = icons.Clock(14, 14, "text-muted").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = icons.Clock(14, 14, "text-content-muted").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "recent pastes</a> <a href=\"/settings\" class=\"block p-2 text-main border border-transparent hover:bg-muted hover:border-main rounded transition-colors flex flex-row items-center gap-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "recent pastes</a> <a href=\"/settings\" class=\"block p-2 text-content border border-transparent hover:bg-surface-muted hover:border-content-muted/30 rounded transition-colors flex flex-row items-center gap-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = icons.Cog(14, 14, "text-muted").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = icons.Cog(14, 14, "text-content-muted").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -72,8 +72,8 @@ func CommandPalette() templ.Component {
 
 func initCommandPalette() templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_initCommandPalette_f66a`,
-		Function: `function __templ_initCommandPalette_f66a(){document.addEventListener(
+		Name: `__templ_initCommandPalette_d8f2`,
+		Function: `function __templ_initCommandPalette_d8f2(){document.addEventListener(
         'DOMContentLoaded', () => {
             const overlay = document.getElementById('command-palette-overlay')
             const palette = document.getElementById('command-palette')
@@ -99,9 +99,9 @@ func initCommandPalette() templ.ComponentScript {
 
             const updateSelectedItem = () => {
                 for (const [index, link] of visibleLinksOnly().entries()) {
-                    link.classList.toggle('bg-muted', index === selectedIndex)
+                    link.classList.toggle('bg-surface-muted', index === selectedIndex)
                     link.classList.toggle('text-accent', index === selectedIndex)
-                    link.classList.toggle('border-main', index === selectedIndex)
+                    link.classList.toggle('border-content-muted/30', index === selectedIndex)
                 }
             }
 
@@ -173,8 +173,8 @@ func initCommandPalette() templ.ComponentScript {
         }
     )
 }`,
-		Call:       templ.SafeScript(`__templ_initCommandPalette_f66a`),
-		CallInline: templ.SafeScriptInline(`__templ_initCommandPalette_f66a`),
+		Call:       templ.SafeScript(`__templ_initCommandPalette_d8f2`),
+		CallInline: templ.SafeScriptInline(`__templ_initCommandPalette_d8f2`),
 	}
 }
 
