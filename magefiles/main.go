@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/aexvir/harness"
-	"github.com/aexvir/harness/bintool"
+	"github.com/aexvir/harness/binary"
 	"github.com/aexvir/harness/commons"
 
 	"github.com/aexvir/skladka/internal/errors"
@@ -16,7 +16,7 @@ import (
 const (
 	pkgName             = "github.com/aexvir/skladka"
 	commitsarVersion    = "0.20.1"
-	golangcilintVersion = "v1.62.2"
+	golangcilintVersion = "v1.64.5"
 )
 
 var h = harness.New(
@@ -109,9 +109,10 @@ func Run(ctx context.Context) error {
 
 func Dev(ctx context.Context) error {
 	// note: installing process compose with go install kinda sucks
-	air, _ := bintool.NewGo(
-		"github.com/air-verse/air",
+	air, _ := binary.New(
+		"air",
 		"latest",
+		binary.GoBinary("github.com/air-verse/air"),
 	)
 
 	if err := air.Ensure(); err != nil {

@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/aexvir/harness"
-	"github.com/aexvir/harness/bintool"
+	"github.com/aexvir/harness/binary"
 	"github.com/aexvir/harness/commons"
 
 	"github.com/aexvir/skladka/internal/errors"
@@ -22,9 +22,9 @@ func Generate(ctx context.Context) error {
 		commons.GoGenerate(),
 		// generate sql code
 		func(ctx context.Context) error {
-			sqlc, _ := bintool.NewGo(
-				"github.com/sqlc-dev/sqlc/cmd/sqlc",
-				"latest",
+			sqlc, _ := binary.New(
+				"sqlc", "latest",
+				binary.GoBinary("github.com/sqlc-dev/sqlc/cmd/sqlc"),
 			)
 
 			if err := sqlc.Ensure(); err != nil {
@@ -35,9 +35,9 @@ func Generate(ctx context.Context) error {
 		},
 		// generate templates
 		func(ctx context.Context) error {
-			templ, _ := bintool.NewGo(
-				"github.com/a-h/templ/cmd/templ",
-				"latest",
+			templ, _ := binary.New(
+				"templ", "latest",
+				binary.GoBinary("github.com/a-h/templ/cmd/templ"),
 			)
 
 			if err := templ.Ensure(); err != nil {
@@ -52,9 +52,25 @@ func Generate(ctx context.Context) error {
 		},
 		// generate styles
 		func(ctx context.Context) error {
+			tailwind, err := binary.New(
+				"tailwind", "4.0.9",
+				binary.RemoteBinaryDownload(
+					"https://github.com/tailwindlabs/tailwindcss/releases/download/v{{.Version}}/tailwindcss-{{.GOOS}}-{{.GOARCH}}{{.Extension}}",
+				),
+				binary.WithGOOSMapping(map[string]string{"darwin": "macos"}),
+			)
+
+			if err != nil {
+				return errors.Wrap(err, "failed to provision tailwind")
+			}
+
+			if err := tailwind.Ensure(); err != nil {
+				return errors.Wrap(err, "failed to provision tailwind")
+			}
+
 			return harness.Run(
 				ctx,
-				"tailwind",
+				tailwind.BinPath(),
 				harness.WithArgs(
 					"-i=internal/frontend/conf.css",
 					"-o=internal/frontend/static/style.css",
@@ -63,9 +79,9 @@ func Generate(ctx context.Context) error {
 		},
 		// generate documentation
 		func(ctx context.Context) error {
-			gomarkdoc, _ := bintool.NewGo(
-				"github.com/princjef/gomarkdoc/cmd/gomarkdoc",
-				"latest",
+			gomarkdoc, _ := binary.New(
+				"gomarkdoc", "latest",
+				binary.GoBinary("github.com/princjef/gomarkdoc/cmd/gomarkdoc"),
 			)
 
 			if err := gomarkdoc.Ensure(); err != nil {
