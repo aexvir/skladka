@@ -21,9 +21,9 @@ templ Toast() {
 
 				// Type-specific styles
 				const typeStyles = {
-					default: 'bg-gray-800 text-white',
-					success: 'bg-green-800 text-white',
-					error: 'bg-red-800 text-white'
+					default: 'bg-surface-muted text-content-muted',
+					success: 'bg-success text-success-contrast',
+					error: 'bg-error text-error-contrast'
 				}
 
 				toast.className += ' ' + (typeStyles[settings.type] || typeStyles.default)

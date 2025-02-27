@@ -36,7 +36,7 @@ func Sidebar() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"h-[90vh] lg:h-full w-full lg:w-[300px] flex-none lg:border-l border-content-muted/30 fixed inset-x-0 -bottom-full lg:static transition-all duration-300\" id=\"sidebar\"><div class=\"h-full\"><form method=\"POST\" action=\"/\" class=\"h-full bg-surface p-4 flex flex-col lowercase rounded-t-2xl lg:rounded-none shadow-xl lg:shadow-none\" id=\"paste-form\"><div class=\"flex-grow space-y-4\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"h-[90vh] lg:h-full w-full lg:w-[300px] flex-none lg:border-l border-content-muted/30 fixed inset-x-0 -bottom-full lg:static transition-all duration-300\" id=\"sidebar\"><div class=\"h-full\"><form method=\"POST\" action=\"/\" enctype=\"multipart/form-data\" class=\"h-full bg-surface p-4 flex flex-col lowercase rounded-t-2xl lg:rounded-none shadow-xl lg:shadow-none\" id=\"paste-form\"><div class=\"flex-grow space-y-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -48,7 +48,7 @@ func Sidebar() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = SelectInput("syntax", "syntax highlight", icons.Code(14, 14, "text-content-muted"), "plaintext", "go", "python", "yaml", "hcl", "ocaml", "json", "yaml", "xml", "rust", "zig").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = SelectInput("syntax", "syntax highlight", icons.Code(14, 14, "text-content-muted"), "plaintext", "go", "python", "yaml", "hcl", "ocaml", "json", "yaml", "xml", "rust", "zig", "base64encode").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -100,7 +100,7 @@ func Sidebar() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<input type=\"hidden\" name=\"content\" id=\"editor-content\"></div><div class=\"flex flex-row w-full fixed inset-x-0 bottom-0 lg:static p-4 lg:p-0\"><button type=\"submit\" class=\"w-full bg-accent text-accent-contrast py-2 rounded-l lg:rounded transition-all duration-200 hover:bg-accent-muted hover:shadow-md\"><span class=\"flex-grow\">paste</span></button><div class=\"w-12 flex items-center justify-center border-l border-content-muted/30 cursor-pointer lg:hidden rounded-r bg-accent\" id=\"expand-sidebar\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<input type=\"hidden\" name=\"content\" id=\"editor-content\"> <input type=\"hidden\" name=\"mimetype\" id=\"form-mimetype\"></div><div class=\"flex flex-row w-full fixed inset-x-0 bottom-0 lg:static p-4 lg:p-0\"><button type=\"submit\" class=\"w-full bg-accent text-accent-contrast py-2 rounded-l lg:rounded transition-all duration-200 hover:bg-accent-muted hover:shadow-md\"><span class=\"flex-grow\">paste</span></button><div class=\"w-12 flex items-center justify-center border-l border-content-muted/30 cursor-pointer lg:hidden rounded-r bg-accent\" id=\"expand-sidebar\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -124,7 +124,7 @@ func Sidebar() templ.Component {
 	})
 }
 
-func Metadata(user *auth.User, paste paste.Paste) templ.Component {
+func Metadata(user *auth.User, paste paste.Paste, signature string, deadline int64) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -152,7 +152,7 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(paste.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/sidebar.templ`, Line: 48, Col: 19}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/sidebar.templ`, Line: 49, Col: 19}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -209,7 +209,7 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(paste.Creation.Format("Jan 2, 2006"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/sidebar.templ`, Line: 65, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/sidebar.templ`, Line: 66, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -223,7 +223,7 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(paste.Views))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/sidebar.templ`, Line: 70, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/sidebar.templ`, Line: 71, Col: 33}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -236,7 +236,7 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(paste.Syntax)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/sidebar.templ`, Line: 70, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/sidebar.templ`, Line: 71, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -249,7 +249,7 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(size)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/sidebar.templ`, Line: 70, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/sidebar.templ`, Line: 71, Col: 69}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -280,7 +280,7 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(tag)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/sidebar.templ`, Line: 80, Col: 123}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/sidebar.templ`, Line: 81, Col: 123}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -304,7 +304,7 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(paste.Expiration.Format("Jan 2, 2006"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/sidebar.templ`, Line: 88, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/components/sidebar.templ`, Line: 89, Col: 55}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -320,21 +320,30 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if paste.Owner != nil && user != nil && *paste.Owner == user.Username {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<button onclick=\"deletePaste()\" type=\"button\" class=\"w-full text-center bg-error hover:bg-error/70 text-white px-4 py-2 mb-2 rounded hover:shadow-md transition-all duration-200 whitespace-nowrap\">delete</button>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<button onclick=\"deletePaste()\" type=\"button\" class=\"w-full text-center bg-error hover:bg-error/70 text-error-contrast px-4 py-2 lg:mb-2 mb-16 rounded hover:shadow-md transition-all duration-200 whitespace-nowrap\">delete</button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<div class=\"flex flex-row w-full fixed inset-x-0 bottom-0 lg:static p-4 lg:p-0\"><div class=\"w-full flex flex-row border border-content-muted/30 rounded lg:border-none shadow-md lg:shadow-none rounded-r-none\"><button onclick=\"window.Editor.copyToClipboard()\" type=\"button\" class=\"rounded-l w-full text-center bg-surface-muted hover:bg-accent text-content hover:text-accent-contrast px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap\">copy</button> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<div class=\"flex flex-row w-full fixed inset-x-0 bottom-0 lg:static p-4 lg:p-0\"><div class=\"w-full flex flex-row border border-content-muted/30 rounded lg:border-none shadow-md lg:shadow-none rounded-r-none\"><button onclick=\"window.Editor.copyToClipboard()\" type=\"button\" class=\"rounded-l w-full text-center bg-surface-muted hover:bg-accent text-content hover:text-accent-contrast px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap\">copy</button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var12 templ.SafeURL = templ.URL(fmt.Sprintf("/r/%s", paste.Reference))
+
+		extra := ""
+		if signature != "" {
+			extra = fmt.Sprintf("?signature=%s&deadline=%d", signature, deadline)
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<a href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var12 templ.SafeURL = templ.SafeURL(fmt.Sprintf("/r/%s", paste.Reference) + extra)
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var12)))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" class=\"w-full text-center bg-surface-muted hover:bg-accent text-content hover:text-accent-contrast px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap\">raw</a> <button onclick=\"window.Editor.downloadAsFile()\" type=\"button\" class=\"rounded-r w-full text-center bg-surface-muted hover:bg-accent text-content hover:text-accent-contrast px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap\">download</button></div><button onclick=\"toggleMetadata()\" type=\"button\" class=\"w-12 flex items-center justify-center border border-l-0 border-content-muted/30 cursor-pointer lg:hidden rounded-r bg-surface-muted\" id=\"expand-metadata\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\" class=\"w-full text-center bg-surface-muted hover:bg-accent text-content hover:text-accent-contrast px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap\">raw</a> <button onclick=\"window.Editor.downloadAsFile()\" type=\"button\" class=\"rounded-r w-full text-center bg-surface-muted hover:bg-accent text-content hover:text-accent-contrast px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap\">download</button></div><button onclick=\"toggleMetadata()\" type=\"button\" class=\"w-12 flex items-center justify-center border border-l-0 border-content-muted/30 cursor-pointer lg:hidden rounded-r bg-surface-muted\" id=\"expand-metadata\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -342,7 +351,7 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</button><script>\n\t\t\t\t\t\tconst toggleMetadata = () => {\n\t\t\t\t\t\t\tconst sidebar = document.getElementById('metadata-sidebar')\n\t\t\t\t\t\t\tconst expandbtn = document.getElementById('expand-metadata')\n\t\t\t\t\t\t\tconst expandicon = expandbtn.querySelector('svg')\n\n\t\t\t\t\t\t\tsidebar.classList.toggle('expanded')\n\n\t\t\t\t\t\t\tif (sidebar.classList.contains('expanded')) {\n\t\t\t\t\t\t\t\tsidebar.style.bottom = '0'\n\t\t\t\t\t\t\t\texpandicon.style.transform = 'rotate(180deg)'\n\t\t\t\t\t\t\t\treturn\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\tsidebar.style.bottom = '-100%'\n\t\t\t\t\t\t\texpandicon.style.transform = 'rotate(0deg)'\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\tconst deletePaste = () => {\n\t\t\t\t\t\t\tif (!confirm('Are you sure you want to delete this paste?')) {\n\t\t\t\t\t\t\t\treturn\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\tfetch(window.location.pathname, { method: 'DELETE' })\n\t\t\t\t\t\t\t\t.then(\n\t\t\t\t\t\t\t\t\tresponse => {\n\t\t\t\t\t\t\t\t\t\tif (response.status < 400) {\n\t\t\t\t\t\t\t\t\t\t\twindow.location.href = '/'\n\t\t\t\t\t\t\t\t\t\t\treturn\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\talert('Failed to delete paste')\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t)\n\t\t\t\t\t\t}\n\t\t\t\t\t</script></div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</button><script>\n\t\t\t\t\t\tconst toggleMetadata = () => {\n\t\t\t\t\t\t\tconst sidebar = document.getElementById('metadata-sidebar')\n\t\t\t\t\t\t\tconst expandbtn = document.getElementById('expand-metadata')\n\t\t\t\t\t\t\tconst expandicon = expandbtn.querySelector('svg')\n\n\t\t\t\t\t\t\tsidebar.classList.toggle('expanded')\n\n\t\t\t\t\t\t\tif (sidebar.classList.contains('expanded')) {\n\t\t\t\t\t\t\t\tsidebar.style.bottom = '0'\n\t\t\t\t\t\t\t\texpandicon.style.transform = 'rotate(180deg)'\n\t\t\t\t\t\t\t\treturn\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\tsidebar.style.bottom = '-100%'\n\t\t\t\t\t\t\texpandicon.style.transform = 'rotate(0deg)'\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\tconst deletePaste = () => {\n\t\t\t\t\t\t\tif (!confirm('Are you sure you want to delete this paste?')) {\n\t\t\t\t\t\t\t\treturn\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\tfetch(window.location.pathname, { method: 'DELETE' })\n\t\t\t\t\t\t\t\t.then(\n\t\t\t\t\t\t\t\t\tresponse => {\n\t\t\t\t\t\t\t\t\t\tif (response.status < 400) {\n\t\t\t\t\t\t\t\t\t\t\twindow.location.href = '/'\n\t\t\t\t\t\t\t\t\t\t\treturn\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\talert('Failed to delete paste')\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t)\n\t\t\t\t\t\t}\n\t\t\t\t\t</script></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -352,8 +361,8 @@ func Metadata(user *auth.User, paste paste.Paste) templ.Component {
 
 func initSidebar() templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_initSidebar_9739`,
-		Function: `function __templ_initSidebar_9739(){document.addEventListener(
+		Name: `__templ_initSidebar_01cb`,
+		Function: `function __templ_initSidebar_01cb(){document.addEventListener(
         'DOMContentLoaded', () => {
             const sidebar = document.getElementById('sidebar')
             const expandbtn = document.getElementById('expand-sidebar')
@@ -381,20 +390,11 @@ func initSidebar() templ.ComponentScript {
                         window.Editor.setSyntax(e.target.value)
                     }
                 )
-
-            document.
-                querySelector('form').
-                addEventListener(
-                    'submit', (e) => {
-                        const editorContent = window.Editor.getContent()
-                        document.getElementById('editor-content').value = editorContent
-                    }
-                )
         }
     )
 }`,
-		Call:       templ.SafeScript(`__templ_initSidebar_9739`),
-		CallInline: templ.SafeScriptInline(`__templ_initSidebar_9739`),
+		Call:       templ.SafeScript(`__templ_initSidebar_01cb`),
+		CallInline: templ.SafeScriptInline(`__templ_initSidebar_01cb`),
 	}
 }
 

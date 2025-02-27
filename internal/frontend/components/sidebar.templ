@@ -11,11 +11,11 @@ import (
 templ Sidebar() {
 	<div class="h-[90vh] lg:h-full w-full lg:w-[300px] flex-none lg:border-l border-content-muted/30 fixed inset-x-0 -bottom-full lg:static transition-all duration-300" id="sidebar">
 		<div class="h-full">
-			<form method="POST" action="/" class="h-full bg-surface p-4 flex flex-col lowercase rounded-t-2xl lg:rounded-none shadow-xl lg:shadow-none" id="paste-form">
+			<form method="POST" action="/" enctype="multipart/form-data" class="h-full bg-surface p-4 flex flex-col lowercase rounded-t-2xl lg:rounded-none shadow-xl lg:shadow-none" id="paste-form">
 				<div class="flex-grow space-y-4">
 					@TextInput("title", "title", "", icons.Paperclip(14, 14, "text-content-muted"))
 					@TagsInput("tags", "tags", icons.Tag(14, 14, "text-content-muted"))
-					@SelectInput("syntax", "syntax highlight", icons.Code(14, 14, "text-content-muted"), "plaintext", "go", "python", "yaml", "hcl", "ocaml", "json", "yaml", "xml", "rust", "zig")
+					@SelectInput("syntax", "syntax highlight", icons.Code(14, 14, "text-content-muted"), "plaintext", "go", "python", "yaml", "hcl", "ocaml", "json", "yaml", "xml", "rust", "zig", "base64encode")
 					@ToggleWithContent("toggle-password", "", "password protection", icons.Lock(14, 14, "text-content-muted")) {
 						@PasswordInput("password", "password", "")
 					}
@@ -24,6 +24,7 @@ templ Sidebar() {
 					}
 					@Toggle("toggle-unlisted", "unlisted", "unlisted", icons.Eye(14, 14, "text-content-muted"))
 					<input type="hidden" name="content" id="editor-content"/>
+					<input type="hidden" name="mimetype" id="form-mimetype"/>
 				</div>
 				<div class="flex flex-row w-full fixed inset-x-0 bottom-0 lg:static p-4 lg:p-0">
 					<button type="submit" class="w-full bg-accent text-accent-contrast py-2 rounded-l lg:rounded transition-all duration-200 hover:bg-accent-muted hover:shadow-md">
@@ -39,7 +40,7 @@ templ Sidebar() {
 	</div>
 }
 
-templ Metadata(user *auth.User, paste paste.Paste) {
+templ Metadata(user *auth.User, paste paste.Paste, signature string, deadline int64) {
 	<div class="h-[90vh] lg:h-full lg:w-[300px] flex-none lg:border-l border-content-muted/30 fixed inset-x-0 -bottom-full lg:static transition-all duration-300" id="metadata-sidebar">
 		<div class="h-full">
 			<div class="h-full bg-surface flex flex-col p-4 rounded-t-2xl lg:rounded-none shadow-xl lg:shadow-none">
@@ -90,14 +91,20 @@ templ Metadata(user *auth.User, paste paste.Paste) {
 					}
 				</div>
 				if paste.Owner != nil && user != nil && *paste.Owner == user.Username {
-					<button onclick="deletePaste()" type="button" class="w-full text-center bg-error hover:bg-error/70 text-white px-4 py-2 mb-2 rounded hover:shadow-md transition-all duration-200 whitespace-nowrap">
+					<button onclick="deletePaste()" type="button" class="w-full text-center bg-error hover:bg-error/70 text-error-contrast px-4 py-2 lg:mb-2 mb-16 rounded hover:shadow-md transition-all duration-200 whitespace-nowrap">
 						delete
 					</button>
 				}
 				<div class="flex flex-row w-full fixed inset-x-0 bottom-0 lg:static p-4 lg:p-0">
 					<div class="w-full flex flex-row border border-content-muted/30 rounded lg:border-none shadow-md lg:shadow-none rounded-r-none">
 						<button onclick="window.Editor.copyToClipboard()" type="button" class="rounded-l w-full text-center bg-surface-muted hover:bg-accent text-content hover:text-accent-contrast px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap">copy</button>
-						<a href={ templ.URL(fmt.Sprintf("/r/%s", paste.Reference)) } class="w-full text-center bg-surface-muted hover:bg-accent text-content hover:text-accent-contrast px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap">raw</a>
+						{{
+							extra := ""
+							if signature != "" {
+								extra = fmt.Sprintf("?signature=%s&deadline=%d", signature, deadline)
+							}
+						}}
+						<a href={ templ.SafeURL(fmt.Sprintf("/r/%s", paste.Reference) + extra) } class="w-full text-center bg-surface-muted hover:bg-accent text-content hover:text-accent-contrast px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap">raw</a>
 						<button onclick="window.Editor.downloadAsFile()" type="button" class="rounded-r w-full text-center bg-surface-muted hover:bg-accent text-content hover:text-accent-contrast px-4 py-2 hover:shadow-md transition-all duration-200 whitespace-nowrap">download</button>
 					</div>
 					<button onclick="toggleMetadata()" type="button" class="w-12 flex items-center justify-center border border-l-0 border-content-muted/30 cursor-pointer lg:hidden rounded-r bg-surface-muted" id="expand-metadata">
@@ -171,15 +178,6 @@ script initSidebar() {
                 addEventListener(
                     'change', (e) => {
                         window.Editor.setSyntax(e.target.value)
-                    }
-                )
-
-            document.
-                querySelector('form').
-                addEventListener(
-                    'submit', (e) => {
-                        const editorContent = window.Editor.getContent()
-                        document.getElementById('editor-content').value = editorContent
                     }
                 )
         }

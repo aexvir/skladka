@@ -13,8 +13,8 @@ import (
 
 const createPaste = `-- name: CreatePaste :one
 insert into pastes
-(reference, owner, title, content, syntax, tags, expiration, public, password)
-values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+(reference, owner, title, content, mimetype, syntax, tags, expiration, public, password)
+values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 returning id
 `
 
@@ -23,6 +23,7 @@ type CreatePasteParams struct {
 	Owner      pgtype.Text      `db:"owner" json:"owner"`
 	Title      string           `db:"title" json:"title"`
 	Content    string           `db:"content" json:"content"`
+	Mimetype   pgtype.Text      `db:"mimetype" json:"mimetype"`
 	Syntax     pgtype.Text      `db:"syntax" json:"syntax"`
 	Tags       []string         `db:"tags" json:"tags"`
 	Expiration pgtype.Timestamp `db:"expiration" json:"expiration"`
@@ -33,8 +34,8 @@ type CreatePasteParams struct {
 // CreatePaste
 //
 //	insert into pastes
-//	(reference, owner, title, content, syntax, tags, expiration, public, password)
-//	values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+//	(reference, owner, title, content, mimetype, syntax, tags, expiration, public, password)
+//	values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 //	returning id
 func (q *Queries) CreatePaste(ctx context.Context, arg CreatePasteParams) (int64, error) {
 	row := q.db.QueryRow(ctx, createPaste,
@@ -42,6 +43,7 @@ func (q *Queries) CreatePaste(ctx context.Context, arg CreatePasteParams) (int64
 		arg.Owner,
 		arg.Title,
 		arg.Content,
+		arg.Mimetype,
 		arg.Syntax,
 		arg.Tags,
 		arg.Expiration,
@@ -105,7 +107,7 @@ func (q *Queries) DeletePaste(ctx context.Context, reference string) error {
 }
 
 const getPasteByID = `-- name: GetPasteByID :one
-select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
+select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner, mimetype
 from pastes
 where id = $1
     and deleted_at is null
@@ -113,7 +115,7 @@ where id = $1
 
 // GetPasteByID
 //
-//	select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
+//	select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner, mimetype
 //	from pastes
 //	where id = $1
 //	    and deleted_at is null
@@ -135,6 +137,7 @@ func (q *Queries) GetPasteByID(ctx context.Context, id int64) (Paste, error) {
 		&i.Views,
 		&i.Password,
 		&i.Owner,
+		&i.Mimetype,
 	)
 	return i, err
 }
@@ -144,7 +147,7 @@ update pastes
 set views = views + 1
 where reference = $1
     and deleted_at is null
-returning id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
+returning id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner, mimetype
 `
 
 // GetPasteByReference
@@ -153,7 +156,7 @@ returning id, reference, title, content, syntax, tags, expiration, public, creat
 //	set views = views + 1
 //	where reference = $1
 //	    and deleted_at is null
-//	returning id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
+//	returning id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner, mimetype
 func (q *Queries) GetPasteByReference(ctx context.Context, reference string) (Paste, error) {
 	row := q.db.QueryRow(ctx, getPasteByReference, reference)
 	var i Paste
@@ -172,12 +175,13 @@ func (q *Queries) GetPasteByReference(ctx context.Context, reference string) (Pa
 		&i.Views,
 		&i.Password,
 		&i.Owner,
+		&i.Mimetype,
 	)
 	return i, err
 }
 
 const listPublicPastes = `-- name: ListPublicPastes :many
-select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
+select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner, mimetype
 from pastes
 where public = true
     and deleted_at is null
@@ -186,7 +190,7 @@ order by created_at desc
 
 // ListPublicPastes
 //
-//	select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
+//	select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner, mimetype
 //	from pastes
 //	where public = true
 //	    and deleted_at is null
@@ -215,6 +219,7 @@ func (q *Queries) ListPublicPastes(ctx context.Context) ([]Paste, error) {
 			&i.Views,
 			&i.Password,
 			&i.Owner,
+			&i.Mimetype,
 		); err != nil {
 			return nil, err
 		}
@@ -227,7 +232,7 @@ func (q *Queries) ListPublicPastes(ctx context.Context) ([]Paste, error) {
 }
 
 const listUserPastes = `-- name: ListUserPastes :many
-select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
+select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner, mimetype
 from pastes
 where owner = $1
     and deleted_at is null
@@ -236,7 +241,7 @@ order by created_at desc
 
 // ListUserPastes
 //
-//	select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner
+//	select id, reference, title, content, syntax, tags, expiration, public, created_at, updated_at, deleted_at, views, password, owner, mimetype
 //	from pastes
 //	where owner = $1
 //	    and deleted_at is null
@@ -265,6 +270,7 @@ func (q *Queries) ListUserPastes(ctx context.Context, owner pgtype.Text) ([]Past
 			&i.Views,
 			&i.Password,
 			&i.Owner,
+			&i.Mimetype,
 		); err != nil {
 			return nil, err
 		}

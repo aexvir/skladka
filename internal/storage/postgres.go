@@ -211,6 +211,7 @@ func (s *PostgresStorage) CreatePaste(ctx context.Context, paste paste.Paste) (r
 			Owner:      row.Owner,
 			Title:      row.Title,
 			Content:    row.Content,
+			Mimetype:   row.Mimetype,
 			Syntax:     row.Syntax,
 			Tags:       row.Tags,
 			Expiration: row.Expiration,

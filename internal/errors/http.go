@@ -141,7 +141,7 @@ func WithErrorHandler(handler ErrorHandlerFunc) http.HandlerFunc {
 			var httperr *HTTPError
 
 			if stderr.As(err, &httperr) {
-				http.Error(w, httperr.Message, httperr.Code)
+				http.Error(w, httperr.Error(), httperr.Code)
 				return
 			}
 

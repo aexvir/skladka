@@ -8,12 +8,72 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
+	"fmt"
 	"github.com/aexvir/skladka/internal/auth"
 	"github.com/aexvir/skladka/internal/frontend/components"
 	"github.com/aexvir/skladka/internal/paste"
+	"path/filepath"
+	"strings"
 )
 
-func Document(user *auth.User, paste paste.Paste) templ.Component {
+// getFileIcon returns an appropriate icon based on the mimetype
+func getFileIcon(mimetype string) string {
+	if strings.HasPrefix(mimetype, "image/") {
+		return "🖼️"
+	} else if strings.HasPrefix(mimetype, "audio/") {
+		return "🎵"
+	} else if strings.HasPrefix(mimetype, "video/") {
+		return "🎬"
+	} else if strings.HasPrefix(mimetype, "application/pdf") {
+		return "📄"
+	} else if strings.Contains(mimetype, "zip") || strings.Contains(mimetype, "compressed") || strings.Contains(mimetype, "archive") {
+		return "🗜️"
+	} else if strings.HasPrefix(mimetype, "text/") || mimetype == "application/json" {
+		return "📝"
+	}
+	return "📦"
+}
+
+// getFileExtension extracts the file extension from the title or returns a default based on mimetype
+func getFileExtension(title, mimetype string) string {
+	ext := filepath.Ext(title)
+	if ext != "" {
+		return ext
+	}
+
+	// Try to guess extension from mimetype
+	mimeToExt := map[string]string{
+		"image/jpeg":         ".jpg",
+		"image/png":          ".png",
+		"image/gif":          ".gif",
+		"image/webp":         ".webp",
+		"image/svg+xml":      ".svg",
+		"application/pdf":    ".pdf",
+		"application/zip":    ".zip",
+		"application/x-tar":  ".tar",
+		"application/x-gzip": ".gz",
+		"application/json":   ".json",
+		"text/plain":         ".txt",
+		"text/html":          ".html",
+		"text/css":           ".css",
+		"text/javascript":    ".js",
+	}
+
+	if ext, ok := mimeToExt[mimetype]; ok {
+		return ext
+	}
+
+	return ""
+}
+
+// isBinaryContent checks if the content is likely binary based on mimetype
+func isBinaryContent(mimetype string) bool {
+	return !strings.HasPrefix(mimetype, "text/") &&
+		mimetype != "application/json" &&
+		mimetype != "text/plain"
+}
+
+func Document(user *auth.User, paste paste.Paste, signature string, deadline int64) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -38,15 +98,137 @@ func Document(user *auth.User, paste paste.Paste) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.Editor(paste.Content, paste.Syntax, true).Render(ctx, templ_7745c5c3_Buffer)
+		switch {
+		case paste.Mimetype == nil, strings.HasPrefix(*paste.Mimetype, "text/"):
+			templ_7745c5c3_Err = components.Editor(paste.Content, paste.Syntax, true).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		case strings.HasPrefix(*paste.Mimetype, "image/"):
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"h-full w-full flex-1 flex items-center justify-center bg-gray-100 dark:bg-gray-800\"><img src=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var2 string
+			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("data:" + *paste.Mimetype + ";base64," + paste.Content)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/views/document.templ`, Line: 76, Col: 70}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" alt=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(paste.Title)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/views/document.templ`, Line: 76, Col: 90}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"max-h-full max-w-full object-contain\"></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		default:
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"h-full w-full flex-1 flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800\"><div class=\"text-6xl mb-4\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(getFileIcon(*paste.Mimetype))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/views/document.templ`, Line: 80, Col: 62}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div><div class=\"text-xl font-semibold mb-2\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(paste.Title)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/views/document.templ`, Line: 81, Col: 58}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div><div class=\"text-sm text-gray-600 dark:text-gray-400 mb-1\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var6 string
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(*paste.Mimetype)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/views/document.templ`, Line: 82, Col: 81}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div><div class=\"text-sm text-gray-500 dark:text-gray-500 mb-6\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var7 string
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f KB", paste.SizeBytes()/1024))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/views/document.templ`, Line: 83, Col: 114}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+
+			extra := ""
+			if signature != "" {
+				extra = fmt.Sprintf("?signature=%s&deadline=%d", signature, deadline)
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<a href=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var8 templ.SafeURL = templ.SafeURL("/r/" + paste.Reference + extra)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var8)))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" download=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var9 string
+			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(paste.Title + getFileExtension(paste.Title, *paste.Mimetype))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/frontend/views/document.templ`, Line: 90, Col: 135}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" class=\"mt-2 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md flex items-center\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5 mr-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4\"></path></svg> Download File</a></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = components.Metadata(user, paste, signature, deadline).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.Metadata(user, paste).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -1,14 +1,100 @@
 package views
 
 import (
+	"fmt"
 	"github.com/aexvir/skladka/internal/auth"
 	"github.com/aexvir/skladka/internal/frontend/components"
 	"github.com/aexvir/skladka/internal/paste"
+	"path/filepath"
+	"strings"
 )
 
-templ Document(user *auth.User, paste paste.Paste) {
+// getFileIcon returns an appropriate icon based on the mimetype
+func getFileIcon(mimetype string) string {
+	if strings.HasPrefix(mimetype, "image/") {
+		return "🖼️"
+	} else if strings.HasPrefix(mimetype, "audio/") {
+		return "🎵"
+	} else if strings.HasPrefix(mimetype, "video/") {
+		return "🎬"
+	} else if strings.HasPrefix(mimetype, "application/pdf") {
+		return "📄"
+	} else if strings.Contains(mimetype, "zip") || strings.Contains(mimetype, "compressed") || strings.Contains(mimetype, "archive") {
+		return "🗜️"
+	} else if strings.HasPrefix(mimetype, "text/") || mimetype == "application/json" {
+		return "📝"
+	}
+	return "📦"
+}
+
+// getFileExtension extracts the file extension from the title or returns a default based on mimetype
+func getFileExtension(title, mimetype string) string {
+	ext := filepath.Ext(title)
+	if ext != "" {
+		return ext
+	}
+
+	// Try to guess extension from mimetype
+	mimeToExt := map[string]string{
+		"image/jpeg":         ".jpg",
+		"image/png":          ".png",
+		"image/gif":          ".gif",
+		"image/webp":         ".webp",
+		"image/svg+xml":      ".svg",
+		"application/pdf":    ".pdf",
+		"application/zip":    ".zip",
+		"application/x-tar":  ".tar",
+		"application/x-gzip": ".gz",
+		"application/json":   ".json",
+		"text/plain":         ".txt",
+		"text/html":          ".html",
+		"text/css":           ".css",
+		"text/javascript":    ".js",
+	}
+
+	if ext, ok := mimeToExt[mimetype]; ok {
+		return ext
+	}
+
+	return ""
+}
+
+// isBinaryContent checks if the content is likely binary based on mimetype
+func isBinaryContent(mimetype string) bool {
+	return !strings.HasPrefix(mimetype, "text/") &&
+		mimetype != "application/json" &&
+		mimetype != "text/plain"
+}
+
+templ Document(user *auth.User, paste paste.Paste, signature string, deadline int64) {
 	<div class="h-full w-full flex flex-row">
-		@components.Editor(paste.Content, paste.Syntax, true)
-		@components.Metadata(user, paste)
+		switch  {
+			case paste.Mimetype == nil, strings.HasPrefix(*paste.Mimetype, "text/"):
+				@components.Editor(paste.Content, paste.Syntax, true)
+			case strings.HasPrefix(*paste.Mimetype, "image/"):
+				<div class="h-full w-full flex-1 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+					<img src={ "data:" + *paste.Mimetype + ";base64," + paste.Content } alt={ paste.Title } class="max-h-full max-w-full object-contain"/>
+				</div>
+			default:
+				<div class="h-full w-full flex-1 flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800">
+					<div class="text-6xl mb-4">{ getFileIcon(*paste.Mimetype) }</div>
+					<div class="text-xl font-semibold mb-2">{ paste.Title }</div>
+					<div class="text-sm text-gray-600 dark:text-gray-400 mb-1">{ *paste.Mimetype }</div>
+					<div class="text-sm text-gray-500 dark:text-gray-500 mb-6">{ fmt.Sprintf("%.2f KB", paste.SizeBytes() / 1024) }</div>
+					{{
+						extra := ""
+						if signature != "" {
+							extra = fmt.Sprintf("?signature=%s&deadline=%d", signature, deadline)
+						}
+					}}
+					<a href={ templ.SafeURL("/r/" + paste.Reference + extra) } download={ paste.Title + getFileExtension(paste.Title, *paste.Mimetype) } class="mt-2 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md flex items-center">
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+						</svg>
+						Download File
+					</a>
+				</div>
+		}
+		@components.Metadata(user, paste, signature, deadline)
 	</div>
 }

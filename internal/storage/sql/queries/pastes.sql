@@ -13,8 +13,8 @@ returning *;
 
 -- name: CreatePaste :one
 insert into pastes
-(reference, owner, title, content, syntax, tags, expiration, public, password)
-values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+(reference, owner, title, content, mimetype, syntax, tags, expiration, public, password)
+values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 returning id;
 
 -- name: ListPublicPastes :many

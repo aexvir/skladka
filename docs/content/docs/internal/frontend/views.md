@@ -37,7 +37,7 @@ Views are designed to work with the \[layouts\] package for consistent page stru
 
 - [func Archive\(title string, pastes \[\]paste.Paste\) templ.Component](<#Archive>)
 - [func Creation\(name string\) templ.Component](<#Creation>)
-- [func Document\(user \*auth.User, paste paste.Paste\) templ.Component](<#Document>)
+- [func Document\(user \*auth.User, paste paste.Paste, signature string, deadline int64\) templ.Component](<#Document>)
 - [func Login\(\) templ.Component](<#Login>)
 - [func PasswordPrompt\(reference string\) templ.Component](<#PasswordPrompt>)
 - [func Profile\(user auth.User, viewer \*auth.User\) templ.Component](<#Profile>)
@@ -54,7 +54,7 @@ func Archive(title string, pastes []paste.Paste) templ.Component
 
 
 <a name="Creation"></a>
-## func [Creation](<https://github.com/aexvir/skladka/blob/master/internal/frontend/views/creation_templ.go#L12>)
+## func [Creation](<https://github.com/aexvir/skladka/blob/master/internal/frontend/views/creation_templ.go#L13>)
 
 ```go
 func Creation(name string) templ.Component
@@ -63,10 +63,10 @@ func Creation(name string) templ.Component
 
 
 <a name="Document"></a>
-## func [Document](<https://github.com/aexvir/skladka/blob/master/internal/frontend/views/document_templ.go#L16>)
+## func [Document](<https://github.com/aexvir/skladka/blob/master/internal/frontend/views/document_templ.go#L76>)
 
 ```go
-func Document(user *auth.User, paste paste.Paste) templ.Component
+func Document(user *auth.User, paste paste.Paste, signature string, deadline int64) templ.Component
 ```
 
 

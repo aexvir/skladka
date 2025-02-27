@@ -1,6 +1,7 @@
 package paste
 
 import (
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -12,6 +13,7 @@ type Paste struct {
 	Owner      *string    `json:"owner"`
 	Title      string     `json:"title"`
 	Content    string     `json:"content"`
+	Mimetype   *string    `json:"mimetype"`
 	Syntax     string     `json:"syntax"`
 	Tags       []string   `json:"tags"`
 	Creation   time.Time  `json:"creation"`
@@ -21,13 +23,40 @@ type Paste struct {
 	Views      int        `json:"views"`
 }
 
+func (p Paste) IsBase64Encoded() bool {
+	return p.Syntax == "base64encode"
+}
+
+func (p Paste) FileName() string {
+	ext := p.FileExtension()
+	return strings.TrimSuffix(p.Title, ext) + ext
+}
+
+func (p Paste) FileExtension() string {
+	ext := filepath.Ext(p.Title)
+	if ext != "" {
+		return ext
+	}
+
+	mime := MimeUknown
+	if p.Mimetype != nil {
+		mime = *p.Mimetype
+	}
+
+	if ext, ok := MimetypeFileExtension[mime]; ok {
+		return ext
+	}
+
+	return ".txt"
+}
+
 func (p Paste) SizeBytes() float64 {
 	return float64(len([]byte(p.Content)))
 }
 
 // Validate checks if the paste meets all validation rules.
 // It returns an error if any rule is violated.
-func (p *Paste) Validate() error {
+func (p Paste) Validate() error {
 	var errs []error
 
 	// content is required and must not be empty

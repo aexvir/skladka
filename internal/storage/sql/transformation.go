@@ -111,11 +111,17 @@ func (db Paste) ToDomain() paste.Paste {
 		password = &db.Password.String
 	}
 
+	var mimetype *string
+	if db.Mimetype.Valid {
+		mimetype = &db.Mimetype.String
+	}
+
 	return paste.Paste{
 		Reference:  db.Reference,
 		Owner:      owner,
 		Title:      db.Title,
 		Content:    db.Content,
+		Mimetype:   mimetype,
 		Syntax:     syntax,
 		Tags:       db.Tags,
 		Creation:   db.CreatedAt.Time,
@@ -159,11 +165,20 @@ func (Paste) FromDomain(domain paste.Paste) *Paste {
 		}
 	}
 
+	var mimetype pgtype.Text
+	if domain.Mimetype != nil {
+		mimetype = pgtype.Text{
+			String: *domain.Mimetype,
+			Valid:  true,
+		}
+	}
+
 	return &Paste{
 		Reference:  domain.Reference,
 		Owner:      owner,
 		Title:      domain.Title,
 		Content:    domain.Content,
+		Mimetype:   mimetype,
 		Syntax:     syntax,
 		Tags:       domain.Tags,
 		Expiration: expiration,

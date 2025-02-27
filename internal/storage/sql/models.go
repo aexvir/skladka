@@ -23,6 +23,7 @@ type Paste struct {
 	Views      pgtype.Int4      `db:"views" json:"views"`
 	Password   pgtype.Text      `db:"password" json:"password"`
 	Owner      pgtype.Text      `db:"owner" json:"owner"`
+	Mimetype   pgtype.Text      `db:"mimetype" json:"mimetype"`
 }
 
 type Session struct {

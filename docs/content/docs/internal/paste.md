@@ -41,20 +41,193 @@ Field validation rules:
 
 ## Index
 
+- [Constants](<#constants>)
+- [Variables](<#variables>)
 - [type Metrics](<#Metrics>)
 - [type Paste](<#Paste>)
+  - [func \(p Paste\) FileExtension\(\) string](<#Paste.FileExtension>)
+  - [func \(p Paste\) FileName\(\) string](<#Paste.FileName>)
+  - [func \(p Paste\) IsBase64Encoded\(\) bool](<#Paste.IsBase64Encoded>)
   - [func \(p Paste\) SizeBytes\(\) float64](<#Paste.SizeBytes>)
-  - [func \(p \*Paste\) Validate\(\) error](<#Paste.Validate>)
+  - [func \(p Paste\) Validate\(\) error](<#Paste.Validate>)
 - [type Service](<#Service>)
   - [func NewService\(ctx context.Context, store Storage\) \(\*Service, error\)](<#NewService>)
-  - [func \(svc \*Service\) CreatePaste\(ctx context.Context, user \*auth.User, title, content, syntax string, public bool, tags \[\]string, password \*string, expiration string\) \(paste Paste, err error\)](<#Service.CreatePaste>)
+  - [func \(svc \*Service\) CreatePaste\(ctx context.Context, user \*auth.User, title, content, syntax string, public bool, tags \[\]string, password \*string, expiration string, mimetype \*string\) \(paste Paste, err error\)](<#Service.CreatePaste>)
   - [func \(svc \*Service\) DeletePaste\(ctx context.Context, user \*auth.User, ref string\) \(err error\)](<#Service.DeletePaste>)
+  - [func \(svc \*Service\) GenerateSignedSecret\(paste Paste, expiration time.Duration\) \(string, int64\)](<#Service.GenerateSignedSecret>)
   - [func \(svc \*Service\) GetPaste\(ctx context.Context, \_ \*auth.User, ref string\) \(paste Paste, err error\)](<#Service.GetPaste>)
   - [func \(svc \*Service\) GetPasteWithPassword\(ctx context.Context, \_ \*auth.User, ref, password string\) \(paste \*Paste, err error\)](<#Service.GetPasteWithPassword>)
   - [func \(svc \*Service\) ListPastes\(ctx context.Context, \_ \*auth.User\) \(pastes \[\]Paste, err error\)](<#Service.ListPastes>)
   - [func \(svc \*Service\) ListUserPastes\(ctx context.Context, user \*auth.User, username string\) \(pastes \[\]Paste, err error\)](<#Service.ListUserPastes>)
+  - [func \(svc \*Service\) VerifySignature\(paste Paste, signature string, deadline int64\) bool](<#Service.VerifySignature>)
 - [type Storage](<#Storage>)
 
+
+## Constants
+
+<a name="MimeUknown"></a>https://developer.mozilla.org/en-US/docs/Web/HTTP/MIME_types/Common_types
+
+```go
+const (
+    MimeUknown = "unknown"
+    MimeAAC    = "audio/aac"
+    MimeAbw    = "application/x-abiword"
+    MimeApng   = "image/apng"
+    MimeArc    = "application/x-freearc"
+    MimeAvif   = "image/avif"
+    MimeAvi    = "video/x-msvideo"
+    MimeAzw    = "application/vnd.amazon.ebook"
+    MimeBin    = "application/octet-stream"
+    MimeBmp    = "image/bmp"
+    MimeBz     = "application/x-bzip"
+    MimeBz2    = "application/x-bzip2"
+    MimeCda    = "application/x-cdf"
+    MimeCsh    = "application/x-csh"
+    MimeCss    = "text/css"
+    MimeCsv    = "text/csv"
+    MimeDoc    = "application/msword"
+    MimeDocx   = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    MimeEot    = "application/vnd.ms-fontobject"
+    MimeEpub   = "application/epub+zip"
+    MimeGz     = "application/gzip"
+    MimeGif    = "image/gif"
+    MimeHtml   = "text/html"
+    MimeIco    = "image/vnd.microsoft.icon"
+    MimeIcs    = "text/calendar"
+    MimeJar    = "application/java-archive"
+    MimeJpeg   = "image/jpeg"
+    MimeJs     = "text/javascript"
+    MimeJson   = "application/json"
+    MimeJsonld = "application/ld+json"
+    MimeMidi   = "audio/midi"
+    // MimeMjs    = "text/javascript"
+    MimeMp3  = "audio/mpeg"
+    MimeMp4  = "video/mp4"
+    MimeMpeg = "video/mpeg"
+    MimeMpkg = "application/vnd.apple.installer+xml"
+    MimeOdp  = "application/vnd.oasis.opendocument.presentation"
+    MimeOds  = "application/vnd.oasis.opendocument.spreadsheet"
+    MimeOdt  = "application/vnd.oasis.opendocument.text"
+    // MimeOga   = "audio/ogg"
+    MimeOgv   = "video/ogg"
+    MimeOgx   = "application/ogg"
+    MimeOpus  = "audio/ogg"
+    MimeOtf   = "font/otf"
+    MimePng   = "image/png"
+    MimePdf   = "application/pdf"
+    MimePhp   = "application/x-httpd-php"
+    MimePpt   = "application/vnd.ms-powerpoint"
+    MimePptx  = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    MimeRar   = "application/vnd.rar"
+    MimeRtf   = "application/rtf"
+    MimeSh    = "application/x-sh"
+    MimeSvg   = "image/svg+xml"
+    MimeTar   = "application/x-tar"
+    MimeTiff  = "image/tiff"
+    MimeTs    = "video/mp2t"
+    MimeTtf   = "font/ttf"
+    MimeTxt   = "text/plain"
+    MimeVsd   = "application/vnd.visio"
+    MimeWav   = "audio/wav"
+    MimeWeba  = "audio/webm"
+    MimeWebm  = "video/webm"
+    MimeWebp  = "image/webp"
+    MimeWoff  = "font/woff"
+    MimeWoff2 = "font/woff2"
+    MimeXhtml = "application/xhtml+xml"
+    MimeXls   = "application/vnd.ms-excel"
+    MimeXlsx  = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    MimeXml   = "application/xml"
+    MimeXul   = "application/vnd.mozilla.xul+xml"
+    MimeZip   = "application/zip"
+    Mime3gp   = "video/3gpp"
+    Mime3g2   = "video/3gpp2"
+    Mime7z    = "application/x-7z-compressed"
+)
+```
+
+## Variables
+
+<a name="MimetypeFileExtension"></a>
+
+```go
+var MimetypeFileExtension = map[string]string{
+    MimeUknown: ".txt",
+    MimeAAC:    ".aac",
+    MimeAbw:    ".abw",
+    MimeApng:   ".apng",
+    MimeArc:    ".arc",
+    MimeAvif:   ".avif",
+    MimeAvi:    ".avi",
+    MimeAzw:    ".azw",
+    MimeBin:    ".bin",
+    MimeBmp:    ".bmp",
+    MimeBz:     ".bz",
+    MimeBz2:    ".bz2",
+    MimeCda:    ".cda",
+    MimeCsh:    ".csh",
+    MimeCss:    ".css",
+    MimeCsv:    ".csv",
+    MimeDoc:    ".doc",
+    MimeDocx:   ".docx",
+    MimeEot:    ".eot",
+    MimeEpub:   ".epub",
+    MimeGz:     ".gz",
+    MimeGif:    ".gif",
+    MimeHtml:   ".html",
+    MimeIco:    ".ico",
+    MimeIcs:    ".ics",
+    MimeJar:    ".jar",
+    MimeJpeg:   ".jpg",
+    MimeJs:     ".js",
+    MimeJson:   ".json",
+    MimeJsonld: ".jsonld",
+    MimeMidi:   ".midi",
+
+    MimeMp3:  ".mp3",
+    MimeMp4:  ".mp4",
+    MimeMpeg: ".mpeg",
+    MimeMpkg: ".mpkg",
+    MimeOdp:  ".odp",
+    MimeOds:  ".ods",
+    MimeOdt:  ".odt",
+
+    MimeOgv:   ".ogv",
+    MimeOgx:   ".ogx",
+    MimeOpus:  ".opus",
+    MimeOtf:   ".otf",
+    MimePng:   ".png",
+    MimePdf:   ".pdf",
+    MimePhp:   ".php",
+    MimePpt:   ".ppt",
+    MimePptx:  ".pptx",
+    MimeRar:   ".rar",
+    MimeRtf:   ".rtf",
+    MimeSh:    ".sh",
+    MimeSvg:   ".svg",
+    MimeTar:   ".tar",
+    MimeTiff:  ".tiff",
+    MimeTs:    ".ts",
+    MimeTtf:   ".ttf",
+    MimeTxt:   ".txt",
+    MimeVsd:   ".vsd",
+    MimeWav:   ".wav",
+    MimeWeba:  ".weba",
+    MimeWebm:  ".webm",
+    MimeWebp:  ".webp",
+    MimeWoff:  ".woff",
+    MimeWoff2: ".woff2",
+    MimeXhtml: ".xhtml",
+    MimeXls:   ".xls",
+    MimeXlsx:  ".xlsx",
+    MimeXml:   ".xml",
+    MimeXul:   ".xul",
+    MimeZip:   ".zip",
+    Mime3gp:   ".3gp",
+    Mime3g2:   ".3g2",
+    Mime7z:    ".7z",
+}
+```
 
 <a name="Metrics"></a>
 ## type [Metrics](<https://github.com/aexvir/skladka/blob/master/internal/paste/metrics.go#L7-L19>)
@@ -78,7 +251,7 @@ type Metrics struct {
 ```
 
 <a name="Paste"></a>
-## type [Paste](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L10-L22>)
+## type [Paste](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L11-L24>)
 
 
 
@@ -88,6 +261,7 @@ type Paste struct {
     Owner      *string    `json:"owner"`
     Title      string     `json:"title"`
     Content    string     `json:"content"`
+    Mimetype   *string    `json:"mimetype"`
     Syntax     string     `json:"syntax"`
     Tags       []string   `json:"tags"`
     Creation   time.Time  `json:"creation"`
@@ -98,8 +272,35 @@ type Paste struct {
 }
 ```
 
+<a name="Paste.FileExtension"></a>
+### func \(Paste\) [FileExtension](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L35>)
+
+```go
+func (p Paste) FileExtension() string
+```
+
+
+
+<a name="Paste.FileName"></a>
+### func \(Paste\) [FileName](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L30>)
+
+```go
+func (p Paste) FileName() string
+```
+
+
+
+<a name="Paste.IsBase64Encoded"></a>
+### func \(Paste\) [IsBase64Encoded](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L26>)
+
+```go
+func (p Paste) IsBase64Encoded() bool
+```
+
+
+
 <a name="Paste.SizeBytes"></a>
-### func \(Paste\) [SizeBytes](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L24>)
+### func \(Paste\) [SizeBytes](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L53>)
 
 ```go
 func (p Paste) SizeBytes() float64
@@ -108,16 +309,16 @@ func (p Paste) SizeBytes() float64
 
 
 <a name="Paste.Validate"></a>
-### func \(\*Paste\) [Validate](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L30>)
+### func \(Paste\) [Validate](<https://github.com/aexvir/skladka/blob/master/internal/paste/paste.go#L59>)
 
 ```go
-func (p *Paste) Validate() error
+func (p Paste) Validate() error
 ```
 
 Validate checks if the paste meets all validation rules. It returns an error if any rule is violated.
 
 <a name="Service"></a>
-## type [Service](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L15-L18>)
+## type [Service](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L19-L23>)
 
 
 
@@ -128,7 +329,7 @@ type Service struct {
 ```
 
 <a name="NewService"></a>
-### func [NewService](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L41>)
+### func [NewService](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L46>)
 
 ```go
 func NewService(ctx context.Context, store Storage) (*Service, error)
@@ -137,16 +338,16 @@ func NewService(ctx context.Context, store Storage) (*Service, error)
 NewService creates a new paste service with the provided storage.
 
 <a name="Service.CreatePaste"></a>
-### func \(\*Service\) [CreatePaste](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L55-L63>)
+### func \(\*Service\) [CreatePaste](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L92-L101>)
 
 ```go
-func (svc *Service) CreatePaste(ctx context.Context, user *auth.User, title, content, syntax string, public bool, tags []string, password *string, expiration string) (paste Paste, err error)
+func (svc *Service) CreatePaste(ctx context.Context, user *auth.User, title, content, syntax string, public bool, tags []string, password *string, expiration string, mimetype *string) (paste Paste, err error)
 ```
 
 CreatePaste creates a new paste with the given parameters. Returns a [Paste](<#Paste>) instance with its reference populated.
 
 <a name="Service.DeletePaste"></a>
-### func \(\*Service\) [DeletePaste](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L136>)
+### func \(\*Service\) [DeletePaste](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L175>)
 
 ```go
 func (svc *Service) DeletePaste(ctx context.Context, user *auth.User, ref string) (err error)
@@ -154,8 +355,17 @@ func (svc *Service) DeletePaste(ctx context.Context, user *auth.User, ref string
 
 DeletePaste deletes a paste by its reference and owner username.
 
+<a name="Service.GenerateSignedSecret"></a>
+### func \(\*Service\) [GenerateSignedSecret](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L58>)
+
+```go
+func (svc *Service) GenerateSignedSecret(paste Paste, expiration time.Duration) (string, int64)
+```
+
+
+
 <a name="Service.GetPaste"></a>
-### func \(\*Service\) [GetPaste](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L106>)
+### func \(\*Service\) [GetPaste](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L145>)
 
 ```go
 func (svc *Service) GetPaste(ctx context.Context, _ *auth.User, ref string) (paste Paste, err error)
@@ -164,7 +374,7 @@ func (svc *Service) GetPaste(ctx context.Context, _ *auth.User, ref string) (pas
 GetPaste retrieves a paste by its reference.
 
 <a name="Service.GetPasteWithPassword"></a>
-### func \(\*Service\) [GetPasteWithPassword](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L121>)
+### func \(\*Service\) [GetPasteWithPassword](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L160>)
 
 ```go
 func (svc *Service) GetPasteWithPassword(ctx context.Context, _ *auth.User, ref, password string) (paste *Paste, err error)
@@ -173,7 +383,7 @@ func (svc *Service) GetPasteWithPassword(ctx context.Context, _ *auth.User, ref,
 GetPasteWithPassword retrieves a password\-protected paste by its reference.
 
 <a name="Service.ListPastes"></a>
-### func \(\*Service\) [ListPastes](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L166>)
+### func \(\*Service\) [ListPastes](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L205>)
 
 ```go
 func (svc *Service) ListPastes(ctx context.Context, _ *auth.User) (pastes []Paste, err error)
@@ -182,7 +392,7 @@ func (svc *Service) ListPastes(ctx context.Context, _ *auth.User) (pastes []Past
 ListPastes retrieves all public pastes from the storage. The function returns a slice of Paste objects and any error that occurred during the operation.
 
 <a name="Service.ListUserPastes"></a>
-### func \(\*Service\) [ListUserPastes](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L182>)
+### func \(\*Service\) [ListUserPastes](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L221>)
 
 ```go
 func (svc *Service) ListUserPastes(ctx context.Context, user *auth.User, username string) (pastes []Paste, err error)
@@ -190,8 +400,17 @@ func (svc *Service) ListUserPastes(ctx context.Context, user *auth.User, usernam
 
 ListUserPastes retrieves all pastes for a specific user from the storage. The function returns a slice of Paste objects and any error that occurred during the operation.
 
+<a name="Service.VerifySignature"></a>
+### func \(\*Service\) [VerifySignature](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L72>)
+
+```go
+func (svc *Service) VerifySignature(paste Paste, signature string, deadline int64) bool
+```
+
+
+
 <a name="Storage"></a>
-## type [Storage](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L20-L38>)
+## type [Storage](<https://github.com/aexvir/skladka/blob/master/internal/paste/service.go#L25-L43>)
 
 
 

@@ -44,7 +44,7 @@ The frontend package automatically handles static asset serving, page routing, a
 
 
 <a name="DashboardRouter"></a>
-## func [DashboardRouter](<https://github.com/aexvir/skladka/blob/master/internal/frontend/frontend.go#L32>)
+## func [DashboardRouter](<https://github.com/aexvir/skladka/blob/master/internal/frontend/frontend.go#L35>)
 
 ```go
 func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth.Service) chi.Router

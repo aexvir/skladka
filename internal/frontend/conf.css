@@ -16,7 +16,13 @@
     --color-accent-contrast: oklch(46.28% 0.1043 64.41);
     --color-complementary: oklch(61.93% 0.1215 250.09);
 
+    --color-success: oklch(70.79% 0.1793 125.62);
+    --color-success-muted: oklch(56.26% 0.1605 125.62);
+    --color-success-contrast: oklch(23.98% 0.0605 125.62);
+
     --color-error: oklch(63.63% 0.1862 24.08);
+    --color-error-muted: oklch(51.04% 0.1862 24.08);
+    --color-error-contrast: oklch(25.78% 0.0925 24.08);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -31,6 +37,11 @@
         --color-accent-contrast: oklch(48.47% 0.1021 75.12);
         --color-complementary: oklch(76.56% 0.1243 250.38);
         --color-error: oklch(62.57% 0.164 23.07);
+        --color-error-muted: oklch(51.04% 0.1862 24.08);
+        --color-error-contrast: oklch(25.78% 0.0925 24.08);
+        --color-success: oklch(70.79% 0.1793 125.62);
+        --color-success-muted: oklch(56.26% 0.1605 125.62);
+        --color-success-contrast: oklch(23.98% 0.0605 125.62);
     }
 }
 

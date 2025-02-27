@@ -26,7 +26,9 @@ import "github.com/aexvir/skladka/internal/frontend/icons"
 - [func Paperclip\(width, height int, classes ...string\) templ.Component](<#Paperclip>)
 - [func Search\(width, height int, classes ...string\) templ.Component](<#Search>)
 - [func Tag\(width, height int, classes ...string\) templ.Component](<#Tag>)
+- [func Upload\(width, height int, classes ...string\) templ.Component](<#Upload>)
 - [func User\(width, height int, classes ...string\) templ.Component](<#User>)
+- [func XMark\(width, height int, classes ...string\) templ.Component](<#XMark>)
 
 
 <a name="Bookmark"></a>
@@ -191,11 +193,29 @@ func Tag(width, height int, classes ...string) templ.Component
 
 
 
+<a name="Upload"></a>
+## func [Upload](<https://github.com/aexvir/skladka/blob/master/internal/frontend/icons/upload_templ.go#L15>)
+
+```go
+func Upload(width, height int, classes ...string) templ.Component
+```
+
+
+
 <a name="User"></a>
 ## func [User](<https://github.com/aexvir/skladka/blob/master/internal/frontend/icons/user_templ.go#L15>)
 
 ```go
 func User(width, height int, classes ...string) templ.Component
+```
+
+
+
+<a name="XMark"></a>
+## func [XMark](<https://github.com/aexvir/skladka/blob/master/internal/frontend/icons/xmark_templ.go#L15>)
+
+```go
+func XMark(width, height int, classes ...string) templ.Component
 ```
 
 

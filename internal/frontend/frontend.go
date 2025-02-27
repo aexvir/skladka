@@ -3,9 +3,12 @@ package frontend
 import (
 	"context"
 	"embed"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -72,8 +75,12 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 				logger := logging.FromContext(r.Context())
 				logger.Info("frontend.dashboard", "creating paste")
 
-				if err := r.ParseForm(); err != nil {
-					return errors.NewHTTPError(http.StatusBadRequest, "error parsing form", err)
+				// Parse multipart form with 50MB max memory
+				if err := r.ParseMultipartForm(50 << 20); err != nil {
+					// If not a multipart form, try to parse regular form
+					if err := r.ParseForm(); err != nil {
+						return errors.NewHTTPError(http.StatusBadRequest, "error parsing form", err)
+					}
 				}
 
 				var password *string
@@ -86,15 +93,49 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 					tags = strings.Split(value, ",")
 				}
 
+				content := r.FormValue("content")
+				syntax := r.FormValue("syntax")
+
+				var mimetype *string
+				if mime := r.FormValue("mimetype"); mime != "" {
+					mimetype = &mime
+
+					if r.Form.Has("file") {
+						file, _, err := r.FormFile("file")
+						if err == nil {
+							defer file.Close()
+
+							rawdata, err := io.ReadAll(file)
+							if err != nil {
+								return errors.NewHTTPError(http.StatusInternalServerError, "error reading uploaded file", err)
+							}
+
+							content = string(rawdata)
+						}
+					}
+				}
+
+				logging.
+					FromContext(r.Context()).
+					Info(
+						"frontend.create", "creating paste",
+						"title", r.FormValue("title"),
+						"syntax", syntax,
+						"hasContent", content != "",
+						"contentLength", len(content),
+						"mimetype", mimetype,
+					)
+
 				paste, err := pastesvc.CreatePaste(r.Context(),
 					auth.UserFromContext(r.Context()),
 					r.FormValue("title"),
-					r.FormValue("content"),
-					r.FormValue("syntax"),
+					content,
+					syntax,
 					r.FormValue("unlisted") != "on",
 					tags,
 					password,
 					r.FormValue("expiration"),
+					mimetype,
 				)
 				if err != nil {
 					return errors.NewHTTPError(http.StatusInternalServerError, "error creating paste", err)
@@ -169,8 +210,9 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 						"tags", paste.Tags,
 					)
 
+				signature, deadline := pastesvc.GenerateSignedSecret(paste, 10*time.Second)
 				return layouts.Base(
-					user, views.Document(user, paste),
+					user, views.Document(user, paste, signature, deadline),
 				).Render(r.Context(), w)
 			},
 		),
@@ -206,8 +248,9 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 						"tags", paste.Tags,
 					)
 
+				signature, deadline := pastesvc.GenerateSignedSecret(*paste, 10*time.Second)
 				return layouts.Base(
-					user, views.Document(user, *paste),
+					user, views.Document(user, *paste, signature, deadline),
 				).Render(r.Context(), w)
 			},
 		),
@@ -217,6 +260,8 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 		errors.WithErrorHandler(
 			func(w http.ResponseWriter, r *http.Request) error {
 				ref := chi.URLParam(r, "ref")
+				signature := r.URL.Query().Get("signature")
+				deadline := r.URL.Query().Get("deadline")
 				password := r.Header.Get("x-skd-password")
 				user := auth.UserFromContext(r.Context())
 
@@ -230,38 +275,71 @@ func DashboardRouter(ctx context.Context, pastesvc *paste.Service, authsvc *auth
 				}
 
 				if paste.Password != nil {
-					if password == "" {
+					switch {
+					case password != "": // password provided, attempt to unlock with it
+						paste, err := pastesvc.GetPasteWithPassword(r.Context(), user, ref, password)
+						if err != nil {
+							return errors.NewHTTPError(
+								http.StatusUnprocessableEntity,
+								fmt.Sprintf("error fetching paste %s", ref),
+								err,
+							)
+						}
+						if paste == nil {
+							return errors.NewHTTPError(http.StatusForbidden, "invalid password", err)
+						}
+
+					case signature != "": // signed url, verify validity
+						deadlinesec, err := strconv.ParseInt(deadline, 10, 64)
+						if err != nil || !pastesvc.VerifySignature(paste, signature, deadlinesec) {
+							http.Redirect(w, r, fmt.Sprintf("/r/%s", paste.Reference), http.StatusSeeOther)
+							return nil
+						}
+
+					default: // missing any kind of secret, prompt for password
 						return layouts.Base(
 							user, views.RawPasswordPrompt(ref),
 						).Render(r.Context(), w)
-					}
-
-					paste, err := pastesvc.GetPasteWithPassword(r.Context(), user, ref, password)
-					if err != nil {
-						return errors.NewHTTPError(
-							http.StatusUnprocessableEntity,
-							fmt.Sprintf("error fetching paste %s", ref),
-							err,
-						)
-					}
-
-					if paste == nil {
-						return errors.NewHTTPError(http.StatusForbidden, "invalid password", err)
 					}
 				}
 
 				logging.
 					FromContext(r.Context()).
 					Info(
-						"frontend.dashboard", "rendering raw document page",
+						"frontend.dashboard", "rendering raw document",
 						"ref", ref,
 						"title", paste.Title,
 						"syntax", paste.Syntax,
 						"tags", paste.Tags,
+						"mimetype", paste.Mimetype,
+						"size", paste.SizeBytes,
 					)
 
 				w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-				_, err = w.Write([]byte(paste.Content))
+				if paste.Mimetype != nil {
+					w.Header().Set("Content-Type", *paste.Mimetype)
+				}
+				// w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, paste.FileName()))
+
+				content := []byte(paste.Content)
+
+				if paste.IsBase64Encoded() {
+					signature, deadline := pastesvc.GenerateSignedSecret(paste, 5*time.Minute)
+					w.Header().Set("x-skd-signature", signature)
+					w.Header().Set("x-skd-deadline", strconv.FormatInt(deadline, 10))
+
+					decoded, err := base64.StdEncoding.DecodeString(paste.Content)
+					if err != nil {
+						return errors.NewHTTPError(
+							http.StatusUnprocessableEntity,
+							fmt.Sprintf("error base64 decoding paste %s", ref),
+							err,
+						)
+					}
+					content = decoded
+				}
+
+				_, err = w.Write(content)
 				return err
 			},
 		),

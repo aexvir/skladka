@@ -20,6 +20,7 @@ create table pastes (
     owner text references users(username),
 
     content text not null,
+    mimetype varchar(255) null,
 
     syntax varchar(50) null,
     tags text[],

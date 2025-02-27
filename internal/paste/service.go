@@ -2,6 +2,10 @@ package paste
 
 import (
 	"context"
+	"crypto/hmac"
+	"crypto/sha512"
+	"encoding/hex"
+	"fmt"
 	"time"
 
 	"github.com/aexvir/skladka/internal/attributes"
@@ -13,8 +17,9 @@ import (
 )
 
 type Service struct {
-	store Storage
-	met   *Metrics
+	store         Storage
+	met           *Metrics
+	encryptionkey string
 }
 
 type Storage interface {
@@ -50,6 +55,38 @@ func NewService(ctx context.Context, store Storage) (*Service, error) {
 	}, nil
 }
 
+func (svc *Service) GenerateSignedSecret(paste Paste, expiration time.Duration) (string, int64) {
+	deadline := time.Now().Add(expiration).Unix()
+
+	h := hmac.New(sha512.New, []byte(svc.encryptionkey))
+	h.Write(
+		fmt.Appendf(nil,
+			"ref=%s;created=%d;deadline=%d",
+			paste.Reference, paste.Creation.Unix(), deadline,
+		),
+	)
+
+	return hex.EncodeToString(h.Sum(nil)), deadline
+}
+
+func (svc *Service) VerifySignature(paste Paste, signature string, deadline int64) bool {
+	if time.Now().Unix() > int64(deadline) {
+		return false
+	}
+
+	h := hmac.New(sha512.New, []byte(svc.encryptionkey))
+	h.Write(
+		fmt.Appendf(nil,
+			"ref=%s;created=%d;deadline=%d",
+			paste.Reference, paste.Creation.Unix(), deadline,
+		),
+	)
+
+	expected := hex.EncodeToString(h.Sum(nil))
+
+	return hmac.Equal([]byte(signature), []byte(expected))
+}
+
 // CreatePaste creates a new paste with the given parameters.
 // Returns a [Paste] instance with its reference populated.
 func (svc *Service) CreatePaste(
@@ -60,6 +97,7 @@ func (svc *Service) CreatePaste(
 	tags []string,
 	password *string,
 	expiration string,
+	mimetype *string,
 ) (paste Paste, err error) {
 	ctx, finish := tracing.FromContext(ctx, trace.SpanKindInternal, "paste.Service.CreatePaste")
 	defer func() {
@@ -79,6 +117,7 @@ func (svc *Service) CreatePaste(
 		Public:   public,
 		Tags:     tags,
 		Password: password,
+		Mimetype: mimetype,
 	}
 
 	if user != nil {

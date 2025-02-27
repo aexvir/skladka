@@ -1,10 +1,365 @@
 package views
 
 import "github.com/aexvir/skladka/internal/frontend/components"
+import "github.com/aexvir/skladka/internal/frontend/icons"
 
 templ Creation(name string) {
-	<div class="h-full w-full flex flex-row">
-		@components.Editor("", "", false)
+	<div class="h-full w-full flex flex-row relative">
+		<div class="h-full w-full flex-1 relative">
+			<div id="editor-container" class="h-full w-full">
+				@components.Editor("", "", false)
+			</div>
+			<div id="preview-container" class="h-full w-full absolute inset-0 bg-white dark:bg-gray-800 hidden flex items-center justify-center">
+				<div id="image-preview" class="max-h-full max-w-full hidden">
+					<img id="preview-img" src="" alt="" class="max-h-full max-w-full object-contain"/>
+				</div>
+				<div id="file-preview" class="text-center hidden">
+					<div class="text-6xl mb-4" id="file-icon">📦</div>
+					<div class="text-xl font-semibold mb-2" id="file-name"></div>
+					<div class="text-sm text-content mb-1" id="file-type"></div>
+					<div class="text-sm text-content-muted mb-6" id="file-size"></div>
+				</div>
+			</div>
+			<div id="drop-overlay" class="absolute inset-4 flex items-center justify-center bg-surface/80 border-4 rounded border-dashed border-accent z-10 hidden">
+				<div class="text-center">
+					<div class="text-4xl mb-4">📄</div>
+					<p class="text-xl font-semibold">Drop your file here</p>
+					<p class="text-sm text-content mt-2">Images and text files will be previewed</p>
+				</div>
+			</div>
+			<form id="upload-form" enctype="multipart/form-data">
+				<input type="file" id="file-input" name="file" class="hidden"/>
+				<input type="hidden" id="mimetype-input" name="mimetype"/>
+				<input type="hidden" id="editor-content" name="content"/>
+			</form>
+			<div class="absolute lg:bottom-5 bottom-20 lg:right-5 flex w-full justify-center lg:justify-end">
+				<button type="button" id="reset-button" class="bg-error hover:bg-error-muted rounded-full p-3 lg:p-2 shadow-lg hidden cursor-pointer">
+					@icons.XMark(16, 16, "text-error-contrast")
+				</button>
+				<button type="button" id="upload-button" class="bg-surface hover:bg-surface-muted rounded-full p-3 lg:p-2 shadow-lg cursor-pointer">
+					@icons.Upload(16, 16, "text-content")
+				</button>
+			</div>
+		</div>
 		@components.Sidebar()
 	</div>
+	<script>
+		document.addEventListener(
+			'DOMContentLoaded', () => {
+				// Get required elements
+				const dropOverlay = document.getElementById('drop-overlay')
+				const fileInput = document.getElementById('file-input')
+				const mimetypeInput = document.getElementById('mimetype-input')
+				const editorContent = document.getElementById('editor-content')
+				const editorContainer = document.getElementById('editor-container')
+				const previewContainer = document.getElementById('preview-container')
+				const imagePreview = document.getElementById('image-preview')
+				const previewImg = document.getElementById('preview-img')
+				const filePreview = document.getElementById('file-preview')
+				const fileIcon = document.getElementById('file-icon')
+				const fileName = document.getElementById('file-name')
+				const fileType = document.getElementById('file-type')
+				const fileSize = document.getElementById('file-size')
+				const uploadButton = document.getElementById('upload-button')
+				const resetButton = document.getElementById('reset-button')
+				const uploadForm = document.getElementById('upload-form')
+
+				// Get main form elements
+				const mainForm = document.querySelector('form#paste-form')
+				const mainContentInput = document.querySelector('#paste-form input[name="content"]')
+				const mainMimetypeInput = document.querySelector('#paste-form input[name="mimetype"]')
+				const syntaxSelect = document.querySelector('#paste-form select[name="syntax"]')
+				const syntaxSelectWrapper = syntaxSelect.closest('.space-y-1')
+				const titleInput = document.querySelector('#paste-form input[name="title"]')
+
+				// Element existence check
+				if (!dropOverlay || !fileInput || !mimetypeInput || !editorContent ||
+					!uploadButton || !resetButton || !editorContainer || !previewContainer ||
+					!imagePreview || !previewImg || !filePreview || !fileIcon ||
+					!fileName || !fileType || !fileSize || !uploadForm || !mainForm ||
+					!mainContentInput || !mainMimetypeInput) {
+					console.error("Required elements not found")
+					return
+				}
+
+				// View toggle utilities
+				const ViewManager = {
+					// Current view state
+					currentView: 'editor',
+
+					// Show editor view
+					showEditor() {
+						previewContainer.classList.add('hidden')
+						imagePreview.classList.add('hidden')
+						filePreview.classList.add('hidden')
+						editorContainer.classList.remove('hidden')
+						resetButton.classList.add('hidden')
+						uploadButton.classList.remove('hidden')
+						syntaxSelectWrapper.classList.remove('hidden')
+
+						this.currentView = 'editor'
+					},
+
+					// Show image preview
+					showImagePreview(file) {
+						editorContainer.classList.add('hidden')
+						previewContainer.classList.remove('hidden')
+						imagePreview.classList.remove('hidden')
+						filePreview.classList.add('hidden')
+						resetButton.classList.remove('hidden')
+						uploadButton.classList.add('hidden')
+						syntaxSelectWrapper.classList.add('hidden')
+
+						this.currentView = 'image'
+
+						// Set image source
+						const objectUrl = URL.createObjectURL(file)
+						previewImg.src = objectUrl
+						previewImg.alt = file.name
+					},
+
+					// Show file preview
+					showFilePreview(file) {
+						editorContainer.classList.add('hidden')
+						previewContainer.classList.remove('hidden')
+						imagePreview.classList.add('hidden')
+						filePreview.classList.remove('hidden')
+						resetButton.classList.remove('hidden')
+						uploadButton.classList.add('hidden')
+						syntaxSelectWrapper.classList.add('hidden')
+
+						this.currentView = 'file'
+
+						// Set file info
+						fileIcon.textContent = getFileIcon(file.type)
+						fileName.textContent = file.name
+						fileType.textContent = file.type
+						fileSize.textContent = formatFileSize(file.size)
+					},
+
+					// Reset to editor with optional content
+					resetToEditor(content = '') {
+						// Clear file input and mimetype
+						fileInput.value = ''
+						mimetypeInput.value = ''
+						titleInput.value = ''
+
+						// Show editor view
+						this.showEditor()
+
+						// Reset editor content if needed
+						if (window.Editor && typeof window.Editor.setContent === 'function' && content !== undefined) {
+							window.Editor.setContent(content)
+						}
+					}
+				}
+
+				// Function to handle the selected file
+				function handleFile(file) {
+					console.log("Handling file:", file.name, file.type, file.size)
+
+					// Set file metadata
+					titleInput.value = file.name
+					mimetypeInput.value = file.type || 'application/octet-stream'
+
+					// Handle based on file type
+					if (isTextFile(file)) {
+						// For text files, display in editor
+						const reader = new FileReader()
+						reader.onload = (e) => {
+							const textContent = e.target.result
+							editorContent.value = textContent
+
+							ViewManager.resetToEditor(textContent)
+
+							// Detect syntax based on file extension
+							if (window.Editor && typeof window.Editor.setSyntax === 'function') {
+								const extension = file.name.split('.').pop().toLowerCase()
+								const syntaxMap = {
+									'js': 'javascript',
+									'ts': 'typescript',
+									'py': 'python',
+									'go': 'go',
+									'html': 'html',
+									'css': 'css',
+									'json': 'json',
+									'md': 'markdown',
+									'xml': 'xml',
+									'yaml': 'yaml',
+									'yml': 'yaml',
+									'rust': 'rust',
+									'rs': 'rust',
+									'zig': 'zig'
+								}
+
+								if (syntaxMap[extension] && syntaxSelect) {
+									syntaxSelect.value = syntaxMap[extension]
+									window.Editor.setSyntax(syntaxMap[extension])
+								}
+							}
+						}
+						reader.readAsText(file)
+					} else if (file.type.startsWith('image/')) {
+						// For images, show image preview
+						ViewManager.showImagePreview(file)
+					} else {
+						// For binary files, show file preview
+						ViewManager.showFilePreview(file)
+					}
+
+					// Save the file in the form for server-side processing
+					const newFileList = new DataTransfer()
+					newFileList.items.add(file)
+					fileInput.files = newFileList.files
+				}
+
+				// Function to detect if a file is a text file
+				function isTextFile(file) {
+					// Check by MIME type first
+					if (file.type.startsWith('text/') || file.type === 'application/json') {
+						return true
+					}
+
+					// Check by common text file extensions
+					const extension = file.name.split('.').pop().toLowerCase()
+					const textExtensions = [
+						'txt', 'md', 'markdown', 'go', 'py', 'js', 'jsx', 'ts', 'tsx',
+						'html', 'htm', 'css', 'scss', 'sass', 'less', 'xml', 'svg',
+						'json', 'yaml', 'yml', 'toml', 'ini', 'cfg', 'conf', 'sh',
+						'bash', 'zsh', 'fish', 'bat', 'cmd', 'ps1', 'c', 'cpp', 'cxx',
+						'h', 'hpp', 'cs', 'java', 'kt', 'rs', 'swift', 'rb', 'php',
+						'pl', 'pm', 'sql', 'graphql', 'prisma', 'lua', 'r', 'd', 'zig'
+					]
+					return textExtensions.includes(extension)
+				}
+
+				// Helper functions
+				function getFileIcon(mimetype) {
+					if (mimetype.startsWith('audio/')) return '🎵'
+					if (mimetype.startsWith('video/')) return '🎬'
+					if (mimetype.startsWith('image/')) return '🖼️'
+					if (mimetype.includes('pdf')) return '📄'
+					if (mimetype.includes('zip') || mimetype.includes('compressed') || mimetype.includes('archive')) return '🗜️'
+					if (mimetype.startsWith('text/') || mimetype === 'application/json') return '📝'
+					return '📦'
+				}
+
+				function formatFileSize(bytes) {
+					if (bytes < 1024) return bytes + ' bytes'
+					if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB'
+					if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + ' MB'
+					return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB'
+				}
+
+				// Event Listeners
+
+				// Reset button
+				resetButton.addEventListener('click', () => ViewManager.resetToEditor())
+
+				// Drag and drop
+				document.addEventListener('dragover', (e) => {
+					e.preventDefault()
+					dropOverlay.classList.remove('hidden')
+				})
+
+				document.addEventListener('dragleave', (e) => {
+					if (!e.relatedTarget || e.relatedTarget === document.documentElement) {
+						dropOverlay.classList.add('hidden')
+					}
+				})
+
+				document.addEventListener('drop', (e) => {
+					e.preventDefault()
+					dropOverlay.classList.add('hidden')
+
+					if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+						handleFile(e.dataTransfer.files[0])
+					}
+				})
+
+				// File input change handler
+				fileInput.addEventListener('change', () => {
+					if (fileInput.files && fileInput.files.length > 0) {
+						handleFile(fileInput.files[0])
+					}
+				})
+
+				// Upload button click handler
+				uploadButton.addEventListener('click', () => {
+					fileInput.click()
+				})
+
+				// Paste handling
+				document.addEventListener('paste', (e) => {
+					const activeElement = document.activeElement
+
+					// Don't handle paste if we're in an input or textarea
+					if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+						return
+					}
+
+					// Handle pasted files
+					if (e.clipboardData && e.clipboardData.files && e.clipboardData.files.length > 0) {
+						e.preventDefault()
+						handleFile(e.clipboardData.files[0])
+					}
+				})
+
+				// Form submission handling
+				mainForm.addEventListener('submit', (e) => {
+					// Editor mode content
+					if (ViewManager.currentView === 'editor') {
+						mainContentInput.value = window.Editor.getContent()
+						mainMimetypeInput.value = ''
+						return // Allow form to submit
+					}
+
+					// File mode content
+					if (fileInput.files && fileInput.files.length > 0) {
+						// We need to read the file content and add to the main form
+						e.preventDefault() // Prevent submission until we've read the file
+
+						const file = fileInput.files[0]
+						mainMimetypeInput.value = file.type || 'application/octet-stream'
+
+						const reader = new FileReader()
+
+						// Read file and submit form once complete
+						reader.onload = (event) => {
+							// Use the same text file detection logic
+							if (isTextFile(file)) {
+								mainContentInput.value = event.target.result
+							} else if (typeof event.target.result === 'string' && event.target.result.startsWith('data:')) {
+								// Extract base64 data from data URL
+								const base64Data = event.target.result.split(',')[1]
+								mainContentInput.value = base64Data
+								syntaxSelect.value = "base64encode"
+							} else {
+								mainContentInput.value = event.target.result
+							}
+
+							mainForm.submit()
+						}
+
+						// Use appropriate reading method based on file type
+						if (isTextFile(file)) {
+							reader.readAsText(file)
+						} else {
+							reader.readAsDataURL(file)
+						}
+
+						return false // Prevent default submission
+					}
+
+					// No content at all
+					e.preventDefault()
+					alert('Please add some content before submitting.')
+					return false
+				})
+
+				// Initialize to editor view
+				ViewManager.showEditor()
+			}
+		)
+	</script>
 }
