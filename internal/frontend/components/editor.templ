@@ -3,6 +3,10 @@ package components
 templ Editor(content, syntax string, readonly bool) {
 	<div class="h-full w-full flex-1 min-w-0 min-h-0">
 		<div id="editor" class="editor">
+			<div class="editor-sticky" aria-hidden="true">
+				<div class="editor-sticky-gutter"></div>
+				<div class="editor-sticky-code"></div>
+			</div>
 			<div class="editor-gutter" aria-hidden="true"></div>
 			<div class="editor-highlight" aria-hidden="true"></div>
 			<textarea
@@ -35,6 +39,45 @@ templ Editor(content, syntax string, readonly bool) {
             tab-size: 4;
         }
 
+        .editor-sticky {
+            grid-row: 1;
+            grid-column: 1 / -1;
+            align-self: start;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: subgrid;
+            cursor: pointer;
+            background-color: inherit;
+            box-shadow: 0 4px 6px -4px light-dark(#00000026, #00000080);
+        }
+
+        .editor-sticky-gutter {
+            position: sticky;
+            left: 0;
+            padding: 0 1rem 0 1.5rem;
+            text-align: right;
+            white-space: pre;
+            background-color: inherit;
+            color: light-dark(#8a919966, #6c738099);
+        }
+
+        .editor-sticky-code {
+            padding: 0 var(--editor-padding);
+            white-space: pre;
+        }
+
+        .editor-sticky-code pre,
+        .editor-sticky-code code,
+        .editor-highlight pre,
+        .editor-highlight code {
+            margin: 0;
+            padding: 0;
+            font: inherit;
+            background-color: transparent !important;
+        }
+
         .editor-gutter {
             grid-row: 1;
             grid-column: 1;
@@ -61,14 +104,6 @@ templ Editor(content, syntax string, readonly bool) {
             white-space: pre;
             overflow-wrap: normal;
             tab-size: inherit;
-        }
-
-        .editor-highlight pre,
-        .editor-highlight code {
-            margin: 0;
-            padding: 0;
-            font: inherit;
-            background-color: transparent !important;
         }
 
         .editor-input {
@@ -112,29 +147,85 @@ templ Editor(content, syntax string, readonly bool) {
         const gutter = container.querySelector('.editor-gutter')
         const highlight = container.querySelector('.editor-highlight')
         const input = container.querySelector('.editor-input')
+        const sticky = container.querySelector('.editor-sticky')
         const decoder = new TextDecoder()
 
         let syntax = 'plaintext'
+        let lines = []
+        let headers = []
 
-        const render = () => {
-            const text = input.value
-
-            // a trailing newline needs a character after it to take up a line in the <pre>
-            const html = codeToHtml(
-                text.endsWith('\n') ? `${text} ` : text,
+        const highlighted = (text) => decoder.decode(
+            codeToHtml(
+                text,
                 {
                     lang: syntax,
                     themes: { light: ayuLight, dark: ayuDark },
                     defaultColor: 'light-dark()',
                 }
             )
-            highlight.innerHTML = decoder.decode(html)
+        )
 
-            const lines = text.split('\n').length
-            gutter.textContent = Array.from({ length: lines }, (_, i) => i + 1).join('\n')
+        // indentation of a line, or -1 for blank lines
+        const indentation = (line) => lines[line].search(/\S/)
+
+        // lines that open the indentation scopes containing the given line, outermost first
+        const scopes = (line) => {
+            const found = []
+            while (line < lines.length - 1 && indentation(line) < 0) {
+                line++
+            }
+            let indent = indentation(line)
+            for (let i = line - 1; i >= 0 && indent > 0; i--) {
+                const current = indentation(i)
+                if (current >= 0 && current < indent) {
+                    found.unshift(i)
+                    indent = current
+                }
+            }
+            return found.slice(-5)
+        }
+
+        // pin the lines opening the scopes of the topmost visible line, like monaco's sticky scroll
+        const stick = () => {
+            const { lineHeight, paddingTop } = getComputedStyle(input)
+            const top = Math.max(
+                0,
+                Math.min(
+                    Math.floor((container.scrollTop - parseFloat(paddingTop)) / parseFloat(lineHeight)),
+                    lines.length - 1
+                )
+            )
+
+            // the pinned lines cover the first visible ones, so look again from below them
+            const below = top + scopes(top).length
+            headers = scopes(below).filter((i) => i < below)
+
+            sticky.style.display = headers.length ? '' : 'none'
+            sticky.firstElementChild.textContent = headers.map((i) => i + 1).join('\n')
+            sticky.lastElementChild.innerHTML = highlighted(headers.map((i) => lines[i]).join('\n'))
+        }
+
+        const render = () => {
+            const text = input.value
+            lines = text.split('\n')
+
+            // a trailing newline needs a character after it to take up a line in the <pre>
+            highlight.innerHTML = highlighted(text.endsWith('\n') ? `${text} ` : text)
+            gutter.textContent = lines.map((_, i) => i + 1).join('\n')
+            stick()
         }
 
         input.addEventListener('input', render)
+        container.addEventListener('scroll', stick)
+
+        sticky.addEventListener(
+            'click',
+            (e) => {
+                const { lineHeight, paddingTop } = getComputedStyle(input)
+                const index = Math.floor((e.clientY - sticky.getBoundingClientRect().top) / parseFloat(lineHeight))
+                container.scrollTop = parseFloat(paddingTop) + headers[index] * parseFloat(lineHeight)
+            }
+        )
 
         input.addEventListener(
             'keydown',
