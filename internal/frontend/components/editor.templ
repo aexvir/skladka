@@ -21,6 +21,7 @@ templ Editor(content, syntax string, readonly bool) {
 			></textarea>
 		</div>
 	</div>
+	@templ.JSONScript("editor-syntaxes", Syntaxes)
 	<style>
         .editor {
             --editor-padding: 1rem;
@@ -131,17 +132,11 @@ templ Editor(content, syntax string, readonly bool) {
         import ayuLight from '/static/highlights/themes/ayu-light.js'
         import ayuDark from '/static/highlights/themes/ayu-dark.js'
 
-        const extensions = {
-            go: 'go',
-            python: 'py',
-            yaml: 'yaml',
-            hcl: 'hcl',
-            ocaml: 'ml',
-            json: 'json',
-            xml: 'xml',
-            rust: 'rs',
-            zig: 'zig',
-        }
+        const extensions = Object.fromEntries(
+            JSON.
+                parse(document.getElementById('editor-syntaxes').textContent).
+                map(({ name, extension }) => [name, extension])
+        )
 
         const container = document.getElementById('editor')
         const gutter = container.querySelector('.editor-gutter')
