@@ -17,29 +17,29 @@ import (
 
 func Download(ctx context.Context) error {
 	err := download(
-		"https://registry.npmjs.org/monaco-editor/-/monaco-editor-0.52.2.tgz",
-		"./bin/monaco-editor.tgz",
+		"https://registry.npmjs.org/@pierre/highlights/-/highlights-0.2.0.tgz",
+		"./bin/highlights.tgz",
 	)
 	if err != nil {
 		return err
 	}
 
 	err = extract(
-		"./bin/monaco-editor.tgz",
+		"./bin/highlights.tgz",
 		spec{
-			destination: "./internal/frontend/static/monaco",
+			destination: "./internal/frontend/static/highlights",
 			processor: func(path string) *string {
-				switch {
-				case path == "package/min/vs/editor/editor.main.css":
-					return ptr("editor.css")
-				case path == "package/min/vs/editor/editor.main.js":
-					return ptr("editor.js")
-				case path == "package/min/vs/loader.js":
-					return ptr("loader.js")
-				case path == "package/min/vs/editor/editor":
+				switch path {
+				case "package/dist/themes/ayu-light.js", "package/dist/themes/ayu-dark.js":
+					return ptr(strings.TrimPrefix(path, "package/dist/"))
+				case "package/dist/themes.js", "package/dist/workerd.js":
 					return nil
-				case strings.HasPrefix(path, "package/min/vs"):
-					return ptr(strings.ReplaceAll(path, "package/min/vs", "core"))
+				}
+				// only the es modules needed by the browser; skip themes, types and sourcemaps
+				if strings.HasPrefix(path, "package/dist/") &&
+					!strings.HasPrefix(path, "package/dist/themes/") &&
+					(strings.HasSuffix(path, ".js") || strings.HasSuffix(path, ".mjs")) {
+					return ptr(strings.TrimPrefix(path, "package/dist/"))
 				}
 				return nil
 			},

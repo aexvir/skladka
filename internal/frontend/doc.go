@@ -10,7 +10,7 @@
 //
 // # Features
 //   - Modern UI built with TailwindCSS for responsive and maintainable styling
-//   - Monaco editor integration for syntax-highlighted code editing and viewing
+//   - Code editor with syntax highlighting powered by @pierre/highlights
 //   - Type-safe templates compiled at build time using templ
 //   - Static asset serving from an embedded filesystem
 //   - Chi-based routing for clean URL structure
