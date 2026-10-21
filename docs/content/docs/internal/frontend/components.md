@@ -17,7 +17,7 @@ The components in this package are designed to be:
 
 ### Available Components
 
-- Editor: Monaco\-based code editor with syntax highlighting
+- Editor: textarea\-based code editor with @pierre/highlights syntax highlighting
 - Entry: Individual paste entry display component
 - Input: Form input fields with consistent styling
 - Nav: Navigation bar component
